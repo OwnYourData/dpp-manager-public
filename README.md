@@ -83,13 +83,19 @@ carrier.
 
 ## Running it
 
-You need Docker. Make a folder, put the `docker-compose.yml` from this
-repository in it, and start:
+**[docs/Install.md](docs/Install.md) is the guide** — which container programs
+work and what each of them costs, a route that is only clicking and a route that
+is one command, where the data ends up, and what to do when something does not
+start. It is written for somebody who has never used a container, because that
+is who this application is for.
+
+The short version, if you already have Docker:
 
     docker compose up -d
 
-Then open http://localhost:3000 in a browser. On the first start you choose a
-passphrase; from then on that passphrase opens your data.
+with the `docker-compose.yml` from this repository, then open
+http://localhost:3000 in a browser. On the first start you choose a passphrase;
+from then on that passphrase opens your data.
 
     docker compose down                        stop it
     docker compose pull && docker compose up -d   fetch a newer version
@@ -189,6 +195,7 @@ Run the application against a directory of your choosing:
 | `app/lib/did/delegation.rb` | the custody mandate: what is signed, and how |
 | `soya/` | the structures this project publishes and ships: the lamp, its transformation, and the manifest |
 | `config/locales/` | every visible string, in both languages |
+| `docs/Install.md` | how to install and run it, for somebody who has never used a container |
 | `docs/Decisions.md` | why the pieces are shaped the way they are |
 
 `docs/Decisions.md` is worth reading before changing anything about the database
