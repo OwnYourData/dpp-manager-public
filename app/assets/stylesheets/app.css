@@ -319,7 +319,12 @@ td.detail .pair { display: inline-block; margin-right: 12px; font-size: 0.9rem; 
 .filters select { width: auto; }
 .filters input[type="submit"] { margin: 0; }
 
-.soon-list { color: var(--muted); }
+/* The overview's two cards: what the operator has, and the file it is in. The
+   first is the reason they opened the page, so it gets the room. */
+.card.wide { flex: 2 1 26rem; }
+.card table.compact { margin: 6px 0 0; border: 0; background: none; }
+.card table.compact td { padding: 5px 0; }
+.card table.compact td.when { text-align: right; white-space: nowrap; }
 .locale-switch { margin-top: 24px; font-size: 0.9rem; text-align: center; color: var(--muted); }
 .locale-switch a { color: var(--oyd-blue); text-decoration: none; }
 
@@ -423,7 +428,7 @@ dl.given { margin: 16px 0 0; grid-template-columns: auto 1fr; }
 dl.given dd code { word-break: break-all; }
 
 .new-passport { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 22px; }
-.new-passport .start {
+.new-passport .start, .card .start {
   display: inline-block;
   padding: 9px 16px;
   border-radius: 6px;
@@ -432,7 +437,7 @@ dl.given dd code { word-break: break-all; }
   text-decoration: none;
   font-weight: 500;
 }
-.new-passport .start:hover { background: var(--oyd-blue-dark); }
+.new-passport .start:hover, .card .start:hover { background: var(--oyd-blue-dark); }
 
 /* --- the setup wizard ------------------------------------------------------ */
 

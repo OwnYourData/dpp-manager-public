@@ -100,11 +100,11 @@ en:
       expired: "expired"
       until: "until %{date}"
     title: "Overview"
-    lead: "This version can hold your data securely. Creating and managing passports follows in the next steps."
+    lead: "Your passports, and the file they are kept in."
     all_events: "Show the full event log"
     recent_events: "Recently"
     help:
-      purpose: "The starting point. Later this page will list your product passports; for now it shows the state of your data file and what is coming next."
+      purpose: "The starting point: the passports you are working on, the file that holds them, and what has happened here recently."
       steps:
         - "Lock the application when you leave the machine."
         - "The event log records everything that happens here."
@@ -113,9 +113,16 @@ en:
       file: "Location"
       opened_at: "Opened at"
       kdf_profile: "Key profile"
-    next:
-      title: "Coming next"
-      body: "These parts are visible in the menu but not active yet:"
+    passports:
+      title: "Your passports"
+      none: "No passports yet."
+      all:
+        one: "The one passport"
+        other: "All %{count} passports"
+    setup:
+      title: "Start here"
+      body: "Before a passport can leave this machine, three things have to be settled: which passport service to write to, an identity of your own, and where the passports are to be kept. It takes a few minutes and each screen explains itself."
+      action: "Set it up"
 
   events:
     title: "Event log"
@@ -338,6 +345,11 @@ en:
       not_minted: "This passport has no identifier, so there is nothing to end. Delete it instead."
       no_keys: "The passport was withdrawn from the service, but there is no revocation key here, so its identifier cannot be revoked."
       revoke_failed: "The passport was withdrawn from the service, but the identifier could not be revoked: %{message}"
+    states:
+      draft: "draft"
+      minted: "identifier created"
+      submitted: "submitted"
+      retired: "ended"
     retired:
       title: "This passport has been ended."
       body: "Ended on %{when}. The service no longer serves it, and its identifier is revoked — it resolves nowhere. What is left here is the record."

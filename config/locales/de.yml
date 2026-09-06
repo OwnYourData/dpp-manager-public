@@ -100,11 +100,11 @@ de:
       expired: "abgelaufen"
       until: "bis %{date}"
     title: "Überblick"
-    lead: "Diese Version kann Ihre Daten sicher aufbewahren. Pässe anlegen und verwalten folgt in den nächsten Schritten."
+    lead: "Ihre Pässe, und die Datei, in der sie liegen."
     all_events: "Das ganze Ereignisprotokoll zeigen"
     recent_events: "Zuletzt"
     help:
-      purpose: "Der Ausgangspunkt. Später listet diese Seite Ihre Produktpässe; vorerst zeigt sie den Zustand Ihrer Datendatei und was als Nächstes kommt."
+      purpose: "Der Ausgangspunkt: die Pässe, an denen Sie arbeiten, die Datei, die sie hält, und was hier zuletzt geschehen ist."
       steps:
         - "Sperren Sie die Anwendung, wenn Sie den Rechner verlassen."
         - "Das Ereignisprotokoll hält fest, was hier geschieht."
@@ -113,9 +113,16 @@ de:
       file: "Ort"
       opened_at: "Geöffnet um"
       kdf_profile: "Schlüsselprofil"
-    next:
-      title: "Als Nächstes"
-      body: "Diese Teile stehen schon im Menü, sind aber noch nicht aktiv:"
+    passports:
+      title: "Ihre Pässe"
+      none: "Noch keine Pässe."
+      all:
+        one: "Der eine Pass"
+        other: "Alle %{count} Pässe"
+    setup:
+      title: "Hier beginnen"
+      body: "Bevor ein Pass diesen Rechner verlassen kann, sind drei Dinge zu klären: an welchen Dienst geschrieben wird, eine eigene Identität, und wo die Pässe liegen sollen. Das dauert ein paar Minuten, und jede Seite erklärt sich selbst."
+      action: "Einrichten"
 
   events:
     title: "Ereignisprotokoll"
@@ -338,6 +345,11 @@ de:
       not_minted: "Dieser Pass hat keine Kennung, es gibt also nichts zu beenden. Löschen Sie ihn stattdessen."
       no_keys: "Der Pass wurde beim Service zurückgezogen, aber hier liegt kein Widerrufsschlüssel — die Kennung lässt sich nicht widerrufen."
       revoke_failed: "Der Pass wurde beim Service zurückgezogen, die Kennung konnte aber nicht widerrufen werden: %{message}"
+    states:
+      draft: "Entwurf"
+      minted: "Kennung angelegt"
+      submitted: "übermittelt"
+      retired: "beendet"
     retired:
       title: "Dieser Pass ist beendet."
       body: "Beendet am %{when}. Der Service stellt ihn nicht mehr bereit, und seine Kennung ist widerrufen — sie löst nirgendwo mehr auf. Was hier bleibt, ist die Aufzeichnung."

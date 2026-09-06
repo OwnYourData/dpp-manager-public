@@ -26,6 +26,39 @@
 <% end %>
 
 <section class="cards">
+  <%# What the operator has, on the left, because that is what they came for.
+      Until the setup is finished there is nothing to have yet, and the honest
+      thing to offer is the one step that has to come first. %>
+  <div class="card wide">
+    <% if !settings.setup_complete? %>
+      <h2><%= t("dashboard.setup.title") %></h2>
+      <p><%= t("dashboard.setup.body") %></p>
+      <p><%= link_to t("dashboard.setup.action"), setup_path, class: "start" %></p>
+    <% else %>
+      <h2><%= t("dashboard.passports.title") %></h2>
+
+      <% if @passports.any? %>
+        <table class="compact">
+          <tbody>
+            <% @passports.each do |passport| %>
+              <tr>
+                <td><%= link_to passport.label, edit_passport_path(passport) %></td>
+                <td class="when muted"><%= t("passports.states.#{passport.status}") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+
+        <p>
+          <%= link_to t("dashboard.passports.all", count: @passport_count), passports_path %>
+        </p>
+      <% else %>
+        <p class="muted"><%= t("dashboard.passports.none") %></p>
+        <p><%= link_to t("nav.new_passport"), passports_path, class: "start" %></p>
+      <% end %>
+    <% end %>
+  </div>
+
   <div class="card">
     <h2><%= t("dashboard.state.title") %></h2>
     <dl>
@@ -36,16 +69,6 @@
       <dt><%= t("dashboard.state.kdf_profile") %></dt>
       <dd><%= Vault::Session.profile %></dd>
     </dl>
-  </div>
-
-  <div class="card">
-    <h2><%= t("dashboard.next.title") %></h2>
-    <p><%= t("dashboard.next.body") %></p>
-    <ul class="soon-list">
-      <li><%= t("nav.setup") %></li>
-      <li><%= t("nav.new_passport") %></li>
-      <li><%= t("nav.passports") %></li>
-    </ul>
   </div>
 </section>
 
