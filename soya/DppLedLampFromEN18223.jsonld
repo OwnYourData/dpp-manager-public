@@ -1,0 +1,92 @@
+{
+  "@graph": [
+    {
+      "@id": "https://soya.ownyourdata.eu/DppLedLampTransformation",
+      "name": "DppLedLampFromEN18223Transformation",
+      "@type": "OverlayTransformation",
+      "value": "# --- helpers ------------------------------------------------------\n\n# Every element in the document, however deeply nested. Collections\n# carry elements, and so does a MultiValuedDataElement, so one recursion\n# covers both.\ndef all_elements:\n  [ (.elements // [])[] | recurse(.elements[]?) ];\n\n# The way back from valueDataType. The form's schema wants a number\n# where the standard allows the value to be written as a string, and a\n# JSON Forms field handed \"9\" for an integer renders empty — so the\n# declared type is used for what it is worth, and a value that does not\n# convert is passed through untouched rather than dropped.\ndef cast:\n  . as $e\n  | ($e.value) as $v\n  | ($e.valueDataType // \"\") as $t\n  | if $v == null then null\n    elif ($t | test(\"integer|decimal|double|float\"; \"i\")) then (try ($v | tonumber) catch $v)\n    elif ($t | test(\"boolean\"; \"i\")) then\n      (if $v == \"true\" then true elif $v == \"false\" then false else $v end)\n    else $v\n    end;\n\n# A collection shares the shape of an element and has no value of its\n# own, so it is skipped explicitly: an id that names both a group and a\n# field would otherwise answer with the group.\ndef one($flat; $id):\n  [ $flat[] | select(.elementId == $id and (.objectType // \"\") != \"DataElementCollection\") ] | first;\n\ndef value($flat; $id):\n  (one($flat; $id) | if . == null then null else cast end);\n\n# Repetitions: the children of a MultiValuedDataElement share one id,\n# because they are the same field said several times.\ndef many($flat; $id):\n  [ $flat[] | select(.elementId == $id) | .value | select(. != null and . != \"\") ];\n\n# A RelatedResource carries a url and no value.\ndef link($flat; $id):\n  [ $flat[] | select(.elementId == $id) | .url | select(. != null and . != \"\") ] | first;\n\n# --- the answers ----------------------------------------------------\n\n(. | all_elements) as $flat\n| {\n    manufacturerName:          value($flat; \"BrandName\"),\n    productDesignation:        value($flat; \"ProductDesignation\"),\n    modelIdentifier:           value($flat; \"ModelIdentifier\"),\n    serialNumber:              value($flat; \"SerialNumber\"),\n    dateOfManufacture:         value($flat; \"DateOfManufacture\"),\n    countryOfOrigin:           value($flat; \"CountryOfOrigin\"),\n\n    usefulLuminousFlux:        value($flat; \"LuminousFlux\"),\n    onModePower:               value($flat; \"OnModePower\"),\n    standbyPower:              value($flat; \"StandbyPower\"),\n    colourTemperature:         value($flat; \"CorrelatedColourTemperature\"),\n    colourRenderingIndex:      value($flat; \"ColourRenderingIndex\"),\n    beamAngle:                 value($flat; \"BeamAngle\"),\n    typeOfDimming:             value($flat; \"DimmingType\"),\n\n    ratedLifetime:             value($flat; \"RatedLifetime\"),\n    guaranteedSwitchingCycles: value($flat; \"SwitchingCycles\"),\n    warrantyPeriodYears:       value($flat; \"WarrantyPeriod\"),\n\n    ceMarking:                 value($flat; \"CeMarking\"),\n    rohsCompliant:             value($flat; \"RoHSCompliant\"),\n    containsSvhc:              value($flat; \"ContainsSubstancesOfVeryHighConcern\"),\n    svhcSubstances:            many($flat; \"SubstanceName\"),\n\n    energyEfficiencyClass:     value($flat; \"EnergyEfficiencyClass\"),\n    carbonFootprint:           value($flat; \"CarbonFootprint\"),\n\n    declarationOfConformity:   link($flat; \"DeclarationOfConformity\"),\n    dismantlingInstructions:   link($flat; \"DismantlingInstructions\")\n  }\n# What was not in the document is left out rather than set to null: an\n# empty field and a field answered with nothing are different things,\n# and JSON Forms shows the second as an error. `false` survives — it is\n# an answer, and \"contains no substances of very high concern\" is the\n# one worth keeping most.\n| with_entries(select(.value != null and .value != \"\" and .value != []))\n",
+      "engine": "jq",
+      "onBase": "https://soya.ownyourdata.eu/DppLedLamp"
+    }
+  ],
+  "@context": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Base": "soya:Base",
+    "form": "soya:form",
+    "name": {
+      "@id": "dct:title",
+      "@container": "@language"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "soya": "https://w3id.org/soya/ns#",
+    "label": {
+      "@id": "rdfs:label",
+      "@container": "@language"
+    },
+    "range": {
+      "@id": "rdfs:range",
+      "@type": "@id"
+    },
+    "domain": {
+      "@id": "rdfs:domain",
+      "@type": "@id"
+    },
+    "format": "soya:format",
+    "import": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "onBase": {
+      "@id": "soya:onBase",
+      "@type": "@id"
+    },
+    "comment": {
+      "@id": "rdfs:comment",
+      "@container": "@language"
+    },
+    "sh:path": {
+      "@type": "@id"
+    },
+    "encoding": "soya:encoding",
+    "alignment": "soya:alignment",
+    "annotation": "soya:annotation",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "validation": "soya:validation",
+    "OverlayForm": "soya:OverlayForm",
+    "sh:nodeKind": {
+      "@type": "@id"
+    },
+    "OverlayFormat": "soya:OverlayFormat",
+    "subPropertyOf": {
+      "@id": "rdfs:subPropertyOf",
+      "@type": "@id"
+    },
+    "attributeOrder": {
+      "@id": "soya:attributeOrder",
+      "@context": {
+        "list": "@list"
+      }
+    },
+    "classification": "soya:classification",
+    "renderingLabel": "soya:renderingLabel",
+    "sh:targetClass": {
+      "@type": "@id"
+    },
+    "transformation": "soya:transformation",
+    "OverlayEncoding": "soya:OverlayEncoding",
+    "OverlayAlignment": "soya:OverlayAlignment",
+    "OverlayAnnotation": "soya:OverlayAnnotation",
+    "OverlayValidation": "soya:OverlayValidation",
+    "OverlayClassification": "soya:OverlayClassification",
+    "OverlayTransformation": "soya:OverlayTransformation",
+    "@base": "https://soya.ownyourdata.eu/DppLedLampFromEN18223/",
+    "@version": 1.1
+  }
+}

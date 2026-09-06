@@ -1,0 +1,133 @@
+# The LED lamp's form answers, turned into the element model of EN 18223.
+#
+# Its own structure, because `soya transform` takes the first overlay in the
+# graph that carries an `engine` field — there is no selecting by name or tag.
+# One structure per direction; the way back (a foreign passport read into this
+# form) is a second one and does not exist yet.
+#
+# What this produces is ONLY the `elements` array. The envelope —
+# uniqueProductIdentifier, granularity, dppSchemaVersion, economicOperatorId,
+# facilityId — is built by the application from its settings and its identity,
+# and dppStatus and lastUpdated are the server's. Putting any of them here would
+# mean a transformation deciding things it cannot know.
+#
+# The collection names follow the DPP Service's own lightbulb example
+# (docs/examples-lightbulb.md): ProductIdentification, EnergyPerformance,
+# LightQuality, Durability, SubstancesOfConcern. They deliberately do NOT match
+# the five tabs of the form. The tabs order a task for a person; the collections
+# order a document for a standard. Making them the same would bend one of them.
+#
+# dictionaryReference is absent on purpose. The service's example marks its own
+# values as illustrative, and inventing strings that look like ECLASS or IEC CDD
+# references would be worse than having none. When a real source exists it
+# belongs in an Alignment overlay, not in this jq.
+
+meta:
+  name: DppLedLampToEN18223
+
+content:
+  overlays:
+    - type: OverlayTransformation
+      base: https://soya.ownyourdata.eu/DppLedLamp
+      name: DppLedLampToEN18223Transformation
+      engine: jq
+      value: |
+        # --- helpers ------------------------------------------------------
+        #
+        # Every one of these yields `empty` for a missing answer, so an absent
+        # value disappears while the array is being built. Filtering nulls out
+        # afterwards would work too, until the day a legitimate `false` or `0`
+        # goes with them — `has` asks whether the operator answered, not whether
+        # the answer is truthy.
+
+        def sv($id; $v; $type):
+          if $v == null or $v == "" then empty
+          else { objectType: "SingleValuedDataElement", elementId: $id, value: $v, valueDataType: $type }
+          end;
+
+        def sv($id; $v; $type; $unit):
+          if $v == null or $v == "" then empty
+          else { objectType: "SingleValuedDataElement", elementId: $id, value: $v, valueDataType: $type, unitOfMeasure: $unit }
+          end;
+
+        # A collection that ends up with no children is left out entirely. An
+        # empty DataElementCollection says "this group is known and empty",
+        # which is a different and stronger claim than saying nothing.
+        def collection($id; $children):
+          ($children | if length == 0 then empty else { elementId: $id, objectType: "DataElementCollection", elements: . } end);
+
+        def resource($id; $url):
+          if $url == null or $url == "" then empty
+          else { objectType: "RelatedResource", elementId: $id, url: $url }
+          end;
+
+        # --- the elements -------------------------------------------------
+
+        . as $in
+        | [
+            collection("ProductIdentification"; [
+              sv("ModelIdentifier";      $in.modelIdentifier;     "xsd:string"),
+              sv("BrandName";            $in.manufacturerName;    "xsd:string"),
+              sv("ProductDesignation";   $in.productDesignation;  "xsd:string"),
+              sv("SerialNumber";         $in.serialNumber;        "xsd:string"),
+              sv("DateOfManufacture";    $in.dateOfManufacture;   "xsd:date"),
+              sv("CountryOfOrigin";      $in.countryOfOrigin;     "xsd:string")
+            ]),
+
+            collection("EnergyPerformance"; [
+              sv("OnModePower";          $in.onModePower;         "xsd:decimal"; "W"),
+              sv("StandbyPower";         $in.standbyPower;        "xsd:decimal"; "W"),
+              sv("LuminousFlux";         $in.usefulLuminousFlux;  "xsd:integer"; "lm"),
+              sv("EnergyEfficiencyClass"; $in.energyEfficiencyClass; "xsd:string")
+            ]),
+
+            collection("LightQuality"; [
+              sv("CorrelatedColourTemperature"; $in.colourTemperature;    "xsd:integer"; "K"),
+              sv("ColourRenderingIndex";        $in.colourRenderingIndex; "xsd:integer"),
+              sv("BeamAngle";                   $in.beamAngle;            "xsd:integer"; "deg"),
+              sv("DimmingType";                 $in.typeOfDimming;        "xsd:string")
+            ]),
+
+            collection("Durability"; [
+              sv("RatedLifetime";    $in.ratedLifetime;             "xsd:integer"; "h"),
+              sv("SwitchingCycles";  $in.guaranteedSwitchingCycles; "xsd:integer"),
+              sv("WarrantyPeriod";   $in.warrantyPeriodYears;       "xsd:integer"; "a")
+            ]),
+
+            collection("Compliance"; [
+              sv("CeMarking";     $in.ceMarking;      "xsd:string"),
+              sv("RoHSCompliant"; $in.rohsCompliant;  "xsd:boolean")
+            ]),
+
+            # The one place a boolean false has to survive: "contains no
+            # substances of very high concern" is a statement worth making, and
+            # it is not the same as leaving the field out.
+            collection("SubstancesOfConcern"; [
+              (if $in.containsSvhc == null then empty
+               else { objectType: "SingleValuedDataElement",
+                      elementId: "ContainsSubstancesOfVeryHighConcern",
+                      value: $in.containsSvhc, valueDataType: "xsd:boolean" }
+               end),
+              # One child per substance, each a value of the same kind — which
+              # is what a MultiValuedDataElement is for. The children share an
+              # elementId because they are repetitions, not different fields.
+              (($in.svhcSubstances // []) | map(select(. != null and . != ""))
+               | if length == 0 then empty
+                 else { objectType: "MultiValuedDataElement",
+                        elementId: "SubstancesOfVeryHighConcern",
+                        elements: map({ objectType: "SingleValuedDataElement",
+                                        elementId: "SubstanceName",
+                                        value: ., valueDataType: "xsd:string" }) }
+                 end)
+            ]),
+
+            collection("EnvironmentalFootprint"; [
+              sv("CarbonFootprint"; $in.carbonFootprint; "xsd:decimal"; "kg CO2e")
+            ]),
+
+            # Documents are referenced, never carried. contentType is left out
+            # rather than guessed from the address: a URL ending in .pdf is not
+            # a promise about what is served.
+            resource("DeclarationOfConformity"; $in.declarationOfConformity),
+            resource("DismantlingInstructions"; $in.dismantlingInstructions)
+          ]

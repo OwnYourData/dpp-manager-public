@@ -1,0 +1,51 @@
+<h1><%= t("passports.keys.title") %></h1>
+<p class="lead"><%= t("passports.keys.lead", label: @passport.label) %></p>
+
+<section class="card">
+  <dl>
+    <dt><%= t("passports.keys.did") %></dt>
+    <dd><code class="break"><%= @passport.dpp_id %></code></dd>
+    <dt><%= t("passports.keys.endpoint") %></dt>
+    <dd><code class="break"><%= @passport.service_endpoint %></code></dd>
+  </dl>
+  <p class="hint"><%= t("passports.keys.endpoint_hint") %></p>
+</section>
+
+<% if @key.secured? %>
+  <p class="muted"><%= t("passports.keys.already_secured", when: l(@key.keys_secured_at.in_time_zone, format: :short)) %></p>
+<% else %>
+  <div class="warning">
+    <strong><%= t("passports.keys.warning_title") %></strong>
+    <p><%= t("passports.keys.warning_body") %></p>
+  </div>
+
+  <%= render "shared/help", key: "passports.keys.help" %>
+
+  <%# The only screen these two ever appear on. Nothing regenerates them: the
+      registrar published the document and threw the secrets away, exactly as it
+      does for the identity. %>
+  <section class="card keys">
+    <dl>
+      <dt><%= t("identity.document_key") %></dt>
+      <dd><code class="break secret"><%= @key.document_key %></code></dd>
+      <dt><%= t("identity.revocation_key") %></dt>
+      <dd><code class="break secret"><%= @key.revocation_key %></code></dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2><%= t("setup.keys.export_title") %></h2>
+    <p><%= t("passports.keys.export_body", directory: Vault::Store.data_dir) %></p>
+    <%= button_to t("setup.keys.export_action"), export_keys_passport_path(@passport), method: :post %>
+  </section>
+
+  <%= form_with url: secure_keys_passport_path(@passport), method: :post, local: true do %>
+    <label class="confirm">
+      <%= check_box_tag :confirmed, "1", false %>
+      <%= t("passports.keys.confirm_label") %>
+    </label>
+    <%= submit_tag t("passports.keys.action") %>
+  <% end %>
+<% end %>
+
+<p><%= link_to t("passports.back"), passports_path %></p>

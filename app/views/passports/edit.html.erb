@@ -1,0 +1,236 @@
+<h1><%= t("passports.edit_title") %></h1>
+
+<%# A passport that has been ended keeps all its records, and without this the
+    page reads exactly like a live one: the form invites editing, the custody
+    section offers a fresh mandate, and nothing says the product is out of
+    circulation. The state belongs at the top, before anything that looks like
+    an action. %>
+<% if @passport.retired? %>
+  <div class="warning ended">
+    <strong><%= t("passports.retired.title") %></strong>
+    <p>
+      <% key = @passport.revoked? ? "passports.retired.body" : "passports.retired.half_body" %>
+      <%= t(key, when: l(@passport.retired_at.in_time_zone, format: :short)) %>
+    </p>
+  </div>
+<% end %>
+
+<%= render "form", passport: @passport, product_type: @product_type %>
+
+<%# The step that leaves this machine. Before it, everything here can be
+    changed or thrown away; after it, the identifier is published and the
+    passport has a name the product can carry. %>
+<section class="mint">
+  <h2><%= t("passports.mint.title") %></h2>
+
+  <% if @passport.minted? %>
+    <dl class="given">
+      <dt><%= t("passports.keys.did") %></dt>
+      <dd><code class="break"><%= @passport.dpp_id %></code></dd>
+      <dt><%= t("passports.mint.minted_at") %></dt>
+      <dd><%= l(@passport.minted_at.in_time_zone, format: :short) %></dd>
+      <dt><%= t("passports.mint.endpoint") %></dt>
+      <dd><code class="break"><%= @passport.service_endpoint %></code></dd>
+    </dl>
+
+    <% unless @passport.keys_secured? %>
+      <p class="warning-inline"><%= t("passports.mint.keys_not_secured") %></p>
+    <% end %>
+
+    <p><%= link_to t("passports.mint.to_keys"), keys_passport_path(@passport) %></p>
+  <% elsif !@passport.envelope_complete? %>
+    <p class="hint"><%= t("passports.mint.envelope_first") %></p>
+  <% elsif mint_endpoint_base.blank? %>
+    <p class="hint"><%= t("passports.mint.no_endpoint") %></p>
+  <% else %>
+    <%= render "shared/help", key: "passports.mint.help" %>
+
+    <div class="warning">
+      <strong><%= t("passports.mint.warning_title") %></strong>
+      <p><%= t("passports.mint.warning_body", endpoint: mint_endpoint_base) %></p>
+    </div>
+
+    <%= button_to t("passports.mint.action"), mint_passport_path(@passport), method: :post,
+          form: { data: { turbo_confirm: t("passports.mint.confirm", endpoint: mint_endpoint_base) } } %>
+  <% end %>
+</section>
+
+<%# Only once the passport has an identifier: submitting is the step after
+    minting, and offering it earlier would put a button in front of a
+    precondition rather than after it. %>
+<% if @passport.minted? %>
+  <section class="mint">
+    <h2><%= t("passports.submit.title") %></h2>
+
+    <% if @passport.submitted? %>
+      <dl class="given">
+        <dt><%= t("passports.submit.submitted_at") %></dt>
+        <dd><%= l(@passport.submitted_at.in_time_zone, format: :short) %></dd>
+        <% if @passport.corrected_at %>
+          <dt><%= t("passports.correct.corrected_at") %></dt>
+          <dd><%= l(@passport.corrected_at.in_time_zone, format: :short) %></dd>
+        <% end %>
+        <dt><%= t("passports.submit.submitted_to") %></dt>
+        <dd><code class="break"><%= @passport.submitted_to %></code></dd>
+      </dl>
+
+      <%# Only when the two actually differ. A button that is always there
+          invites sending an update that changes nothing, and the service would
+          dutifully archive a version identical to the last one. %>
+      <% if @passport.retired? %>
+        <p class="hint"><%= t("passports.retired.not_served") %></p>
+      <% elsif @passport.differs_from_service? %>
+        <p class="warning-inline"><%= t("passports.correct.differs") %></p>
+        <%= button_to t("passports.correct.action"), correct_passport_path(@passport), method: :post,
+              form: { data: { turbo_confirm: t("passports.correct.confirm", service: @passport.submitted_to) } } %>
+      <% else %>
+        <p class="hint"><%= t("passports.correct.in_step") %></p>
+      <% end %>
+    <% elsif !settings.service_configured? %>
+      <p class="hint"><%= t("passports.submit.no_service") %></p>
+    <%# Against where the passport will be kept, not against the service. For a
+        custodial passport those are two different addresses: the document is
+        handed to the service, which writes it into the custodian named in the
+        mandate — and the endpoint was minted to name the custodian. Comparing
+        with the service here refused every custodial passport a button. %>
+    <% elsif !@passport.endpoint_agrees_with?(storage_base) %>
+      <p class="warning-inline">
+        <%= t("passports.submit.endpoint_mismatch",
+              endpoint: @passport.endpoint_host, service: storage_base) %>
+      </p>
+    <% else %>
+      <%= render "shared/help", key: "passports.submit.help" %>
+
+      <div class="warning">
+        <strong><%= t("passports.submit.warning_title") %></strong>
+        <p><%= t("passports.submit.warning_body", service: settings.service_base_url) %></p>
+      </div>
+
+      <%= button_to t("passports.submit.action"), submit_passport_path(@passport), method: :post,
+            form: { data: { turbo_confirm: t("passports.submit.confirm", service: settings.service_base_url) } } %>
+    <% end %>
+  </section>
+<% end %>
+
+<%# Who holds this passport, and on whose authority.
+    Only for a passport that was minted against a custodian: for one kept in the
+    service's own database there is no mandate, and a section explaining that
+    would be a paragraph about something that is not happening. %>
+<% if @passport.custodial? && @passport.minted? %>
+  <section class="mint">
+    <h2><%= t("passports.custody.title") %></h2>
+
+    <%= render "shared/help", key: "passports.custody.help" %>
+
+    <dl class="given">
+      <dt><%= t("passports.custody.custodian") %></dt>
+      <dd><code class="break"><%= @passport.endpoint_base %></code></dd>
+      <dt><%= t("passports.custody.collection") %></dt>
+      <dd><%= @passport.custodian_collection_id %></dd>
+
+      <% if @passport.delegated? %>
+        <dt><%= t("passports.custody.signed_at") %></dt>
+        <dd><%= l(@passport.delegation_signed_at.in_time_zone, format: :short) %></dd>
+        <dt><%= t("passports.custody.expires_at") %></dt>
+        <dd><%= l(@passport.delegation_expires_at.in_time_zone, format: :short) %></dd>
+        <dt><%= t("passports.custody.act") %></dt>
+        <dd><%= @passport.delegation_act.to_s.split(",").join(", ") %></dd>
+        <dt><%= t("passports.custody.jti") %></dt>
+        <dd><code><%= @passport.delegation_jti %></code></dd>
+      <% end %>
+    </dl>
+
+    <% if !@passport.submitted? %>
+      <p class="hint"><%= t("passports.custody.not_yet") %></p>
+    <% elsif @passport.delegation_expired? %>
+      <p class="warning-inline"><%= t("passports.custody.expired") %></p>
+    <% elsif @passport.delegation_expiring_soon? %>
+      <p class="warning-inline">
+        <%= t("passports.custody.expiring", days: ((@passport.delegation_expires_at - Time.current) / 86_400).ceil) %>
+      </p>
+    <% end %>
+
+    <% if @passport.move_unfinished? %>
+      <%# The document has moved and the identifier has not. The one state in a
+          handover a reader would notice, so it is said rather than retried
+          quietly — and it can be finished, because the keys are here. %>
+      <p class="warning-inline">
+        <%= t("passports.custody.move_half_done", custodian: @passport.pending_endpoint_base,
+                                                  previous: @passport.endpoint_base) %>
+      </p>
+      <%= button_to t("passports.custody.finish_move"), finish_move_passport_path(@passport), method: :post %>
+    <%# Nothing to renew and nowhere to hand it to: the document is gone from the
+        custodian and the identifier is revoked. What is above is the record of
+        what applied while it was there. %>
+    <% elsif @passport.retired? %>
+      <p class="hint"><%= t("passports.retired.custody_over") %></p>
+    <% elsif @passport.submitted? %>
+      <div class="custody-actions">
+        <%= button_to t("passports.custody.renew"), renew_delegation_passport_path(@passport), method: :post,
+              form: { data: { turbo_confirm: t("passports.custody.confirm_renew") } } %>
+        <%= button_to t("passports.custody.check"), check_delegation_passport_path(@passport), method: :post,
+              class: "link" %>
+      </div>
+
+      <%# The exit. Folded shut because it is rare and because an open form
+          inviting a handover next to every passport reads as a suggestion. %>
+      <details class="handover">
+        <summary><%= t("passports.custody.move_title") %></summary>
+
+        <p class="hint"><%= t("passports.custody.move_hint") %></p>
+
+        <%= form_with url: move_custody_passport_path(@passport), method: :post, local: true do %>
+          <label for="custodian_base_url"><%= t("setup.custodian.base_url") %></label>
+          <%= text_field_tag :custodian_base_url, nil, id: "custodian_base_url",
+                placeholder: "https://pod.example.com" %>
+
+          <label for="custodian_collection_id"><%= t("setup.custodian.collection") %></label>
+          <%= text_field_tag :custodian_collection_id, nil, id: "custodian_collection_id" %>
+
+          <label class="confirm">
+            <%= check_box_tag :release_previous, "1", false %>
+            <span><%= t("passports.custody.release_previous") %></span>
+          </label>
+          <p class="hint"><%= t("passports.custody.release_hint") %></p>
+
+          <%= submit_tag t("passports.custody.move_action"),
+                data: { turbo_confirm: t("passports.custody.confirm_move") } %>
+        <% end %>
+      </details>
+    <% end %>
+  </section>
+<% end %>
+
+<div class="danger-zone">
+  <%# Three states, three different things to offer. A passport that never left
+      this machine is simply deleted; one that is out in the world is ended,
+      which is two acts; one that is ended is a record, and a record may go. %>
+  <% if @passport.revoked? || !@passport.minted? %>
+    <h2><%= t("passports.remove.title") %></h2>
+    <p class="hint">
+      <%= @passport.revoked? ? t("passports.remove.retired_hint") : t("passports.remove.hint") %>
+    </p>
+    <%= button_to t("passports.remove.button"), passport_path(@passport),
+          method: :delete, class: "link danger",
+          form: { data: { turbo_confirm: t("passports.remove.confirm", label: @passport.label) } } %>
+  <% else %>
+    <h2><%= t("passports.retire.title") %></h2>
+
+    <% if @passport.half_retired? %>
+      <%# Withdrawn but the identifier is still live. The keys are still here, so
+          this can be finished — and until it is, the page says so rather than
+          calling the passport ended. %>
+      <p class="warning-inline"><%= t("passports.retire.half_done") %></p>
+      <%= button_to t("passports.retire.finish"), retire_passport_path(@passport),
+            method: :post, class: "link danger",
+            form: { data: { turbo_confirm: t("passports.retire.confirm_revoke") } } %>
+    <% else %>
+      <p class="hint"><%= t("passports.retire.hint") %></p>
+      <%= button_to t("passports.retire.button"), retire_passport_path(@passport),
+            method: :post, class: "link danger",
+            form: { data: { turbo_confirm: t("passports.retire.confirm", label: @passport.label) } } %>
+    <% end %>
+  <% end %>
+</div>
+
+<p><%= link_to t("passports.back"), passports_path %></p>

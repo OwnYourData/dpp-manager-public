@@ -1,0 +1,45 @@
+<h1><%= t("setup.title") %></h1>
+
+<%= render "setup/progress" %>
+<%= render "shared/help", key: "setup.identity.help" %>
+
+<h2><%= t("setup.identity.heading") %></h2>
+<p class="lead"><%= t("setup.identity.lead") %></p>
+
+<div class="warning">
+  <strong><%= t("setup.identity.warning_title") %></strong>
+  <p><%= t("setup.identity.warning_body") %></p>
+</div>
+
+<section class="card">
+  <h2><%= t("setup.identity.mint.title") %></h2>
+  <p><%= t("setup.identity.mint.body") %></p>
+
+  <%= form_with url: setup_mint_identity_path, method: :post, local: true do %>
+    <label for="label"><%= t("setup.identity.label_field") %></label>
+    <%= text_field_tag :label, nil, id: "label", placeholder: t("setup.identity.label_placeholder"), autocomplete: "organization" %>
+    <p class="hint"><%= t("setup.identity.label_hint") %></p>
+    <%= submit_tag t("setup.identity.mint.action") %>
+  <% end %>
+
+  <p class="hint"><%= t("setup.identity.mint.needs_network") %></p>
+</section>
+
+<section class="card">
+  <h2><%= t("setup.identity.import.title") %></h2>
+  <p><%= t("setup.identity.import.body") %></p>
+
+  <%= form_with url: setup_import_identity_path, method: :post, local: true do %>
+    <label for="did"><%= t("setup.identity.import.did") %></label>
+    <%= text_field_tag :did, nil, id: "did", placeholder: "did:oyd:zQm…", autocomplete: "off", spellcheck: false %>
+
+    <label for="document_key"><%= t("setup.identity.import.document_key") %></label>
+    <%= password_field_tag :document_key, nil, id: "document_key", autocomplete: "off" %>
+
+    <label for="revocation_key"><%= t("setup.identity.import.revocation_key") %></label>
+    <%= password_field_tag :revocation_key, nil, id: "revocation_key", autocomplete: "off" %>
+    <p class="hint"><%= t("setup.identity.import.revocation_hint") %></p>
+
+    <%= submit_tag t("setup.identity.import.action") %>
+  <% end %>
+</section>

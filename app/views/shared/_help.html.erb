@@ -1,0 +1,32 @@
+<%#
+  The help panel. On by default, switched off in the settings.
+
+  Every page passes a translation key prefix; the panel renders the purpose of
+  the page and a short list of what can be done on it. The texts live in the
+  locale files, never here — that is what makes them translatable and what keeps
+  a second language from drifting behind the first.
+
+  Two ways to make it go away, and they answer different questions. "Close" is
+  for right now, on this page, because the box is in the way of what the
+  operator is doing; it comes back next time. The setting is for somebody who
+  has read them and does not want them any more. Offering only the second one
+  makes a person turn off all the help to get past one box.
+%>
+<% if help_mode? %>
+  <aside class="help" data-controller="dismissable">
+    <h2><%= t("help.title") %></h2>
+    <p><%= t("#{key}.purpose") %></p>
+
+    <% steps = t("#{key}.steps", default: []) %>
+    <% if steps.present? %>
+      <ul>
+        <% steps.each do |step| %><li><%= step %></li><% end %>
+      </ul>
+    <% end %>
+
+    <p class="muted">
+      <%= t("help.switch_off_hint") %>
+      <button type="button" class="as-link" data-action="dismissable#dismiss"><%= t("help.close") %></button>
+    </p>
+  </aside>
+<% end %>

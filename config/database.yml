@@ -1,0 +1,27 @@
+# Deliberately not the real configuration.
+#
+# The vault is opened by Vault::Store, which calls establish_connection with a
+# key that only exists after someone has entered the passphrase. Rails wants a
+# database.yml to exist, so here is one that points at a path under tmp/ and is
+# never used by the running application. If a `rails db:*` task ever creates a
+# file there, that file is an accident and can be deleted — the real one lives
+# in the mounted data directory.
+default: &default
+  adapter: sqlite3
+  timeout: 5000
+  pragmas:
+    journal_mode: delete
+    synchronous: full
+    foreign_keys: true
+
+development:
+  <<: *default
+  database: tmp/unused-development.sqlite3
+
+test:
+  <<: *default
+  database: tmp/unused-test.sqlite3
+
+production:
+  <<: *default
+  database: tmp/unused-production.sqlite3

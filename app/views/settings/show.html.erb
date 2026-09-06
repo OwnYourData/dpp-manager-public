@@ -1,0 +1,50 @@
+<h1><%= t("settings.title") %></h1>
+
+<%= render "shared/help", key: "settings.help" %>
+
+<%= form_with model: @setting, url: settings_path, method: :patch, local: true do |f| %>
+  <fieldset>
+    <legend><%= t("settings.language.legend") %></legend>
+    <label for="setting_locale"><%= t("settings.language.label") %></label>
+    <%= f.select :locale, Setting::LOCALES.map { |code| [ t("locales.#{code}"), code ] } %>
+    <p class="hint"><%= t("settings.language.hint") %></p>
+  </fieldset>
+
+  <fieldset>
+    <legend><%= t("settings.help_mode.legend") %></legend>
+    <label>
+      <%= f.check_box :help_mode %>
+      <%= t("settings.help_mode.label") %>
+    </label>
+    <p class="hint"><%= t("settings.help_mode.hint") %></p>
+  </fieldset>
+
+  <fieldset>
+    <legend><%= t("settings.idle.legend") %></legend>
+    <label for="setting_idle_timeout_minutes"><%= t("settings.idle.label") %></label>
+    <%= f.number_field :idle_timeout_minutes, min: 1, max: 480 %>
+    <p class="hint"><%= t("settings.idle.hint") %></p>
+  </fieldset>
+
+  <%= f.submit t("settings.save") %>
+<% end %>
+
+<%# Outside the form above, because it is not a field of this record: the
+    custodian is decided on its own page, where there is room to say what a
+    custodian is and what changing one does. This is where somebody looks for
+    it, so this is where the way in belongs. %>
+<fieldset>
+  <legend><%= t("settings.custodian.legend") %></legend>
+  <p>
+    <% if settings.custodian_configured? %>
+      <code><%= settings.custodian_base_url %></code> ·
+      <%= t("setup.custodian.collection") %> <%= settings.custodian_collection_id %>
+    <% else %>
+      <%= t("settings.custodian.none") %>
+    <% end %>
+  </p>
+  <p class="hint"><%= t("settings.custodian.hint") %></p>
+  <p><%= link_to t("settings.custodian.change"), setup_path(step: :custodian) %></p>
+</fieldset>
+
+<p><%= link_to t("settings.to_vault"), vault_path %></p>

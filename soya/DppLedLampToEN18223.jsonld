@@ -1,0 +1,92 @@
+{
+  "@graph": [
+    {
+      "@id": "https://soya.ownyourdata.eu/DppLedLampTransformation",
+      "name": "DppLedLampToEN18223Transformation",
+      "@type": "OverlayTransformation",
+      "value": "# --- helpers ------------------------------------------------------\n#\n# Every one of these yields `empty` for a missing answer, so an absent\n# value disappears while the array is being built. Filtering nulls out\n# afterwards would work too, until the day a legitimate `false` or `0`\n# goes with them — `has` asks whether the operator answered, not whether\n# the answer is truthy.\n\ndef sv($id; $v; $type):\n  if $v == null or $v == \"\" then empty\n  else { objectType: \"SingleValuedDataElement\", elementId: $id, value: $v, valueDataType: $type }\n  end;\n\ndef sv($id; $v; $type; $unit):\n  if $v == null or $v == \"\" then empty\n  else { objectType: \"SingleValuedDataElement\", elementId: $id, value: $v, valueDataType: $type, unitOfMeasure: $unit }\n  end;\n\n# A collection that ends up with no children is left out entirely. An\n# empty DataElementCollection says \"this group is known and empty\",\n# which is a different and stronger claim than saying nothing.\ndef collection($id; $children):\n  ($children | if length == 0 then empty else { elementId: $id, objectType: \"DataElementCollection\", elements: . } end);\n\ndef resource($id; $url):\n  if $url == null or $url == \"\" then empty\n  else { objectType: \"RelatedResource\", elementId: $id, url: $url }\n  end;\n\n# --- the elements -------------------------------------------------\n\n. as $in\n| [\n    collection(\"ProductIdentification\"; [\n      sv(\"ModelIdentifier\";      $in.modelIdentifier;     \"xsd:string\"),\n      sv(\"BrandName\";            $in.manufacturerName;    \"xsd:string\"),\n      sv(\"ProductDesignation\";   $in.productDesignation;  \"xsd:string\"),\n      sv(\"SerialNumber\";         $in.serialNumber;        \"xsd:string\"),\n      sv(\"DateOfManufacture\";    $in.dateOfManufacture;   \"xsd:date\"),\n      sv(\"CountryOfOrigin\";      $in.countryOfOrigin;     \"xsd:string\")\n    ]),\n\n    collection(\"EnergyPerformance\"; [\n      sv(\"OnModePower\";          $in.onModePower;         \"xsd:decimal\"; \"W\"),\n      sv(\"StandbyPower\";         $in.standbyPower;        \"xsd:decimal\"; \"W\"),\n      sv(\"LuminousFlux\";         $in.usefulLuminousFlux;  \"xsd:integer\"; \"lm\"),\n      sv(\"EnergyEfficiencyClass\"; $in.energyEfficiencyClass; \"xsd:string\")\n    ]),\n\n    collection(\"LightQuality\"; [\n      sv(\"CorrelatedColourTemperature\"; $in.colourTemperature;    \"xsd:integer\"; \"K\"),\n      sv(\"ColourRenderingIndex\";        $in.colourRenderingIndex; \"xsd:integer\"),\n      sv(\"BeamAngle\";                   $in.beamAngle;            \"xsd:integer\"; \"deg\"),\n      sv(\"DimmingType\";                 $in.typeOfDimming;        \"xsd:string\")\n    ]),\n\n    collection(\"Durability\"; [\n      sv(\"RatedLifetime\";    $in.ratedLifetime;             \"xsd:integer\"; \"h\"),\n      sv(\"SwitchingCycles\";  $in.guaranteedSwitchingCycles; \"xsd:integer\"),\n      sv(\"WarrantyPeriod\";   $in.warrantyPeriodYears;       \"xsd:integer\"; \"a\")\n    ]),\n\n    collection(\"Compliance\"; [\n      sv(\"CeMarking\";     $in.ceMarking;      \"xsd:string\"),\n      sv(\"RoHSCompliant\"; $in.rohsCompliant;  \"xsd:boolean\")\n    ]),\n\n    # The one place a boolean false has to survive: \"contains no\n    # substances of very high concern\" is a statement worth making, and\n    # it is not the same as leaving the field out.\n    collection(\"SubstancesOfConcern\"; [\n      (if $in.containsSvhc == null then empty\n       else { objectType: \"SingleValuedDataElement\",\n              elementId: \"ContainsSubstancesOfVeryHighConcern\",\n              value: $in.containsSvhc, valueDataType: \"xsd:boolean\" }\n       end),\n      # One child per substance, each a value of the same kind — which\n      # is what a MultiValuedDataElement is for. The children share an\n      # elementId because they are repetitions, not different fields.\n      (($in.svhcSubstances // []) | map(select(. != null and . != \"\"))\n       | if length == 0 then empty\n         else { objectType: \"MultiValuedDataElement\",\n                elementId: \"SubstancesOfVeryHighConcern\",\n                elements: map({ objectType: \"SingleValuedDataElement\",\n                                elementId: \"SubstanceName\",\n                                value: ., valueDataType: \"xsd:string\" }) }\n         end)\n    ]),\n\n    collection(\"EnvironmentalFootprint\"; [\n      sv(\"CarbonFootprint\"; $in.carbonFootprint; \"xsd:decimal\"; \"kg CO2e\")\n    ]),\n\n    # Documents are referenced, never carried. contentType is left out\n    # rather than guessed from the address: a URL ending in .pdf is not\n    # a promise about what is served.\n    resource(\"DeclarationOfConformity\"; $in.declarationOfConformity),\n    resource(\"DismantlingInstructions\"; $in.dismantlingInstructions)\n  ]\n",
+      "engine": "jq",
+      "onBase": "https://soya.ownyourdata.eu/DppLedLamp"
+    }
+  ],
+  "@context": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Base": "soya:Base",
+    "form": "soya:form",
+    "name": {
+      "@id": "dct:title",
+      "@container": "@language"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "soya": "https://w3id.org/soya/ns#",
+    "label": {
+      "@id": "rdfs:label",
+      "@container": "@language"
+    },
+    "range": {
+      "@id": "rdfs:range",
+      "@type": "@id"
+    },
+    "domain": {
+      "@id": "rdfs:domain",
+      "@type": "@id"
+    },
+    "format": "soya:format",
+    "import": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "onBase": {
+      "@id": "soya:onBase",
+      "@type": "@id"
+    },
+    "comment": {
+      "@id": "rdfs:comment",
+      "@container": "@language"
+    },
+    "sh:path": {
+      "@type": "@id"
+    },
+    "encoding": "soya:encoding",
+    "alignment": "soya:alignment",
+    "annotation": "soya:annotation",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "validation": "soya:validation",
+    "OverlayForm": "soya:OverlayForm",
+    "sh:nodeKind": {
+      "@type": "@id"
+    },
+    "OverlayFormat": "soya:OverlayFormat",
+    "subPropertyOf": {
+      "@id": "rdfs:subPropertyOf",
+      "@type": "@id"
+    },
+    "attributeOrder": {
+      "@id": "soya:attributeOrder",
+      "@context": {
+        "list": "@list"
+      }
+    },
+    "classification": "soya:classification",
+    "renderingLabel": "soya:renderingLabel",
+    "sh:targetClass": {
+      "@type": "@id"
+    },
+    "transformation": "soya:transformation",
+    "OverlayEncoding": "soya:OverlayEncoding",
+    "OverlayAlignment": "soya:OverlayAlignment",
+    "OverlayAnnotation": "soya:OverlayAnnotation",
+    "OverlayValidation": "soya:OverlayValidation",
+    "OverlayClassification": "soya:OverlayClassification",
+    "OverlayTransformation": "soya:OverlayTransformation",
+    "@base": "https://soya.ownyourdata.eu/DppLedLampToEN18223/",
+    "@version": 1.1
+  }
+}

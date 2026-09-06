@@ -1,0 +1,67 @@
+<h1><%= t("product_types.title") %></h1>
+<p class="lead"><%= t("product_types.lead") %></p>
+
+<%= render "shared/help", key: "product_types.help" %>
+
+<%# Only when something is actually missing. A button that is always there and
+    usually does nothing is a button people stop reading. %>
+<% if @seed_pending %>
+  <p class="hint"><%= t("product_types.bundled.available") %></p>
+  <%= button_to t("product_types.bundled.install"), install_bundled_product_types_path, method: :post, class: "link" %>
+<% end %>
+
+<% if @web_cli.nil? %>
+  <div class="warning">
+    <strong><%= t("product_types.no_web_cli.title") %></strong>
+    <p><%= t("product_types.no_web_cli.body") %></p>
+  </div>
+<% end %>
+
+<% if @product_types.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("product_types.columns.label") %></th>
+        <th><%= t("product_types.columns.structure") %></th>
+        <th><%= t("product_types.columns.state") %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @product_types.each do |type| %>
+        <tr>
+          <td><%= type.label %></td>
+          <td>
+            <code><%= type.structure_name %></code>
+            <p class="hint"><%= type.repo_base_url %></p>
+          </td>
+          <td>
+            <% if type.fetch_error.present? %>
+              <span class="state-bad"><%= t("product_types.state.failed") %></span>
+              <p class="hint"><%= type.fetch_error %></p>
+            <% elsif type.fetched? %>
+              <span class="state-good"><%= t("product_types.state.ready") %></span>
+              <p class="hint">
+                <%= l(type.fetched_at.in_time_zone, format: :short) %>
+                <% if (summary = type.summary) %>
+                  · <%= t("product_types.state.overlays", count: summary[:overlays].values.sum) %>
+                <% end %>
+                · <%= type.forms_by_language.keys.map(&:upcase).join(", ") %>
+              </p>
+            <% else %>
+              <span class="muted"><%= t("product_types.state.pending") %></span>
+            <% end %>
+          </td>
+          <td class="actions">
+            <%= button_to t("product_types.refresh"), refresh_product_type_path(type), class: "link" %>
+            <%= link_to t("product_types.edit"), edit_product_type_path(type) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="muted"><%= t("product_types.empty") %></p>
+<% end %>
+
+<p><%= link_to t("product_types.add"), new_product_type_path %></p>

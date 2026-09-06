@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= content_for(:title) || t("app.name") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <%# The bar spans the window so the page has a lid, but everything in it
+        sits in a block as wide as `main` — otherwise the navigation starts at
+        the window edge while the content it belongs to starts a quarter of the
+        way in, and the two look like different pages. %>
+    <header class="bar">
+      <div class="bar-inner">
+        <%# The title leads home, and Overview stays as its own entry: that a
+            wordmark is a link is a convention not everybody knows, and the
+            entry costs one slot. %>
+        <%= link_to root_path, class: "brand" do %>
+          <%= image_tag "oyd-mark.svg", class: "mark", alt: "" %>
+          <%= t("app.name") %>
+        <% end %>
+
+        <%# Three groups rather than eight equals: making passports, being
+            somebody, and looking after this installation's own data. %>
+        <nav data-controller="nav-menu">
+          <%= link_to t("nav.dashboard"), root_path, class: ("on" if current_page?(root_path)) %>
+
+          <details class="menu <%= "on" if nav_section?(passports_path, lookup_path, product_types_path) %>"
+                   data-nav-menu-target="menu" data-action="toggle->nav-menu#opened">
+            <summary><%= t("nav.groups.passports") %></summary>
+            <div>
+              <%= link_to t("nav.all_passports"), passports_path, class: ("on" if current_page?(passports_path)) %>
+              <%= link_to t("nav.read_passport"), lookup_path, class: ("on" if current_page?(lookup_path)) %>
+              <div class="sep"></div>
+              <%= link_to t("nav.product_types"), product_types_path, class: ("on" if current_page?(product_types_path)) %>
+            </div>
+          </details>
+
+          <details class="menu <%= "on" if nav_section?(identity_path, setup_path) %>"
+                   data-nav-menu-target="menu" data-action="toggle->nav-menu#opened">
+            <summary><%= t("nav.groups.identity") %></summary>
+            <div>
+              <%= link_to t("nav.identity"), identity_path, class: ("on" if current_page?(identity_path)) if Identity.current %>
+              <%= link_to t("nav.setup"), setup_path, class: ("on" if current_page?(setup_path)) %>
+            </div>
+          </details>
+
+          <details class="menu <%= "on" if nav_section?(vault_path, events_path, settings_path) %>"
+                   data-nav-menu-target="menu" data-action="toggle->nav-menu#opened">
+            <summary><%= t("nav.groups.administration") %></summary>
+            <div>
+              <%= link_to t("nav.vault"), vault_path, class: ("on" if current_page?(vault_path)) %>
+              <%= link_to t("nav.events"), events_path, class: ("on" if current_page?(events_path)) %>
+              <div class="sep"></div>
+              <%= link_to t("nav.settings"), settings_path, class: ("on" if current_page?(settings_path)) %>
+            </div>
+          </details>
+        </nav>
+
+        <%= button_to lock_path, method: :delete, class: "link" do %>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="2.6" y="7" width="10.8" height="7.4" rx="1.6"/>
+            <path d="M5.2 7V4.8a2.8 2.8 0 0 1 5.6 0V7"/>
+          </svg>
+          <%= t("nav.lock") %>
+        <% end %>
+      </div>
+    </header>
+
+    <main>
+      <%# The problems belong inside the message that announced them — a count on
+          its own tells somebody that something is wrong and nothing about what.
+          Folded shut, because most of the time the sentence above is the whole
+          answer, and a list of constraint violations under every save reads as
+          an error report to somebody who only wanted to keep a draft. %>
+      <% if notice %>
+        <div class="flash notice">
+          <p><%= notice %></p>
+          <% if flash[:problems].present? %>
+            <details class="problems">
+              <summary><%= t("passports.problem.show", count: Array(flash[:problems]).size) %></summary>
+              <ul>
+                <% Array(flash[:problems]).each do |problem| %><li><%= problem %></li><% end %>
+              </ul>
+            </details>
+          <% end %>
+        </div>
+      <% end %>
+      <% if alert %><p class="flash alert"><%= alert %></p><% end %>
+
+      <%= yield %>
+    </main>
+
+    <footer>
+      <%# The words that name the file lead to the page about it. Quiet on
+          purpose: in the same grey as the sentence around it, underlined only
+          under the cursor. A blue link in the footer would pull the eye away
+          from whatever the page is actually for. %>
+      <span class="by">
+        <%= image_tag "oyd-mark.svg", class: "mark", alt: "" %>
+        <%= t("app.footer_html", version: DppManager::VERSION,
+              link: (vault_open? ? link_to(t("app.footer_link"), vault_path, class: "quiet")
+                                 : t("app.footer_link"))) %>
+      </span>
+    </footer>
+  </body>
+</html>

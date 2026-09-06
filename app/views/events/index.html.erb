@@ -1,0 +1,51 @@
+<h1><%= t("events.title") %></h1>
+
+<%= render "shared/help", key: "events.help" %>
+
+<% if @broken_at %>
+  <p class="flash alert"><%= t("events.chain_broken", id: @broken_at) %></p>
+<% else %>
+  <p class="chain-ok"><%= t("events.chain_ok", count: @total) %></p>
+<% end %>
+
+<form method="get" action="<%= events_path %>" class="filters">
+  <label for="kind"><%= t("events.filter.kind") %></label>
+  <select name="kind" id="kind">
+    <option value=""><%= t("events.filter.all") %></option>
+    <% Event::KINDS.each do |kind| %>
+      <option value="<%= kind %>" <%= "selected" if @kind == kind %>><%= t("events.kinds.#{kind}") %></option>
+    <% end %>
+  </select>
+  <%= submit_tag t("events.filter.apply"), name: nil %>
+</form>
+
+<% if @events.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("events.column.when") %></th>
+        <th><%= t("events.column.kind") %></th>
+        <th><%= t("events.column.detail") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @events.each do |event| %>
+        <tr>
+          <td class="when"><%= l(event.occurred_at.in_time_zone, format: :long) %></td>
+          <td><%= t("events.kinds.#{event.kind}") %></td>
+          <td class="detail">
+            <% event.detail_hash.each do |key, value| %>
+              <span class="pair"><%= key %>: <%= value %></span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if @total > EventsController::PER_PAGE %>
+    <p class="muted"><%= t("events.truncated", shown: EventsController::PER_PAGE, total: @total) %></p>
+  <% end %>
+<% else %>
+  <p class="muted"><%= t("events.empty") %></p>
+<% end %>

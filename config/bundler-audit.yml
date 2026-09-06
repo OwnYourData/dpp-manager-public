@@ -1,0 +1,12 @@
+# Advisories that bin/bundler-audit reports and that this application is not
+# exposed through. Each entry says why, and what has to happen before it can go.
+#
+# An entry here is a promise to look again, not a way of making a report quiet.
+# The list is empty, and it got that way by the promise being kept: three
+# advisories sat here on 2026-09-04 because oydid pinned `jwt ~> 3.1.2` and
+# `json ~> 2.18.1`, which excluded every fixed version. oydid 0.9.6 opened both
+# pins the same day and the entries came out.
+
+# An empty key parses as nil and bundler-audit refuses the file; the list has
+# to be an empty array to say "nothing is excused".
+ignore: []

@@ -1,0 +1,59 @@
+<h1><%= t("vault.title") %></h1>
+
+<%= render "shared/help", key: "vault.help" %>
+
+<section class="card">
+  <h2><%= t("vault.file.title") %></h2>
+  <dl>
+    <dt><%= t("vault.file.path") %></dt>
+    <dd><code><%= Vault::Store.path %></code></dd>
+    <dt><%= t("vault.file.size") %></dt>
+    <dd><%= number_to_human_size(Vault::Store.path.size) %></dd>
+  </dl>
+  <p class="hint"><%= t("vault.file.hint") %></p>
+</section>
+
+<section>
+  <h2><%= t("vault.backup.title") %></h2>
+  <p><%= t("vault.backup.body") %></p>
+  <%= button_to t("vault.backup.action"), vault_backup_path, method: :post %>
+
+  <% if @backups.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th><%= t("vault.backup.filename") %></th>
+          <th><%= t("vault.backup.size") %></th>
+          <th><%= t("vault.backup.created") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @backups.each do |backup| %>
+          <tr>
+            <td><code><%= backup[:name] %></code></td>
+            <td><%= number_to_human_size(backup[:size]) %></td>
+            <td><%= l(backup[:modified_at].in_time_zone, format: :short) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+</section>
+
+<section>
+  <h2><%= t("vault.passphrase.title") %></h2>
+  <p><%= t("vault.passphrase.body") %></p>
+
+  <%= form_with url: vault_passphrase_path, method: :post, local: true do |f| %>
+    <label for="current_passphrase"><%= t("vault.passphrase.current") %></label>
+    <%= password_field_tag :current_passphrase, nil, id: "current_passphrase", autocomplete: "current-password" %>
+
+    <label for="new_passphrase"><%= t("vault.passphrase.new") %></label>
+    <%= password_field_tag :new_passphrase, nil, id: "new_passphrase", autocomplete: "new-password" %>
+
+    <label for="new_passphrase_confirmation"><%= t("vault.passphrase.confirmation") %></label>
+    <%= password_field_tag :new_passphrase_confirmation, nil, id: "new_passphrase_confirmation", autocomplete: "new-password" %>
+
+    <%= submit_tag t("vault.passphrase.action") %>
+  <% end %>
+</section>

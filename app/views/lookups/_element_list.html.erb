@@ -1,0 +1,28 @@
+<%# The element tree as it stands in the document.
+    Recursive, because the model is: a collection holds elements, and so does a
+    multi-valued element. Nothing here knows about lamps — any EN 18223 tree
+    renders, including one written against a structure this vault never saw. %>
+<% if elements.empty? %>
+  <p class="hint"><%= t("lookup.no_elements") %></p>
+<% else %>
+  <ul class="elements">
+    <% elements.each do |element| %>
+      <% next unless element.is_a?(Hash) %>
+      <li>
+        <span class="eid"><%= element["elementId"] %></span>
+
+        <% if element["value"].present? || element["value"] == false %>
+          <span class="val">
+            <%= element["value"].to_s %><%= " #{element['unitOfMeasure']}" if element["unitOfMeasure"].present? %>
+          </span>
+        <% elsif element["url"].present? %>
+          <span class="val"><code class="break"><%= element["url"] %></code></span>
+        <% end %>
+
+        <% if element["elements"].is_a?(Array) %>
+          <%= render "element_list", elements: element["elements"] %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

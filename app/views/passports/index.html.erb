@@ -1,0 +1,58 @@
+<h1><%= t("passports.title") %></h1>
+<p class="lead"><%= t("passports.lead") %></p>
+
+<%= render "shared/help", key: "passports.help" %>
+
+<% if @product_types.empty? %>
+  <p class="muted"><%= t("passports.no_types") %></p>
+  <p><%= link_to t("passports.to_types"), product_types_path %></p>
+<% else %>
+  <%# Which kind of passport comes first, because it decides the whole form.
+      With one type this is a button; with several it is a choice, and it is
+      better made here than discovered halfway down a form. %>
+  <div class="new-passport">
+    <% @product_types.each do |type| %>
+      <%= link_to t("passports.new_of", label: type.label),
+            new_passport_path(product_type_id: type.id), class: "start" %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @passports.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th><%= t("passports.columns.label") %></th>
+        <th><%= t("passports.columns.type") %></th>
+        <th><%= t("passports.columns.content") %></th>
+        <th><%= t("passports.columns.changed") %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @passports.each do |passport| %>
+        <tr>
+          <td>
+            <%= passport.label %>
+            <% if passport.retired? %>
+              <span class="ended"><%= t("passports.retired.badge") %></span>
+            <% end %>
+            <% if passport.minted? %>
+              <br><code class="muted" title="<%= passport.dpp_id %>"><%= passport.short_dpp_id %>…</code>
+            <% end %>
+          </td>
+          <td><%= passport.product_type.label %></td>
+          <td class="detail">
+            <% passport.summary.each do |key, value| %>
+              <span class="pair"><span class="muted"><%= key %></span> <%= value.truncate(40) %></span>
+            <% end %>
+          </td>
+          <td class="when"><%= l(passport.updated_at.in_time_zone, format: :short) %></td>
+          <td class="actions"><%= link_to t("passports.edit"), edit_passport_path(passport) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="muted"><%= t("passports.empty") %></p>
+<% end %>

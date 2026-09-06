@@ -1,0 +1,34 @@
+<h1><%= t("identity.title") %></h1>
+
+<%= render "shared/help", key: "identity.help" %>
+
+<section class="card">
+  <h2><%= t("identity.who") %></h2>
+  <dl>
+    <dt><%= t("identity.did") %></dt>
+    <dd><code class="break"><%= @identity.did %></code></dd>
+    <% if @identity.label.present? %>
+      <dt><%= t("identity.label_field") %></dt>
+      <dd><%= @identity.label %></dd>
+    <% end %>
+    <dt><%= t("identity.origin") %></dt>
+    <dd><%= t("identity.origins.#{@identity.origin}") %></dd>
+    <dt><%= t("identity.revocable") %></dt>
+    <dd><%= @identity.revocable? ? t("identity.revocable_yes") : t("identity.revocable_no") %></dd>
+  </dl>
+</section>
+
+<section>
+  <h2><%= t("identity.check.title") %></h2>
+  <p><%= t("identity.check.body") %></p>
+  <%= button_to t("identity.check.action"), identity_check_path, method: :post %>
+</section>
+
+<section>
+  <h2><%= t("identity.export.title") %></h2>
+  <p><%= t("identity.export.body", directory: Vault::Store.data_dir, filename: @export_path) %></p>
+  <div class="warning">
+    <p><%= t("identity.export.warning") %></p>
+  </div>
+  <%= button_to t("identity.export.action"), identity_export_path, method: :post %>
+</section>

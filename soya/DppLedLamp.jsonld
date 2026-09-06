@@ -1,0 +1,1543 @@
+{
+  "@graph": [
+    {
+      "@id": "DppLedLamp",
+      "@type": "owl:Class",
+      "subClassOf": "soya:Base"
+    },
+    {
+      "@id": "manufacturerName",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "productDesignation",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "modelIdentifier",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "serialNumber",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "dateOfManufacture",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:date",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "countryOfOrigin",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "usefulLuminousFlux",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "onModePower",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "standbyPower",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "colourTemperature",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "colourRenderingIndex",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "beamAngle",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "typeOfDimming",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "ratedLifetime",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "guaranteedSwitchingCycles",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "warrantyPeriodYears",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "ceMarking",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "rohsCompliant",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:boolean",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "containsSvhc",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:boolean",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "svhcSubstances",
+      "@type": "owl:DatatypeProperty",
+      "range": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List",
+      "domain": "DppLedLamp",
+      "soya:containerType": "set",
+      "soya:containerElementTypes": [
+        "https://soya.ownyourdata.eu/DppLedLamp/xsd:string"
+      ]
+    },
+    {
+      "@id": "energyEfficiencyClass",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "carbonFootprint",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "declarationOfConformity",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "dismantlingInstructions",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "DppLedLamp",
+      "label": {
+        "de": [
+          "LED-Lampe"
+        ],
+        "en": [
+          "LED lamp"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Digitaler Produktpass für eine einzelne LED-Lampe."
+        ],
+        "en": [
+          "Digital product passport for a single LED lamp."
+        ]
+      }
+    },
+    {
+      "@id": "manufacturerName",
+      "label": {
+        "de": [
+          "Hersteller"
+        ],
+        "en": [
+          "Manufacturer"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Der eingetragene Name des Herstellers, wie er auf dem Typenschild steht."
+        ],
+        "en": [
+          "The legal name of the manufacturer, as it appears on the nameplate."
+        ]
+      }
+    },
+    {
+      "@id": "productDesignation",
+      "label": {
+        "de": [
+          "Produktbezeichnung"
+        ],
+        "en": [
+          "Product designation"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Wie der Hersteller dieses Produkt in seinem Katalog nennt."
+        ],
+        "en": [
+          "What the manufacturer calls this product in their catalogue."
+        ]
+      }
+    },
+    {
+      "@id": "modelIdentifier",
+      "label": {
+        "de": [
+          "Modell"
+        ],
+        "en": [
+          "Model"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Bezeichnet das Modell, nicht die einzelne Lampe. Jede Lampe dieses Modells trägt denselben Wert."
+        ],
+        "en": [
+          "Identifies the model, not the individual lamp. Every lamp of this model carries the same value."
+        ]
+      }
+    },
+    {
+      "@id": "serialNumber",
+      "label": {
+        "de": [
+          "Seriennummer"
+        ],
+        "en": [
+          "Serial number"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Nur bei einem Pass, der ein einzelnes Stück beschreibt."
+        ],
+        "en": [
+          "Only for a passport that describes one individual item."
+        ]
+      }
+    },
+    {
+      "@id": "dateOfManufacture",
+      "label": {
+        "de": [
+          "Herstelldatum"
+        ],
+        "en": [
+          "Date of manufacture"
+        ]
+      }
+    },
+    {
+      "@id": "countryOfOrigin",
+      "label": {
+        "de": [
+          "Ursprungsland"
+        ],
+        "en": [
+          "Country of origin"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Zweibuchstabiger Ländercode, zum Beispiel DE oder AT."
+        ],
+        "en": [
+          "Two-letter country code, for example DE or AT."
+        ]
+      }
+    },
+    {
+      "@id": "usefulLuminousFlux",
+      "label": {
+        "de": [
+          "Nutzlichtstrom (lm)"
+        ],
+        "en": [
+          "Useful luminous flux (lm)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Das Licht, das die Lampe innerhalb ihres Abstrahlwinkels tatsächlich abgibt — nicht die Rohleistung der Dioden."
+        ],
+        "en": [
+          "The light the lamp actually delivers within its beam angle — not the raw output of the diodes."
+        ]
+      }
+    },
+    {
+      "@id": "onModePower",
+      "label": {
+        "de": [
+          "Leistungsaufnahme im Ein-Zustand (W)"
+        ],
+        "en": [
+          "On-mode power (W)"
+        ]
+      }
+    },
+    {
+      "@id": "standbyPower",
+      "label": {
+        "de": [
+          "Leistungsaufnahme im Bereitschaftszustand (W)"
+        ],
+        "en": [
+          "Standby power (W)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Null bei einer Lampe ohne Bereitschaftszustand."
+        ],
+        "en": [
+          "Zero for a lamp with no standby state."
+        ]
+      }
+    },
+    {
+      "@id": "colourTemperature",
+      "label": {
+        "de": [
+          "Farbtemperatur (K)"
+        ],
+        "en": [
+          "Colour temperature (K)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "2700 K ist Warmweiß, 6500 K ist Tageslichtweiß."
+        ],
+        "en": [
+          "2700 K is warm white, 6500 K is daylight."
+        ]
+      }
+    },
+    {
+      "@id": "colourRenderingIndex",
+      "label": {
+        "de": [
+          "Farbwiedergabeindex (Ra)"
+        ],
+        "en": [
+          "Colour rendering index (Ra)"
+        ]
+      }
+    },
+    {
+      "@id": "beamAngle",
+      "label": {
+        "de": [
+          "Abstrahlwinkel (°)"
+        ],
+        "en": [
+          "Beam angle (°)"
+        ]
+      }
+    },
+    {
+      "@id": "typeOfDimming",
+      "label": {
+        "de": [
+          "Dimmbarkeit"
+        ],
+        "en": [
+          "Dimming"
+        ]
+      }
+    },
+    {
+      "@id": "ratedLifetime",
+      "label": {
+        "de": [
+          "Bemessungslebensdauer (h)"
+        ],
+        "en": [
+          "Rated lifetime (h)"
+        ]
+      }
+    },
+    {
+      "@id": "guaranteedSwitchingCycles",
+      "label": {
+        "de": [
+          "Garantierte Schaltzyklen"
+        ],
+        "en": [
+          "Guaranteed switching cycles"
+        ]
+      }
+    },
+    {
+      "@id": "warrantyPeriodYears",
+      "label": {
+        "de": [
+          "Garantie (Jahre)"
+        ],
+        "en": [
+          "Warranty (years)"
+        ]
+      }
+    },
+    {
+      "@id": "ceMarking",
+      "label": {
+        "de": [
+          "CE-Kennzeichnung"
+        ],
+        "en": [
+          "CE marking"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Die Kennung, unter der die Konformität erklärt wurde."
+        ],
+        "en": [
+          "The identifier under which conformity was declared."
+        ]
+      }
+    },
+    {
+      "@id": "rohsCompliant",
+      "label": {
+        "de": [
+          "RoHS-konform"
+        ],
+        "en": [
+          "RoHS compliant"
+        ]
+      }
+    },
+    {
+      "@id": "containsSvhc",
+      "label": {
+        "de": [
+          "Enthält besonders besorgniserregende Stoffe"
+        ],
+        "en": [
+          "Contains substances of very high concern"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Über 0,1 Massenprozent, wie es REACH festlegt."
+        ],
+        "en": [
+          "Above 0.1 percent by weight, as REACH defines it."
+        ]
+      }
+    },
+    {
+      "@id": "svhcSubstances",
+      "label": {
+        "de": [
+          "Welche Stoffe"
+        ],
+        "en": [
+          "Which substances"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Ein Eintrag je Stoff. Leer lassen, wenn keine enthalten sind."
+        ],
+        "en": [
+          "One entry per substance. Leave empty if there are none."
+        ]
+      }
+    },
+    {
+      "@id": "energyEfficiencyClass",
+      "label": {
+        "de": [
+          "Energieeffizienzklasse"
+        ],
+        "en": [
+          "Energy efficiency class"
+        ]
+      }
+    },
+    {
+      "@id": "carbonFootprint",
+      "label": {
+        "de": [
+          "CO2-Fußabdruck (kg CO2e)"
+        ],
+        "en": [
+          "Carbon footprint (kg CO2e)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Über den gesamten Lebenszyklus, je Lampe."
+        ],
+        "en": [
+          "Over the whole life cycle, per lamp."
+        ]
+      }
+    },
+    {
+      "@id": "declarationOfConformity",
+      "label": {
+        "de": [
+          "Konformitätserklärung (Link)"
+        ],
+        "en": [
+          "Declaration of conformity (link)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Eine Webadresse. Diese Anwendung hostet das Dokument nicht."
+        ],
+        "en": [
+          "A web address. This application does not host the document."
+        ]
+      }
+    },
+    {
+      "@id": "dismantlingInstructions",
+      "label": {
+        "de": [
+          "Demontageanleitung (Link)"
+        ],
+        "en": [
+          "Dismantling instructions (link)"
+        ]
+      }
+    },
+    {
+      "@id": "OverlayAnnotation",
+      "name": "DppLedLampAnnotation",
+      "@type": "OverlayAnnotation",
+      "onBase": "DppLedLamp"
+    },
+    {
+      "@id": "DppLedLampOverlayValidation",
+      "name": "DppLedLampValidation",
+      "@type": "OverlayValidation",
+      "onBase": "DppLedLamp",
+      "sh:property": [
+        {
+          "sh:path": "manufacturerName",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 120,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "productDesignation",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 120,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "modelIdentifier",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 60,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "serialNumber",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:maxLength": 60,
+          "sh:minLength": 0
+        },
+        {
+          "sh:path": "dateOfManufacture",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:minRange": {
+            "@type": "xsd:date",
+            "@value": "2000-01-01"
+          }
+        },
+        {
+          "sh:path": "countryOfOrigin",
+          "sh:message": {
+            "de": "Zwei Großbuchstaben, zum Beispiel DE.",
+            "en": "Two capital letters, for example DE."
+          },
+          "sh:pattern": "^[A-Z]{2}$",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "usefulLuminousFlux",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "onModePower",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "standbyPower",
+          "sh:maxCount": 1,
+          "sh:minCount": 0
+        },
+        {
+          "sh:path": "colourTemperature",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000,
+          "sh:minInclusive": 1500
+        },
+        {
+          "sh:path": "colourRenderingIndex",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "beamAngle",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:maxInclusive": 360,
+          "sh:minInclusive": 1
+        },
+        {
+          "sh:in": {
+            "@list": [
+              "none",
+              "phase",
+              "dali",
+              "pwm"
+            ]
+          },
+          "sh:path": "typeOfDimming",
+          "sh:maxCount": 1,
+          "sh:minCount": 0
+        },
+        {
+          "sh:path": "ratedLifetime",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "guaranteedSwitchingCycles",
+          "sh:maxCount": 1,
+          "sh:minCount": 0
+        },
+        {
+          "sh:path": "warrantyPeriodYears",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:maxInclusive": 25,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "ceMarking",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:maxLength": 40,
+          "sh:minLength": 0
+        },
+        {
+          "sh:path": "rohsCompliant",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "containsSvhc",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "@type": "sh:PropertyShape",
+          "sh:path": {
+            "@list": [
+              {
+                "@id": "svhcSubstances"
+              },
+              {
+                "sh:zeroOrMorePath": {
+                  "@id": "rdf:rest"
+                }
+              },
+              {
+                "@id": "rdf:first"
+              }
+            ]
+          },
+          "sh:minCount": 0,
+          "sh:maxLength": 200,
+          "sh:minLength": 1
+        },
+        {
+          "sh:in": {
+            "@list": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "G"
+            ]
+          },
+          "sh:path": "energyEfficiencyClass",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "carbonFootprint",
+          "sh:maxCount": 1,
+          "sh:minCount": 0
+        },
+        {
+          "sh:path": "declarationOfConformity",
+          "sh:message": {
+            "de": "Eine https-Adresse.",
+            "en": "A https address."
+          },
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 0
+        },
+        {
+          "sh:path": "dismantlingInstructions",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 0
+        }
+      ],
+      "sh:targetClass": "DppLedLamp"
+    },
+    {
+      "ui": {
+        "type": "Categorization",
+        "options": {
+          "density": "compact",
+          "variant": "standard"
+        },
+        "elements": [
+          {
+            "type": "Category",
+            "label": "Product",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Manufacturer",
+                    "scope": "#/properties/manufacturerName"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Product designation",
+                    "scope": "#/properties/productDesignation"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Model",
+                    "scope": "#/properties/modelIdentifier"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Serial number",
+                    "scope": "#/properties/serialNumber"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Date of manufacture",
+                    "scope": "#/properties/dateOfManufacture"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Country of origin",
+                    "scope": "#/properties/countryOfOrigin"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Light and power",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Useful luminous flux (lm)",
+                    "scope": "#/properties/usefulLuminousFlux"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Colour temperature (K)",
+                    "scope": "#/properties/colourTemperature"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "On-mode power (W)",
+                    "scope": "#/properties/onModePower"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Standby power (W)",
+                    "scope": "#/properties/standbyPower"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Colour rendering index (Ra)",
+                    "scope": "#/properties/colourRenderingIndex"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Beam angle (°)",
+                    "scope": "#/properties/beamAngle"
+                  }
+                ]
+              },
+              {
+                "type": "Control",
+                "label": "Dimming",
+                "scope": "#/properties/typeOfDimming"
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Lifetime",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Rated lifetime (h)",
+                    "scope": "#/properties/ratedLifetime"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Guaranteed switching cycles",
+                    "scope": "#/properties/guaranteedSwitchingCycles"
+                  }
+                ]
+              },
+              {
+                "type": "Control",
+                "label": "Warranty (years)",
+                "scope": "#/properties/warrantyPeriodYears"
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Conformity and substances",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "CE marking",
+                "scope": "#/properties/ceMarking"
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "RoHS compliant",
+                    "scope": "#/properties/rohsCompliant"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Contains substances of very high concern",
+                    "scope": "#/properties/containsSvhc"
+                  }
+                ]
+              },
+              {
+                "rule": {
+                  "effect": "SHOW",
+                  "condition": {
+                    "scope": "#/properties/containsSvhc",
+                    "schema": {
+                      "const": true
+                    }
+                  }
+                },
+                "type": "Control",
+                "label": "Which substances",
+                "scope": "#/properties/svhcSubstances"
+              },
+              {
+                "type": "Control",
+                "label": "Declaration of conformity (link)",
+                "scope": "#/properties/declarationOfConformity"
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Environment",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Energy efficiency class",
+                    "scope": "#/properties/energyEfficiencyClass"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Carbon footprint (kg CO2e)",
+                    "scope": "#/properties/carbonFootprint"
+                  }
+                ]
+              },
+              {
+                "type": "Control",
+                "label": "Dismantling instructions (link)",
+                "scope": "#/properties/dismantlingInstructions"
+              }
+            ]
+          }
+        ]
+      },
+      "@id": "DppLedLampForm",
+      "tag": "dpp",
+      "name": "DppLedLampFormEn",
+      "@type": "OverlayForm",
+      "onBase": "DppLedLamp",
+      "schema": {
+        "type": "object",
+        "required": [
+          "manufacturerName",
+          "productDesignation",
+          "modelIdentifier",
+          "dateOfManufacture",
+          "countryOfOrigin",
+          "usefulLuminousFlux",
+          "onModePower",
+          "colourTemperature",
+          "ratedLifetime",
+          "rohsCompliant",
+          "containsSvhc",
+          "energyEfficiencyClass"
+        ],
+        "properties": {
+          "beamAngle": {
+            "type": "integer",
+            "maximum": 360,
+            "minimum": 1
+          },
+          "ceMarking": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "onModePower": {
+            "type": "number",
+            "minimum": 0
+          },
+          "containsSvhc": {
+            "type": "boolean"
+          },
+          "serialNumber": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "standbyPower": {
+            "type": "number",
+            "minimum": 0
+          },
+          "ratedLifetime": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "rohsCompliant": {
+            "type": "boolean"
+          },
+          "typeOfDimming": {
+            "enum": [
+              "none",
+              "phase",
+              "dali",
+              "pwm"
+            ],
+            "type": "string"
+          },
+          "svhcSubstances": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 1
+            }
+          },
+          "carbonFootprint": {
+            "type": "number",
+            "minimum": 0
+          },
+          "countryOfOrigin": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          },
+          "modelIdentifier": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1
+          },
+          "manufacturerName": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "colourTemperature": {
+            "type": "integer",
+            "maximum": 10000,
+            "minimum": 1500
+          },
+          "dateOfManufacture": {
+            "type": "string",
+            "format": "date"
+          },
+          "productDesignation": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "usefulLuminousFlux": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "warrantyPeriodYears": {
+            "type": "integer",
+            "maximum": 25,
+            "minimum": 0
+          },
+          "colourRenderingIndex": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "energyEfficiencyClass": {
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "G"
+            ],
+            "type": "string"
+          },
+          "declarationOfConformity": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "dismantlingInstructions": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "guaranteedSwitchingCycles": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "language": "en"
+    },
+    {
+      "ui": {
+        "type": "Categorization",
+        "options": {
+          "density": "compact",
+          "variant": "standard"
+        },
+        "elements": [
+          {
+            "type": "Category",
+            "label": "Produkt",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Hersteller",
+                    "scope": "#/properties/manufacturerName"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Produktbezeichnung",
+                    "scope": "#/properties/productDesignation"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Modell",
+                    "scope": "#/properties/modelIdentifier"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Seriennummer",
+                    "scope": "#/properties/serialNumber"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Herstelldatum",
+                    "scope": "#/properties/dateOfManufacture"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Ursprungsland",
+                    "scope": "#/properties/countryOfOrigin"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Licht und Leistung",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Nutzlichtstrom (lm)",
+                    "scope": "#/properties/usefulLuminousFlux"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Farbtemperatur (K)",
+                    "scope": "#/properties/colourTemperature"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Leistungsaufnahme im Ein-Zustand (W)",
+                    "scope": "#/properties/onModePower"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Leistungsaufnahme im Bereitschaftszustand (W)",
+                    "scope": "#/properties/standbyPower"
+                  }
+                ]
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Farbwiedergabeindex (Ra)",
+                    "scope": "#/properties/colourRenderingIndex"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Abstrahlwinkel (°)",
+                    "scope": "#/properties/beamAngle"
+                  }
+                ]
+              },
+              {
+                "type": "Control",
+                "label": "Dimmbarkeit",
+                "scope": "#/properties/typeOfDimming"
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Lebensdauer",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Bemessungslebensdauer (h)",
+                    "scope": "#/properties/ratedLifetime"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Garantierte Schaltzyklen",
+                    "scope": "#/properties/guaranteedSwitchingCycles"
+                  }
+                ]
+              },
+              {
+                "type": "Control",
+                "label": "Garantie (Jahre)",
+                "scope": "#/properties/warrantyPeriodYears"
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Konformität und Stoffe",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "CE-Kennzeichnung",
+                "scope": "#/properties/ceMarking"
+              },
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "RoHS-konform",
+                    "scope": "#/properties/rohsCompliant"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "Enthält besonders besorgniserregende Stoffe",
+                    "scope": "#/properties/containsSvhc"
+                  }
+                ]
+              },
+              {
+                "rule": {
+                  "effect": "SHOW",
+                  "condition": {
+                    "scope": "#/properties/containsSvhc",
+                    "schema": {
+                      "const": true
+                    }
+                  }
+                },
+                "type": "Control",
+                "label": "Welche Stoffe",
+                "scope": "#/properties/svhcSubstances"
+              },
+              {
+                "type": "Control",
+                "label": "Konformitätserklärung (Link)",
+                "scope": "#/properties/declarationOfConformity"
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Umwelt",
+            "elements": [
+              {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "label": "Energieeffizienzklasse",
+                    "scope": "#/properties/energyEfficiencyClass"
+                  },
+                  {
+                    "type": "Control",
+                    "label": "CO2-Fußabdruck (kg CO2e)",
+                    "scope": "#/properties/carbonFootprint"
+                  }
+                ]
+              },
+              {
+                "type": "Control",
+                "label": "Demontageanleitung (Link)",
+                "scope": "#/properties/dismantlingInstructions"
+              }
+            ]
+          }
+        ]
+      },
+      "@id": "DppLedLampForm",
+      "tag": "dpp",
+      "name": "DppLedLampFormDe",
+      "@type": "OverlayForm",
+      "onBase": "DppLedLamp",
+      "schema": {
+        "type": "object",
+        "required": [
+          "manufacturerName",
+          "productDesignation",
+          "modelIdentifier",
+          "dateOfManufacture",
+          "countryOfOrigin",
+          "usefulLuminousFlux",
+          "onModePower",
+          "colourTemperature",
+          "ratedLifetime",
+          "rohsCompliant",
+          "containsSvhc",
+          "energyEfficiencyClass"
+        ],
+        "properties": {
+          "beamAngle": {
+            "type": "integer",
+            "maximum": 360,
+            "minimum": 1
+          },
+          "ceMarking": {
+            "type": "string",
+            "maxLength": 40
+          },
+          "onModePower": {
+            "type": "number",
+            "minimum": 0
+          },
+          "containsSvhc": {
+            "type": "boolean"
+          },
+          "serialNumber": {
+            "type": "string",
+            "maxLength": 60
+          },
+          "standbyPower": {
+            "type": "number",
+            "minimum": 0
+          },
+          "ratedLifetime": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "rohsCompliant": {
+            "type": "boolean"
+          },
+          "typeOfDimming": {
+            "enum": [
+              "none",
+              "phase",
+              "dali",
+              "pwm"
+            ],
+            "type": "string"
+          },
+          "svhcSubstances": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 200,
+              "minLength": 1
+            }
+          },
+          "carbonFootprint": {
+            "type": "number",
+            "minimum": 0
+          },
+          "countryOfOrigin": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          },
+          "modelIdentifier": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1
+          },
+          "manufacturerName": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "colourTemperature": {
+            "type": "integer",
+            "maximum": 10000,
+            "minimum": 1500
+          },
+          "dateOfManufacture": {
+            "type": "string",
+            "format": "date"
+          },
+          "productDesignation": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "usefulLuminousFlux": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "warrantyPeriodYears": {
+            "type": "integer",
+            "maximum": 25,
+            "minimum": 0
+          },
+          "colourRenderingIndex": {
+            "type": "integer",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "energyEfficiencyClass": {
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "G"
+            ],
+            "type": "string"
+          },
+          "declarationOfConformity": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "dismantlingInstructions": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "guaranteedSwitchingCycles": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "language": "de"
+    }
+  ],
+  "@context": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Base": "soya:Base",
+    "form": "soya:form",
+    "name": {
+      "@id": "dct:title",
+      "@container": "@language"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "soya": "https://w3id.org/soya/ns#",
+    "label": {
+      "@id": "rdfs:label",
+      "@container": "@language"
+    },
+    "range": {
+      "@id": "rdfs:range",
+      "@type": "@id"
+    },
+    "domain": {
+      "@id": "rdfs:domain",
+      "@type": "@id"
+    },
+    "format": "soya:format",
+    "import": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "onBase": {
+      "@id": "soya:onBase",
+      "@type": "@id"
+    },
+    "comment": {
+      "@id": "rdfs:comment",
+      "@container": "@language"
+    },
+    "sh:path": {
+      "@type": "@id"
+    },
+    "encoding": "soya:encoding",
+    "alignment": "soya:alignment",
+    "annotation": "soya:annotation",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "validation": "soya:validation",
+    "OverlayForm": "soya:OverlayForm",
+    "sh:nodeKind": {
+      "@type": "@id"
+    },
+    "OverlayFormat": "soya:OverlayFormat",
+    "subPropertyOf": {
+      "@id": "rdfs:subPropertyOf",
+      "@type": "@id"
+    },
+    "attributeOrder": {
+      "@id": "soya:attributeOrder",
+      "@context": {
+        "list": "@list"
+      }
+    },
+    "classification": "soya:classification",
+    "renderingLabel": "soya:renderingLabel",
+    "sh:targetClass": {
+      "@type": "@id"
+    },
+    "transformation": "soya:transformation",
+    "OverlayEncoding": "soya:OverlayEncoding",
+    "OverlayAlignment": "soya:OverlayAlignment",
+    "OverlayAnnotation": "soya:OverlayAnnotation",
+    "OverlayValidation": "soya:OverlayValidation",
+    "OverlayClassification": "soya:OverlayClassification",
+    "OverlayTransformation": "soya:OverlayTransformation",
+    "@base": "https://soya.ownyourdata.eu/DppLedLamp/",
+    "@version": 1.1
+  }
+}

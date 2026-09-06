@@ -1,0 +1,6 @@
+<h1><%= t("passports.new_title") %></h1>
+<p class="lead"><%= t("passports.new_lead", label: @product_type.label) %></p>
+
+<%= render "form", passport: @passport, product_type: @product_type %>
+
+<p><%= link_to t("passports.back"), passports_path %></p>

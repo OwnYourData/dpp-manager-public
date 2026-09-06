@@ -1,0 +1,101 @@
+<h1><%= t("lookup.title") %></h1>
+
+<%= render "shared/help", key: "lookup.help" %>
+
+<%= form_with url: lookup_path, method: :get, local: true, class: "lookup" do %>
+  <label for="identifier"><%= t("lookup.field") %></label>
+  <%= text_field_tag :identifier, @identifier, autofocus: true, autocomplete: "off",
+        placeholder: "did:oyd:… · https://id.example.com/01/…" %>
+  <p class="hint">
+    <%= t("lookup.field_hint") %>
+    <% if settings.service_configured? %>
+      <%= t("lookup.field_service", service: settings.service_base_url) %>
+    <% else %>
+      <strong><%= t("lookup.no_service") %></strong>
+    <% end %>
+  </p>
+
+  <%= submit_tag t("lookup.action") %>
+<% end %>
+
+<% if @document %>
+  <section class="read">
+    <h2><%= t("lookup.envelope") %></h2>
+
+    <dl class="given">
+      <dt><%= t("lookup.fields.dpp_id") %></dt>
+      <dd><code class="break"><%= @document["digitalProductPassportId"] %></code></dd>
+      <dt><%= t("lookup.fields.product_id") %></dt>
+      <dd><code class="break"><%= @document["uniqueProductIdentifier"] %></code></dd>
+      <dt><%= t("lookup.fields.granularity") %></dt>
+      <dd><%= @document["granularity"] %></dd>
+      <dt><%= t("lookup.fields.status") %></dt>
+      <dd><%= @document["dppStatus"] %></dd>
+      <% if @document["lastUpdated"].present? %>
+        <dt><%= t("lookup.fields.last_updated") %></dt>
+        <dd><%= @document["lastUpdated"] %></dd>
+      <% end %>
+      <dt><%= t("lookup.fields.operator") %></dt>
+      <dd><code class="break"><%= @document["economicOperatorId"] %></code></dd>
+      <% if @document["facilityId"].present? %>
+        <dt><%= t("lookup.fields.facility") %></dt>
+        <dd><code class="break"><%= @document["facilityId"] %></code></dd>
+      <% end %>
+      <dt><%= t("lookup.fields.schema") %></dt>
+      <dd><%= @document["dppSchemaVersion"] %></dd>
+    </dl>
+  </section>
+
+  <%# What the passport actually says, in its own structure. Shown for every
+      passport, including one no type here can read: it is the document, and a
+      screen that showed only this installation's reading of it would hide
+      everything the reading has no field for. %>
+  <section class="read">
+    <h2><%= t("lookup.elements") %></h2>
+    <%= render "element_list", elements: Array(@document["elements"]) %>
+  </section>
+
+  <%# The same passport as answers to a form here — only when a type in this
+      vault carries the transformation that reads it back. %>
+  <section class="read">
+    <h2><%= t("lookup.as_answers") %></h2>
+
+    <% readable = ProductType.fetched.select(&:readable?) %>
+    <% if readable.empty? %>
+      <p class="hint"><%= t("lookup.no_reader") %></p>
+    <% else %>
+      <% if readable.many? %>
+        <%= form_with url: lookup_path, method: :get, local: true, class: "inline" do %>
+          <%= hidden_field_tag :identifier, @identifier %>
+          <label for="product_type_id"><%= t("lookup.read_as") %></label>
+          <%= select_tag :product_type_id,
+                options_from_collection_for_select(readable, :id, :label, @type&.id) %>
+          <%= submit_tag t("lookup.read_again"), class: "secondary" %>
+        <% end %>
+      <% end %>
+
+      <% if @answers.present? %>
+        <p class="hint"><%= t("lookup.answers_hint", label: @type.label) %></p>
+
+        <dl class="given">
+          <% labels = @type.field_labels %>
+          <% @answers.each do |key, value| %>
+            <dt><%= labels[key].presence || key %></dt>
+            <dd><%= Array(value).join(", ") %></dd>
+          <% end %>
+        </dl>
+
+        <%= form_with url: lookup_draft_path, method: :post, local: true do %>
+          <%= hidden_field_tag :identifier, @identifier %>
+          <%= hidden_field_tag :product_type_id, @type.id %>
+          <p class="hint"><%= t("lookup.draft.hint") %></p>
+          <%= submit_tag t("lookup.draft.action") %>
+        <% end %>
+      <% elsif @type %>
+        <p class="hint"><%= t("lookup.nothing_readable", label: @type.label) %></p>
+      <% else %>
+        <p class="hint"><%= t("lookup.choose_reader") %></p>
+      <% end %>
+    <% end %>
+  </section>
+<% end %>

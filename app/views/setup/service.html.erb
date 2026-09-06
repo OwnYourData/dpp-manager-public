@@ -1,0 +1,16 @@
+<h1><%= t("setup.title") %></h1>
+
+<%= render "setup/progress" %>
+<%= render "shared/help", key: "setup.service.help" %>
+
+<h2><%= t("setup.service.heading") %></h2>
+<p class="lead"><%= t("setup.service.lead") %></p>
+
+<%= form_with url: setup_service_path, method: :post, local: true do %>
+  <label for="service_base_url"><%= t("setup.service.label") %></label>
+  <%= text_field_tag :service_base_url, settings.service_base_url.presence || "https://dpp-service.ownyourdata.eu",
+        id: "service_base_url", autofocus: true, autocomplete: "off", spellcheck: false %>
+  <p class="hint"><%= t("setup.service.hint") %></p>
+
+  <%= submit_tag t("setup.service.action") %>
+<% end %>

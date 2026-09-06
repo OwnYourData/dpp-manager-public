@@ -1,0 +1,39 @@
+# The DPP Manager on one computer.
+#
+#   docker compose up -d      start it, and after that it starts by itself
+#   docker compose down       stop it; the folder below is untouched
+#   docker compose pull       fetch a newer version, then `up -d` again
+#
+# Everything the application knows is one encrypted file in ./data. That folder
+# is the backup: copy it and you have copied the passports, the keys and the
+# log. Nothing else on this computer is written to.
+
+services:
+  dpp-manager:
+    image: oydeu/dpp-manager:latest
+    container_name: dpp-manager
+
+    # A folder next to this file rather than a named volume. A named volume is
+    # the tidier default and the wrong one here: the operator has to be able to
+    # see, copy and back up their own data without learning a Docker command
+    # for it.
+    volumes:
+      - ${DPP_MANAGER_DATA:-./data}:/data
+
+    ports:
+      - "${DPP_MANAGER_PORT:-3000}:3000"
+
+    # So that it is simply there after a restart of the computer. Not `always`:
+    # somebody who stops it meant to stop it.
+    restart: unless-stopped
+
+    # The image brings its own check (GET /up, which deliberately does not touch
+    # the database — the application answers while the data file is still
+    # locked). Declaring it here is what makes `docker compose ps` say
+    # "healthy" rather than only "running".
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:3000/up"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3

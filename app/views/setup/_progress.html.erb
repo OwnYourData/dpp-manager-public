@@ -1,0 +1,14 @@
+<%#
+  Where the operator is in the wizard. The step is derived from what is actually
+  configured, so this is a readout of state rather than a counter — going back
+  and forth cannot desynchronise it.
+%>
+<ol class="steps">
+  <% SetupController::STEPS.each_with_index do |step, index| %>
+    <% next if step == :done %>
+    <li class="<%= "on" if step == @step %><%= " past" if SetupController::STEPS.index(step) < SetupController::STEPS.index(@step) %>">
+      <span class="num"><%= index + 1 %></span>
+      <%= t("setup.steps.#{step}") %>
+    </li>
+  <% end %>
+</ol>

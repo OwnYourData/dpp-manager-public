@@ -1,0 +1,32 @@
+<h1><%= t("setup.title") %></h1>
+
+<%= render "setup/progress" %>
+
+<h2><%= t("setup.done.heading") %></h2>
+<p class="lead"><%= t("setup.done.lead") %></p>
+
+<section class="card">
+  <dl>
+    <dt><%= t("setup.steps.service") %></dt>
+    <dd><code><%= settings.service_base_url %></code></dd>
+    <dt><%= t("setup.done.service_did") %></dt>
+    <dd><code class="break"><%= settings.service_did.presence || t("setup.done.no_service_did") %></code></dd>
+    <dt><%= t("setup.steps.identity") %></dt>
+    <dd><code class="break"><%= @identity&.did %></code></dd>
+    <dt><%= t("setup.steps.custodian") %></dt>
+    <dd>
+      <% if settings.custodian_configured? %>
+        <code><%= settings.custodian_base_url %></code> · <%= t("setup.custodian.collection") %> <%= settings.custodian_collection_id %>
+      <% else %>
+        <%= t("setup.done.no_custodian") %>
+      <% end %>
+      <br><%= link_to t("setup.done.change_custodian"), setup_path(step: :custodian), class: "quiet" %>
+    </dd>
+  </dl>
+</section>
+
+<p>
+  <%= link_to t("setup.done.to_overview"), root_path %> ·
+  <%= link_to t("setup.done.to_identity"), identity_path %> ·
+  <%= link_to t("setup.done.to_settings"), settings_path %>
+</p>

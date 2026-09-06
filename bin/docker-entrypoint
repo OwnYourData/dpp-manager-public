@@ -1,0 +1,53 @@
+#!/bin/bash -e
+
+if [ ! -d "${DPP_DATA_DIR}" ]; then
+  echo "The data directory ${DPP_DATA_DIR} is not there. Mount a directory from your computer onto it." >&2
+  exit 1
+fi
+
+if [ ! -w "${DPP_DATA_DIR}" ]; then
+  echo "The data directory ${DPP_DATA_DIR} is not writable by this container (uid $(id -u))." >&2
+  echo "On Linux, chown the directory to uid 1000. On macOS and Windows, Docker Desktop handles this for you." >&2
+  exit 1
+fi
+
+# soya-web-cli: soya-js behind an HTTP interface, on the loopback address only.
+#
+# Its repository is this application. That single environment variable is what
+# makes the rest work without a network: every structure it resolves comes back
+# out of the encrypted file rather than off the internet, so a form opens, data
+# validates and a transformation runs on a laptop with the wifi off.
+#
+# Two processes in one container, which is usually a smell. The reason it is
+# right here: the operator is given one thing to run, and the alternative —
+# reimplementing what soya-js does in Ruby — would mean forms that differ subtly
+# from the ones every other SOyA tool produces from the same structure.
+#
+# Started from its own directory, and that is not a detail. soya-web-cli finds
+# its package.json and its OpenAPI file with find-root over `path.resolve()` —
+# the *working directory*, not the directory the script is in. Launched from
+# anywhere else it dies on the first line with "package.json not found in path",
+# which names nothing that would lead you here. The published image gets away
+# with a bare `node dist/index.js` only because its WORKDIR happens to be right.
+if [ -d /soya-web-cli ]; then
+  (
+    cd /soya-web-cli
+    # export, not `PORT=… exec node …`: an assignment in front of a special
+    # builtin sets a shell variable and does not export it, so the program that
+    # replaces the shell never sees it — and starts on its own default port,
+    # putting its repository proxy where this application expects the API.
+    export PORT="${SOYA_WEB_CLI_PORT:-8081}"
+    export REPO_PROXY_PORT="${SOYA_WEB_CLI_PROXY_PORT:-8082}"
+    export REPO_BASE_URL="${SOYA_WEB_CLI_REPO:-http://127.0.0.1:3000/soya}"
+    export NODE_ENV=production
+    exec node dist/index.js
+  ) &
+
+  soya_pid=$!
+  # If it dies, the application keeps serving: everything except forms still
+  # works, and the product types page says plainly that the component is not
+  # answering. Killing the container instead would take the vault down with it.
+  trap 'kill "${soya_pid}" 2>/dev/null || true' TERM INT
+fi
+
+exec "$@"

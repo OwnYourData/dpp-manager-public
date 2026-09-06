@@ -1,0 +1,48 @@
+<%= image_tag "oyd-logo.svg", class: "logo", alt: "OwnYourData" %>
+<h1><%= t("app.name") %></h1>
+
+<% if @vault_exists %>
+  <p class="lead"><%= t("unlock.existing.lead") %></p>
+
+  <%= form_with url: unlock_path, method: :post, local: true do |f| %>
+    <label for="passphrase"><%= t("unlock.passphrase") %></label>
+    <%= password_field_tag :passphrase, nil, id: "passphrase", autofocus: true, autocomplete: "current-password" %>
+    <%= submit_tag t("unlock.open") %>
+  <% end %>
+
+  <details class="help-inline">
+    <summary><%= t("help.title") %></summary>
+    <p><%= t("unlock.existing.purpose") %></p>
+    <p><%= t("unlock.existing.no_recovery") %></p>
+  </details>
+<% else %>
+  <p class="lead"><%= t("unlock.new.lead") %></p>
+
+  <div class="warning">
+    <strong><%= t("unlock.new.warning_title") %></strong>
+    <p><%= t("unlock.new.warning_body") %></p>
+  </div>
+
+  <%= form_with url: unlock_path, method: :post, local: true, data: { controller: "passphrase" } do |f| %>
+    <label for="passphrase"><%= t("unlock.new.passphrase") %></label>
+    <%= password_field_tag :passphrase, nil, id: "passphrase", autofocus: true,
+          autocomplete: "new-password", data: { passphrase_target: "input", action: "input->passphrase#assess" } %>
+
+    <div class="meter" data-passphrase-target="meter" hidden>
+      <div class="meter-bar"><span data-passphrase-target="fill"></span></div>
+      <span class="meter-label" data-passphrase-target="label"></span>
+    </div>
+
+    <label for="passphrase_confirmation"><%= t("unlock.new.passphrase_confirmation") %></label>
+    <%= password_field_tag :passphrase_confirmation, nil, id: "passphrase_confirmation", autocomplete: "new-password" %>
+
+    <%= submit_tag t("unlock.new.create") %>
+  <% end %>
+
+  <div class="meter-strings"
+       data-strength-too-short="<%= t('unlock.strength.too_short', count: Vault::Passphrase::MINIMUM_LENGTH) %>"
+       data-strength-weak="<%= t('unlock.strength.weak') %>"
+       data-strength-fair="<%= t('unlock.strength.fair') %>"
+       data-strength-strong="<%= t('unlock.strength.strong') %>"
+       hidden></div>
+<% end %>

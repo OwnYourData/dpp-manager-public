@@ -1,0 +1,508 @@
+/* The OwnYourData palette, taken from the logo itself rather than approximated:
+   the blue and the orange are the two halves of the flame, the near-black is the
+   OYD wordmark, the grey-blue is the "OwnYourData" line.
+
+   The orange is used sparingly and always to mean "read this before you act" —
+   the irreversibility warning, an expiring mandate. If it appears everywhere it
+   stops meaning anything. */
+:root {
+  --oyd-blue: #446DA7;
+  --oyd-blue-dark: #37598A;
+  --oyd-blue-tint: #EDF1F7;
+  --oyd-flame: #ED9839;
+  --oyd-flame-tint: #FDF3E7;
+  --ink: #1A1919;
+  --muted: #85949E;
+  --line: #DCE0E5;
+  --bg: #F6F7F9;
+  --panel: #FFFFFF;
+  --bad: #9B2226;
+  --bad-tint: #FBEAEA;
+  --good: #1F6F43;
+  --good-tint: #E9F3ED;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+body.centered {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* --- the unlock screen ---------------------------------------------------- */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 32px 34px 28px;
+  width: 100%;
+  max-width: 30rem;
+  box-shadow: 0 1px 2px rgba(26, 25, 25, 0.04), 0 8px 24px rgba(26, 25, 25, 0.06);
+}
+
+.panel .logo {
+  display: block;
+  width: 132px;
+  height: auto;
+  margin: 0 auto 18px;
+}
+
+.panel h1 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 6px;
+}
+
+.panel .lead { text-align: center; }
+
+/* --- the bar -------------------------------------------------------------- */
+
+/* The bar spans the window so the page keeps a lid, but its contents sit in a
+   block as wide as `main`. Without that the navigation begins at the window
+   edge while the content it belongs to begins a quarter of the way in, and the
+   two read as different pages. */
+.bar { background: var(--panel); border-bottom: 1px solid var(--line); }
+
+.bar-inner {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px 22px;
+}
+
+.brand {
+  display: flex; align-items: center; gap: 9px;
+  font-weight: 600; white-space: nowrap;
+  color: var(--ink); text-decoration: none;
+}
+.brand .mark { width: 15px; height: auto; display: block; }
+.brand:hover { color: var(--oyd-blue); }
+
+.bar nav { display: flex; align-items: center; gap: 4px; flex: 1; font-size: 0.95rem; }
+
+/* One flat entry and three groups. The flat one is where the title also leads;
+   the groups are the three things this application is. */
+.bar nav > a, .bar nav summary {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 6px;
+  color: var(--ink); text-decoration: none; cursor: pointer;
+  white-space: nowrap;
+}
+.bar nav > a:hover, .bar nav summary:hover { background: var(--oyd-blue-tint); color: var(--oyd-blue); }
+
+/* Where you are. The mark sits on the GROUP, not only on the entry inside it:
+   most pages are one level down from the entry they belong to — a passport
+   being edited is under /passports — and a bar that only lit up on the index
+   would stop answering the question on nearly every page. */
+.bar nav > a.on, .bar nav .menu.on > summary { color: var(--oyd-blue); font-weight: 600; }
+
+.menu { position: relative; }
+.menu summary { list-style: none; }
+.menu summary::-webkit-details-marker { display: none; }
+.menu summary::after {
+  content: ""; width: 5px; height: 5px; margin-left: 1px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+.menu[open] > summary { background: var(--oyd-blue-tint); color: var(--oyd-blue); }
+.menu[open] > summary::after { transform: translateY(1px) rotate(-135deg); }
+
+.menu > div {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 20;
+  min-width: 13rem; padding: 5px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(26, 25, 25, 0.04), 0 8px 24px rgba(26, 25, 25, 0.10);
+  display: flex; flex-direction: column;
+}
+.menu > div a {
+  padding: 7px 10px; border-radius: 5px;
+  color: var(--ink); text-decoration: none; white-space: nowrap;
+}
+.menu > div a:hover { background: var(--oyd-blue-tint); color: var(--oyd-blue); }
+.menu > div a.on { color: var(--oyd-blue); font-weight: 600; }
+.menu > div .sep { height: 1px; margin: 5px 4px; background: var(--line); }
+
+/* German labels are noticeably longer than the English ones — "Ereignisprotokoll"
+   against "Event log". On a narrow window the groups stay and the navigation
+   moves to its own row rather than the bar growing sideways. */
+@media (max-width: 44rem) {
+  .bar-inner { flex-wrap: wrap; }
+  .bar nav { order: 3; flex-basis: 100%; flex-wrap: wrap; }
+  .brand { flex: 1; }
+}
+
+button.link {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+}
+button.link:hover { border-color: var(--oyd-blue); color: var(--oyd-blue); }
+
+/* --- page ----------------------------------------------------------------- */
+
+main { max-width: 62rem; margin: 0 auto; padding: 26px 20px 60px; }
+
+h1 { font-size: 1.5rem; margin: 0 0 4px; }
+h2 { font-size: 1.05rem; margin: 26px 0 8px; }
+.lead { color: var(--muted); margin: 0 0 20px; }
+.muted, .hint { color: var(--muted); }
+.hint { font-size: 0.9rem; margin: 4px 0 0; }
+
+.flash { padding: 10px 14px; border-radius: 6px; margin: 0 0 18px; }
+.flash.notice { background: var(--good-tint); border: 1px solid #A7CEB6; }
+.flash p { margin: 0; }
+.flash ul { margin: 8px 0 0; padding-left: 20px; }
+.flash li { margin: 2px 0; }
+.flash .problems { margin-top: 6px; }
+.flash .problems summary { cursor: pointer; font-size: 0.92rem; }
+.flash.alert  { background: var(--bad-tint);  border: 1px solid #DDA9A9; }
+
+/* The flame colour, used where it means something: this cannot be undone. */
+.warning {
+  background: var(--oyd-flame-tint);
+  border: 1px solid var(--oyd-flame);
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 0 0 20px;
+}
+.warning p { margin: 6px 0 0; }
+
+/* --- forms ---------------------------------------------------------------- */
+
+label { display: block; margin: 14px 0 4px; font-weight: 500; }
+label input[type="checkbox"] { margin-right: 6px; font-weight: 400; }
+
+input[type="password"], input[type="number"], input[type="text"], select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--panel);
+  color: var(--ink);
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--oyd-blue);
+  box-shadow: 0 0 0 3px var(--oyd-blue-tint);
+}
+
+input[type="submit"], button[type="submit"] {
+  margin-top: 18px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--oyd-blue);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+input[type="submit"]:hover, button[type="submit"]:hover { background: var(--oyd-blue-dark); }
+
+/* Locking is not the main action on any page, so it must not look like one.
+   button_to renders a submit button, which would otherwise pick up the filled
+   style above. */
+.bar button.link, .bar button[type="submit"] {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 5px 12px;
+  background: none;
+  color: var(--ink);
+  font-weight: 400;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+/* currentColor, so the padlock follows the label into blue on hover. */
+.bar button.link svg { width: 13px; height: 13px; flex: none; }
+.bar button.link:hover, .bar button[type="submit"]:hover {
+  background: none;
+  border-color: var(--oyd-blue);
+  color: var(--oyd-blue);
+}
+
+fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 6px 16px 18px; margin: 0 0 18px; background: var(--panel); }
+legend { padding: 0 6px; font-weight: 600; }
+
+/* --- passphrase strength -------------------------------------------------- */
+
+.meter { margin: 10px 0 0; }
+.meter-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.meter-bar span { display: block; height: 100%; width: 0; transition: width 0.15s; }
+.meter-bar span.too_short, .meter-bar span.weak { background: var(--bad); }
+.meter-bar span.fair { background: var(--oyd-flame); }
+.meter-bar span.strong { background: var(--good); }
+.meter-label { font-size: 0.85rem; color: var(--muted); }
+
+/* --- help ----------------------------------------------------------------- */
+
+.help {
+  background: var(--oyd-blue-tint);
+  border-left: 3px solid var(--oyd-blue);
+  border-radius: 0 8px 8px 0;
+  padding: 13px 16px;
+  margin: 0 0 22px;
+}
+.help h2 { margin: 0 0 6px; font-size: 0.95rem; color: var(--oyd-blue-dark); }
+.help p { margin: 0 0 8px; }
+.help ul { margin: 0 0 8px; padding-left: 20px; }
+.help .muted { font-size: 0.85rem; }
+
+/* A button, because it acts on this page and changes nothing anywhere else.
+   It sits in the same grey as the sentence it follows and takes its underline
+   only under the cursor: an offer, not an instruction. A blue underlined link
+   there would compete with the page's own actions for a first glance, which is
+   exactly what somebody who wants the box out of the way does not need. */
+button.as-link {
+  margin: 0 0 0 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+button.as-link:hover,
+button.as-link:focus-visible { text-decoration: underline; }
+
+.help-inline { margin-top: 22px; }
+.help-inline summary { cursor: pointer; color: var(--oyd-blue); }
+
+/* --- cards and tables ----------------------------------------------------- */
+
+.cards { display: flex; gap: 18px; flex-wrap: wrap; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 18px;
+  flex: 1 1 20rem;
+}
+.card h2 { margin-top: 4px; }
+
+dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; }
+dt { color: var(--muted); }
+dd { margin: 0; }
+
+table { width: 100%; border-collapse: collapse; margin: 10px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; background: var(--bg); }
+td.when { white-space: nowrap; color: var(--muted); }
+td.detail .pair { display: inline-block; margin-right: 12px; font-size: 0.9rem; }
+
+.chain-ok { color: var(--good); }
+.filters { display: flex; gap: 10px; align-items: end; margin: 10px 0; }
+.filters label { margin: 0; }
+.filters select { width: auto; }
+.filters input[type="submit"] { margin: 0; }
+
+.soon-list { color: var(--muted); }
+.locale-switch { margin-top: 24px; font-size: 0.9rem; text-align: center; color: var(--muted); }
+.locale-switch a { color: var(--oyd-blue); text-decoration: none; }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 0 0 30px;
+}
+footer .by { display: inline-flex; align-items: center; gap: 6px; }
+footer .by .mark { width: 11px; height: auto; vertical-align: middle; }
+
+a { color: var(--oyd-blue); }
+code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.9em; }
+
+/* --- product types --------------------------------------------------------- */
+
+.state-good { color: var(--good); font-weight: 500; }
+.state-bad   { color: var(--bad);  font-weight: 500; }
+td .hint { margin: 2px 0 0; }
+td.actions { white-space: nowrap; text-align: right; }
+td.actions form { display: inline-block; margin-right: 10px; }
+td.actions button.link { padding: 3px 10px; font-size: 0.9rem; }
+
+/* The one irreversible step on the passport page. Set apart from the form above
+   it for the same reason the danger zone is: it must not be reached by tabbing
+   past the save button. */
+.mint { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); }
+.mint h2 { margin-top: 0; font-size: 0.95rem; }
+.mint dl.given { margin-top: 0; }
+.warning-inline { color: var(--bad); margin: 10px 0 0; font-size: 0.92rem; }
+
+/* A passport that has been ended. Grey rather than the flame tint the other
+   warnings use: nothing is wrong and nothing needs doing — the passport is
+   simply over, and the page should say so without raising an alarm. */
+.warning.ended { background: var(--bg); border-color: var(--line); color: var(--muted); }
+.warning.ended strong { color: var(--ink); }
+
+/* The same state in the list, where there is room for one word. */
+span.ended {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  vertical-align: 2px;
+}
+
+/* Destructive actions sit apart and are never the filled blue button: the eye
+   goes to the primary action, and removing something must not be where the eye
+   lands. */
+.danger-zone { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); }
+.danger-zone h2 { margin-top: 0; font-size: 0.95rem; }
+button.link.danger, .danger-zone button[type="submit"] {
+  margin: 8px 0 0;
+  background: none;
+  color: var(--bad);
+  font-weight: 400;
+  border: 1px solid var(--line);
+}
+button.link.danger:hover, .danger-zone button[type="submit"]:hover {
+  background: none;
+  border-color: var(--bad);
+}
+
+/* --- the embedded form ----------------------------------------------------- */
+
+/* The frame grows to the height the form reports, so it never scrolls inside
+   itself — a form with its own scrollbar inside a page with another one is the
+   quickest way to lose the save button. */
+/* The border and the padding sit on a wrapper rather than on the frame itself.
+   soya-form's page draws to its own edges — its tab bar spans the full width
+   and its labels sit against the left margin — and the inside of a frame is not
+   ours to style. Room made around it reads as room inside it. */
+.soya-frame-wrap {
+  margin: 6px 0 0;
+  padding: 16px 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.soya-frame {
+  width: 100%;
+  /* A starting height only: the controller measures the form and sets the real
+     one within a frame or two. Small enough that a short form does not flash a
+     band of empty white first. */
+  height: 220px;
+  border: 0;
+  background: var(--panel);
+  display: block;
+}
+
+/* The character count next to the identifier. It only ever needs to say two
+   things: how much of the budget is gone, and that it is gone. */
+.hint .over { color: var(--bad); font-weight: 600; }
+
+dl.given { margin: 16px 0 0; grid-template-columns: auto 1fr; }
+dl.given dd code { word-break: break-all; }
+
+.new-passport { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 22px; }
+.new-passport .start {
+  display: inline-block;
+  padding: 9px 16px;
+  border-radius: 6px;
+  background: var(--oyd-blue);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.new-passport .start:hover { background: var(--oyd-blue-dark); }
+
+/* --- the setup wizard ------------------------------------------------------ */
+
+.steps { display: flex; gap: 10px 22px; flex-wrap: wrap; list-style: none; margin: 0 0 24px; padding: 0; color: var(--muted); }
+.steps li { display: flex; align-items: center; gap: 7px; }
+.steps .num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 21px; height: 21px; border-radius: 50%;
+  border: 1px solid var(--line); font-size: 0.8rem;
+}
+.steps li.past { color: var(--ink); }
+.steps li.past .num { border-color: var(--good); color: var(--good); }
+.steps li.on { color: var(--oyd-blue); font-weight: 600; }
+.steps li.on .num { border-color: var(--oyd-blue); background: var(--oyd-blue); color: #fff; }
+
+/* Secrets shown once. Monospace and wrapping, because these get copied by hand
+   and a line break in the middle of a key is how a character goes missing. */
+code.break { word-break: break-all; }
+code.secret { display: block; padding: 7px 9px; background: var(--oyd-blue-tint); border-radius: 5px; margin: 2px 0 6px; }
+.card.keys dl { grid-template-columns: 1fr; gap: 2px; }
+.card.keys dt { margin-top: 8px; }
+
+label.confirm { display: flex; align-items: flex-start; gap: 8px; font-weight: 400; margin: 20px 0 0; }
+label.confirm input { margin-top: 4px; }
+
+form.skip { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
+input[type="submit"].secondary { background: none; color: var(--oyd-blue); border: 1px solid var(--line); }
+input[type="submit"].secondary:hover { background: none; border-color: var(--oyd-blue); }
+
+/* Two saves side by side. The one that stays on the page is the filled button,
+   because it is the one used repeatedly while a passport is being filled in. */
+.save-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.save-actions input[type="submit"] { margin-top: 18px; }
+
+/* --- reading a passport ---------------------------------------------------- */
+
+form.lookup { margin: 0 0 26px; }
+form.lookup input[type="text"] { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+form.inline { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; margin: 0 0 16px; }
+form.inline label { margin: 0; }
+form.inline select { margin: 0; }
+form.inline input[type="submit"] { margin: 0; }
+
+section.read { margin: 0 0 30px; }
+
+/* The element tree. Indented by nesting rather than by a marker per level: the
+   structure is the point, and a bullet in front of every collection makes a
+   document of forty elements read as a shopping list. */
+ul.elements { list-style: none; margin: 6px 0 0; padding: 0; }
+ul.elements ul.elements { margin-left: 18px; padding-left: 12px; border-left: 1px solid var(--line); }
+ul.elements li { padding: 3px 0; }
+ul.elements .eid { color: var(--muted); }
+ul.elements .val { color: var(--ink); font-weight: 500; margin-left: 8px; }
+
+/* The two custody buttons sit on one line: signing a fresh mandate is the act,
+   comparing is the question you ask before deciding to. */
+.custody-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.custody-actions form { margin: 0; }
+
+/* A link that does not want to be noticed until it is looked for: the colour of
+   the sentence it sits in, underlined only under the cursor. The footer names
+   the file the whole application is about, so pointing at the page about it is
+   worth doing — and not worth a blue word competing with the page's own
+   actions for the first glance. */
+a.quiet { color: inherit; text-decoration: none; }
+a.quiet:hover,
+a.quiet:focus-visible { text-decoration: underline; }
+
+/* The handover, folded shut. It is the rarest thing on the page and the one
+   with the most consequences, so it is offered rather than presented. */
+details.handover { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 14px; }
+details.handover summary { cursor: pointer; color: var(--oyd-blue); }
+details.handover > *:not(summary) { margin-top: 12px; }

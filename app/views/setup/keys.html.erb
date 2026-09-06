@@ -1,0 +1,39 @@
+<h1><%= t("setup.title") %></h1>
+
+<%= render "setup/progress" %>
+
+<h2><%= t("setup.keys.heading") %></h2>
+
+<div class="warning">
+  <strong><%= t("setup.keys.warning_title") %></strong>
+  <p><%= t("setup.keys.warning_body") %></p>
+</div>
+
+<%= render "shared/help", key: "setup.keys.help" %>
+
+<section class="card keys">
+  <h2><%= t("setup.keys.your_identity") %></h2>
+  <dl>
+    <dt><%= t("identity.did") %></dt>
+    <dd><code class="break"><%= @identity.did %></code></dd>
+    <dt><%= t("identity.document_key") %></dt>
+    <dd><code class="break secret"><%= @identity.document_key %></code></dd>
+    <dt><%= t("identity.revocation_key") %></dt>
+    <dd><code class="break secret"><%= @identity.revocation_key %></code></dd>
+  </dl>
+  <p class="hint"><%= t("setup.keys.what_they_are") %></p>
+</section>
+
+<section>
+  <h2><%= t("setup.keys.export_title") %></h2>
+  <p><%= t("setup.keys.export_body", directory: Vault::Store.data_dir) %></p>
+  <%= button_to t("setup.keys.export_action"), identity_export_path, method: :post %>
+</section>
+
+<%= form_with url: setup_keys_path, method: :post, local: true do %>
+  <label class="confirm">
+    <%= check_box_tag :confirmed, "1", false %>
+    <%= t("setup.keys.confirm_label") %>
+  </label>
+  <%= submit_tag t("setup.keys.action") %>
+<% end %>

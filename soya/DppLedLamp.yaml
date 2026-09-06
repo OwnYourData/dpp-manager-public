@@ -1,0 +1,519 @@
+# Digital product passport for an LED lamp.
+#
+# The attributes are taken from the Siemens LED lamp asset administration shell
+# (Nameplate, TechnicalSpecification, LifespanAndWaranties, Compliance,
+# EnvironmentalFootprint, MaterialComposition), so this describes a product that
+# exists rather than one invented to fit the model.
+#
+# What is deliberately NOT here: uniqueProductIdentifier, granularity,
+# economicOperatorId, facilityId, dppSchemaVersion, dppStatus, lastUpdated.
+# Those are the passport's envelope and the service's own fields — they belong
+# to the DPP Service and to the carrier, not to a product data model, and
+# putting them in the form is how an operator ends up typing a value the server
+# is about to overwrite.
+#
+# Types live here in the base and nowhere else: the validation overlay has no
+# `datatype` key and the converter drops one silently if you write it.
+
+meta:
+  name: DppLedLamp
+
+content:
+  bases:
+    - name: DppLedLamp
+      attributes:
+        # --- who made it, and which one is it ---
+        manufacturerName: String
+        productDesignation: String
+        modelIdentifier: String
+        serialNumber: String
+        dateOfManufacture: Date
+        countryOfOrigin: String
+
+        # --- light and power ---
+        usefulLuminousFlux: Integer
+        onModePower: Decimal
+        standbyPower: Decimal
+        colourTemperature: Integer
+        colourRenderingIndex: Integer
+        beamAngle: Integer
+        typeOfDimming: String
+
+        # --- how long it lasts ---
+        ratedLifetime: Integer
+        guaranteedSwitchingCycles: Integer
+        warrantyPeriodYears: Integer
+
+        # --- conformity and substances ---
+        ceMarking: String
+        rohsCompliant: Boolean
+        containsSvhc: Boolean
+        svhcSubstances: Set<String>
+
+        # --- environment ---
+        energyEfficiencyClass: String
+        carbonFootprint: Decimal
+
+        # Documents are referenced, never held: version 1 of the application
+        # takes a URL and does not host anything.
+        declarationOfConformity: AnyURI
+        dismantlingInstructions: AnyURI
+
+  overlays:
+    - type: OverlayAnnotation
+      base: DppLedLamp
+      name: DppLedLampAnnotation
+      class:
+        label:
+          en: LED lamp
+          de: LED-Lampe
+        comment:
+          en: Digital product passport for a single LED lamp.
+          de: Digitaler Produktpass für eine einzelne LED-Lampe.
+      attributes:
+        manufacturerName:
+          label: { en: Manufacturer, de: Hersteller }
+          comment:
+            en: The legal name of the manufacturer, as it appears on the nameplate.
+            de: Der eingetragene Name des Herstellers, wie er auf dem Typenschild steht.
+        productDesignation:
+          label: { en: Product designation, de: Produktbezeichnung }
+          comment:
+            en: What the manufacturer calls this product in their catalogue.
+            de: Wie der Hersteller dieses Produkt in seinem Katalog nennt.
+        modelIdentifier:
+          label: { en: Model, de: Modell }
+          comment:
+            en: Identifies the model, not the individual lamp. Every lamp of this model carries the same value.
+            de: Bezeichnet das Modell, nicht die einzelne Lampe. Jede Lampe dieses Modells trägt denselben Wert.
+        serialNumber:
+          label: { en: Serial number, de: Seriennummer }
+          comment:
+            en: Only for a passport that describes one individual item.
+            de: Nur bei einem Pass, der ein einzelnes Stück beschreibt.
+        dateOfManufacture:
+          label: { en: Date of manufacture, de: Herstelldatum }
+        countryOfOrigin:
+          label: { en: Country of origin, de: Ursprungsland }
+          comment:
+            en: Two-letter country code, for example DE or AT.
+            de: Zweibuchstabiger Ländercode, zum Beispiel DE oder AT.
+
+        usefulLuminousFlux:
+          label: { en: Useful luminous flux (lm), de: Nutzlichtstrom (lm) }
+          comment:
+            en: The light the lamp actually delivers within its beam angle — not the raw output of the diodes.
+            de: Das Licht, das die Lampe innerhalb ihres Abstrahlwinkels tatsächlich abgibt — nicht die Rohleistung der Dioden.
+        onModePower:
+          label: { en: On-mode power (W), de: Leistungsaufnahme im Ein-Zustand (W) }
+        standbyPower:
+          label: { en: Standby power (W), de: Leistungsaufnahme im Bereitschaftszustand (W) }
+          comment:
+            en: Zero for a lamp with no standby state.
+            de: Null bei einer Lampe ohne Bereitschaftszustand.
+        colourTemperature:
+          label: { en: Colour temperature (K), de: Farbtemperatur (K) }
+          comment:
+            en: 2700 K is warm white, 6500 K is daylight.
+            de: 2700 K ist Warmweiß, 6500 K ist Tageslichtweiß.
+        colourRenderingIndex:
+          label: { en: Colour rendering index (Ra), de: Farbwiedergabeindex (Ra) }
+        beamAngle:
+          label: { en: Beam angle (°), de: Abstrahlwinkel (°) }
+        typeOfDimming:
+          label: { en: Dimming, de: Dimmbarkeit }
+
+        ratedLifetime:
+          label: { en: Rated lifetime (h), de: Bemessungslebensdauer (h) }
+        guaranteedSwitchingCycles:
+          label: { en: Guaranteed switching cycles, de: Garantierte Schaltzyklen }
+        warrantyPeriodYears:
+          label: { en: Warranty (years), de: Garantie (Jahre) }
+
+        ceMarking:
+          label: { en: CE marking, de: CE-Kennzeichnung }
+          comment:
+            en: The identifier under which conformity was declared.
+            de: Die Kennung, unter der die Konformität erklärt wurde.
+        rohsCompliant:
+          label: { en: RoHS compliant, de: RoHS-konform }
+        containsSvhc:
+          label: { en: Contains substances of very high concern, de: Enthält besonders besorgniserregende Stoffe }
+          comment:
+            en: Above 0.1 percent by weight, as REACH defines it.
+            de: Über 0,1 Massenprozent, wie es REACH festlegt.
+        svhcSubstances:
+          label: { en: Which substances, de: Welche Stoffe }
+          comment:
+            en: One entry per substance. Leave empty if there are none.
+            de: Ein Eintrag je Stoff. Leer lassen, wenn keine enthalten sind.
+
+        energyEfficiencyClass:
+          label: { en: Energy efficiency class, de: Energieeffizienzklasse }
+        carbonFootprint:
+          label: { en: Carbon footprint (kg CO2e), de: CO2-Fußabdruck (kg CO2e) }
+          comment:
+            en: Over the whole life cycle, per lamp.
+            de: Über den gesamten Lebenszyklus, je Lampe.
+
+        declarationOfConformity:
+          label: { en: Declaration of conformity (link), de: Konformitätserklärung (Link) }
+          comment:
+            en: A web address. This application does not host the document.
+            de: Eine Webadresse. Diese Anwendung hostet das Dokument nicht.
+        dismantlingInstructions:
+          label: { en: Dismantling instructions (link), de: Demontageanleitung (Link) }
+
+    - type: OverlayValidation
+      base: DppLedLamp
+      name: DppLedLampValidation
+      attributes:
+        manufacturerName:
+          cardinality: "1..1"
+          length: "[1..120]"
+        productDesignation:
+          cardinality: "1..1"
+          length: "[1..120]"
+        modelIdentifier:
+          cardinality: "1..1"
+          length: "[1..60]"
+        serialNumber:
+          cardinality: "0..1"
+          length: "[0..60]"
+        dateOfManufacture:
+          cardinality: "1..1"
+          # No lamp in a passport predates the directive that asks for one.
+          valueRange: "[2000-01-01..*]"
+        countryOfOrigin:
+          cardinality: "1..1"
+          pattern: "^[A-Z]{2}$"
+          message:
+            en: Two capital letters, for example DE.
+            de: Zwei Großbuchstaben, zum Beispiel DE.
+
+        usefulLuminousFlux:
+          cardinality: "1..1"
+          valueRange: "[1..]"
+        onModePower:
+          cardinality: "1..1"
+          valueRange: "[0..]"
+        standbyPower:
+          cardinality: "0..1"
+          valueRange: "[0..]"
+        colourTemperature:
+          cardinality: "1..1"
+          # Below 1500 K is not white light; above 10000 K no lamp is sold.
+          valueRange: "[1500..10000]"
+        colourRenderingIndex:
+          cardinality: "0..1"
+          valueRange: "[0..100]"
+        beamAngle:
+          cardinality: "0..1"
+          valueRange: "[1..360]"
+        # Literals for the same reason as energyEfficiencyClass below. This one
+        # never failed because nobody had chosen a dimming type yet; it would
+        # have, at the first passport that did.
+        typeOfDimming:
+          cardinality: "0..1"
+          valueOption: [ none, phase, dali, pwm ]
+
+        ratedLifetime:
+          cardinality: "1..1"
+          valueRange: "[1..]"
+        guaranteedSwitchingCycles:
+          cardinality: "0..1"
+          valueRange: "[0..]"
+        warrantyPeriodYears:
+          cardinality: "0..1"
+          valueRange: "[0..25]"
+
+        ceMarking:
+          cardinality: "0..1"
+          length: "[0..40]"
+        rohsCompliant:
+          cardinality: "1..1"
+        containsSvhc:
+          cardinality: "1..1"
+        # Zero to many, and the reason it is a Set: a lamp with two substances
+        # must not force the operator to invent a separator.
+        svhcSubstances:
+          cardinality: "0..n"
+          length: "[1..200]"
+
+        # Plain strings, not `id:` options — and that is the whole point of this
+        # block rather than a stylistic choice.
+        #
+        # An option written as `id: A` becomes the IRI …/DppLedLamp/A in the
+        # sh:in list. The attribute's range is xsd:string, so the answer arrives
+        # as the literal "A", and a literal is never in a list of IRIs: every
+        # passport was reported as violating a constraint it satisfied, and the
+        # message named the blank node holding the list rather than the value.
+        # A closed list over a literal range has to be a list of literals.
+        #
+        # What is given up: the generated form can no longer translate the
+        # options, because there is no IRI left to hang a label on. For A to G
+        # the label is the value, so nothing is lost here.
+        energyEfficiencyClass:
+          cardinality: "1..1"
+          valueOption: [ A, B, C, D, E, F, G ]
+        carbonFootprint:
+          cardinality: "0..1"
+          valueRange: "[0..]"
+
+        declarationOfConformity:
+          cardinality: "0..1"
+          pattern: "^https://"
+          message:
+            en: A https address.
+            de: Eine https-Adresse.
+        dismantlingInstructions:
+          cardinality: "0..1"
+          pattern: "^https://"
+
+    # The generated form would put twenty-six controls in one column in the
+    # order the base happens to list them. That is the only thing wrong with it,
+    # and it is exactly what a form overlay is for: grouping and order.
+    #
+    # The schema below repeats the constraints of the validation overlay, and
+    # that repetition is deliberate. JSON Forms validates against this schema and
+    # against nothing else, so a limit that lives only in the validation overlay
+    # is invisible to the person typing and surfaces on the server afterwards —
+    # which is where "Farbtemperatur: 1" came from. The two are kept honest by
+    # LampStructureTest, which compares them attribute by attribute.
+    #
+    # Two overlays, same tag, different language. That is how SOyA carries
+    # multilingual forms; there is no other mechanism and no third overlay type.
+    - type: OverlayForm
+      base: DppLedLamp
+      name: DppLedLampFormEn
+      tag: dpp
+      language: en
+      schema:
+        type: object
+        properties:
+          manufacturerName: { type: string, minLength: 1, maxLength: 120 }
+          productDesignation: { type: string, minLength: 1, maxLength: 120 }
+          modelIdentifier: { type: string, minLength: 1, maxLength: 60 }
+          serialNumber: { type: string, maxLength: 60 }
+          dateOfManufacture: { type: string, format: date }
+          countryOfOrigin: { type: string, pattern: "^[A-Z]{2}$" }
+          usefulLuminousFlux: { type: integer, minimum: 1 }
+          onModePower: { type: number, minimum: 0 }
+          standbyPower: { type: number, minimum: 0 }
+          colourTemperature: { type: integer, minimum: 1500, maximum: 10000 }
+          colourRenderingIndex: { type: integer, minimum: 0, maximum: 100 }
+          beamAngle: { type: integer, minimum: 1, maximum: 360 }
+          typeOfDimming: { type: string, enum: [ none, phase, dali, pwm ] }
+          ratedLifetime: { type: integer, minimum: 1 }
+          guaranteedSwitchingCycles: { type: integer, minimum: 0 }
+          warrantyPeriodYears: { type: integer, minimum: 0, maximum: 25 }
+          ceMarking: { type: string, maxLength: 40 }
+          rohsCompliant: { type: boolean }
+          containsSvhc: { type: boolean }
+          svhcSubstances: { type: array, items: { type: string, minLength: 1, maxLength: 200 } }
+          energyEfficiencyClass: { type: string, enum: [ A, B, C, D, E, F, G ] }
+          carbonFootprint: { type: number, minimum: 0 }
+          declarationOfConformity: { type: string, pattern: "^https://" }
+          dismantlingInstructions: { type: string, pattern: "^https://" }
+        required:
+          - manufacturerName
+          - productDesignation
+          - modelIdentifier
+          - dateOfManufacture
+          - countryOfOrigin
+          - usefulLuminousFlux
+          - onModePower
+          - colourTemperature
+          - ratedLifetime
+          - rohsCompliant
+          - containsSvhc
+          - energyEfficiencyClass
+      ui:
+        type: Categorization
+        options:
+          variant: standard
+          density: compact
+        elements:
+          - type: Category
+            label: Product
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/manufacturerName", label: "Manufacturer" }
+                  - { type: Control, scope: "#/properties/productDesignation", label: "Product designation" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/modelIdentifier", label: "Model" }
+                  - { type: Control, scope: "#/properties/serialNumber", label: "Serial number" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/dateOfManufacture", label: "Date of manufacture" }
+                  - { type: Control, scope: "#/properties/countryOfOrigin", label: "Country of origin" }
+          - type: Category
+            label: Light and power
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/usefulLuminousFlux", label: "Useful luminous flux (lm)" }
+                  - { type: Control, scope: "#/properties/colourTemperature", label: "Colour temperature (K)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/onModePower", label: "On-mode power (W)" }
+                  - { type: Control, scope: "#/properties/standbyPower", label: "Standby power (W)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/colourRenderingIndex", label: "Colour rendering index (Ra)" }
+                  - { type: Control, scope: "#/properties/beamAngle", label: "Beam angle (°)" }
+              - { type: Control, scope: "#/properties/typeOfDimming", label: "Dimming" }
+          - type: Category
+            label: Lifetime
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/ratedLifetime", label: "Rated lifetime (h)" }
+                  - { type: Control, scope: "#/properties/guaranteedSwitchingCycles", label: "Guaranteed switching cycles" }
+              - { type: Control, scope: "#/properties/warrantyPeriodYears", label: "Warranty (years)" }
+          - type: Category
+            label: Conformity and substances
+            elements:
+              - { type: Control, scope: "#/properties/ceMarking", label: "CE marking" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/rohsCompliant", label: "RoHS compliant" }
+                  - { type: Control, scope: "#/properties/containsSvhc", label: "Contains substances of very high concern" }
+              # Only asked when the answer above says there is something to ask
+              # about. An empty list next to "contains: no" is a contradiction
+              # waiting to be filled in by accident.
+              - type: Control
+                scope: "#/properties/svhcSubstances"
+                label: "Which substances"
+                rule:
+                  effect: SHOW
+                  condition:
+                    scope: "#/properties/containsSvhc"
+                    schema: { const: true }
+              - { type: Control, scope: "#/properties/declarationOfConformity", label: "Declaration of conformity (link)" }
+          - type: Category
+            label: Environment
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/energyEfficiencyClass", label: "Energy efficiency class" }
+                  - { type: Control, scope: "#/properties/carbonFootprint", label: "Carbon footprint (kg CO2e)" }
+              - { type: Control, scope: "#/properties/dismantlingInstructions", label: "Dismantling instructions (link)" }
+
+    - type: OverlayForm
+      base: DppLedLamp
+      name: DppLedLampFormDe
+      tag: dpp
+      language: de
+      schema:
+        type: object
+        properties:
+          manufacturerName: { type: string, minLength: 1, maxLength: 120 }
+          productDesignation: { type: string, minLength: 1, maxLength: 120 }
+          modelIdentifier: { type: string, minLength: 1, maxLength: 60 }
+          serialNumber: { type: string, maxLength: 60 }
+          dateOfManufacture: { type: string, format: date }
+          countryOfOrigin: { type: string, pattern: "^[A-Z]{2}$" }
+          usefulLuminousFlux: { type: integer, minimum: 1 }
+          onModePower: { type: number, minimum: 0 }
+          standbyPower: { type: number, minimum: 0 }
+          colourTemperature: { type: integer, minimum: 1500, maximum: 10000 }
+          colourRenderingIndex: { type: integer, minimum: 0, maximum: 100 }
+          beamAngle: { type: integer, minimum: 1, maximum: 360 }
+          typeOfDimming: { type: string, enum: [ none, phase, dali, pwm ] }
+          ratedLifetime: { type: integer, minimum: 1 }
+          guaranteedSwitchingCycles: { type: integer, minimum: 0 }
+          warrantyPeriodYears: { type: integer, minimum: 0, maximum: 25 }
+          ceMarking: { type: string, maxLength: 40 }
+          rohsCompliant: { type: boolean }
+          containsSvhc: { type: boolean }
+          svhcSubstances: { type: array, items: { type: string, minLength: 1, maxLength: 200 } }
+          energyEfficiencyClass: { type: string, enum: [ A, B, C, D, E, F, G ] }
+          carbonFootprint: { type: number, minimum: 0 }
+          declarationOfConformity: { type: string, pattern: "^https://" }
+          dismantlingInstructions: { type: string, pattern: "^https://" }
+        required:
+          - manufacturerName
+          - productDesignation
+          - modelIdentifier
+          - dateOfManufacture
+          - countryOfOrigin
+          - usefulLuminousFlux
+          - onModePower
+          - colourTemperature
+          - ratedLifetime
+          - rohsCompliant
+          - containsSvhc
+          - energyEfficiencyClass
+      ui:
+        type: Categorization
+        options:
+          variant: standard
+          density: compact
+        elements:
+          - type: Category
+            label: Produkt
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/manufacturerName", label: "Hersteller" }
+                  - { type: Control, scope: "#/properties/productDesignation", label: "Produktbezeichnung" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/modelIdentifier", label: "Modell" }
+                  - { type: Control, scope: "#/properties/serialNumber", label: "Seriennummer" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/dateOfManufacture", label: "Herstelldatum" }
+                  - { type: Control, scope: "#/properties/countryOfOrigin", label: "Ursprungsland" }
+          - type: Category
+            label: Licht und Leistung
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/usefulLuminousFlux", label: "Nutzlichtstrom (lm)" }
+                  - { type: Control, scope: "#/properties/colourTemperature", label: "Farbtemperatur (K)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/onModePower", label: "Leistungsaufnahme im Ein-Zustand (W)" }
+                  - { type: Control, scope: "#/properties/standbyPower", label: "Leistungsaufnahme im Bereitschaftszustand (W)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/colourRenderingIndex", label: "Farbwiedergabeindex (Ra)" }
+                  - { type: Control, scope: "#/properties/beamAngle", label: "Abstrahlwinkel (°)" }
+              - { type: Control, scope: "#/properties/typeOfDimming", label: "Dimmbarkeit" }
+          - type: Category
+            label: Lebensdauer
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/ratedLifetime", label: "Bemessungslebensdauer (h)" }
+                  - { type: Control, scope: "#/properties/guaranteedSwitchingCycles", label: "Garantierte Schaltzyklen" }
+              - { type: Control, scope: "#/properties/warrantyPeriodYears", label: "Garantie (Jahre)" }
+          - type: Category
+            label: Konformität und Stoffe
+            elements:
+              - { type: Control, scope: "#/properties/ceMarking", label: "CE-Kennzeichnung" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/rohsCompliant", label: "RoHS-konform" }
+                  - { type: Control, scope: "#/properties/containsSvhc", label: "Enthält besonders besorgniserregende Stoffe" }
+              - type: Control
+                scope: "#/properties/svhcSubstances"
+                label: "Welche Stoffe"
+                rule:
+                  effect: SHOW
+                  condition:
+                    scope: "#/properties/containsSvhc"
+                    schema: { const: true }
+              - { type: Control, scope: "#/properties/declarationOfConformity", label: "Konformitätserklärung (Link)" }
+          - type: Category
+            label: Umwelt
+            elements:
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/energyEfficiencyClass", label: "Energieeffizienzklasse" }
+                  - { type: Control, scope: "#/properties/carbonFootprint", label: "CO2-Fußabdruck (kg CO2e)" }
+              - { type: Control, scope: "#/properties/dismantlingInstructions", label: "Demontageanleitung (Link)" }

@@ -1,0 +1,72 @@
+<h1><%= t("setup.title") %></h1>
+
+<%= render "setup/progress" %>
+<%= render "shared/help", key: "setup.custodian.help" %>
+
+<h2><%= t("setup.custodian.heading") %></h2>
+<p class="lead"><%= t("setup.custodian.lead") %></p>
+
+<%# What a custodian is, before what to type. "Custodian" is a word somebody can
+    read as "a folder in the cloud", and the difference is the whole point: a
+    custodian holds the document, and what it may do with it is one signed
+    sentence about one passport, revocable without asking anybody. %>
+<p><%= t("setup.custodian.what_it_is") %></p>
+
+<section class="card">
+  <h2><%= t("setup.custodian.what_you_need") %></h2>
+  <p><%= t("setup.custodian.what_you_need_body") %></p>
+  <p class="hint"><%= t("setup.custodian.controller_hint", did: Identity.current&.did) %></p>
+</section>
+
+<% known = Setting::KNOWN_CUSTODIAN %>
+<% chose_known = settings.custodian_base_url.blank? || Setting.known_custodian?(settings.custodian_base_url) %>
+
+<%= form_with url: setup_custodian_path, method: :post, local: true do %>
+  <fieldset class="choice">
+    <legend><%= t("setup.custodian.which") %></legend>
+
+    <%# The address of the named one is not in a field: it comes from the
+        application when this option is chosen. A field would invite a typo into
+        something that is frozen into every identifier minted afterwards. %>
+    <label class="confirm">
+      <%= radio_button_tag :custodian_choice, "known", chose_known %>
+      <span>
+        <strong><%= known[:name] %></strong> · <code><%= known[:base_url] %></code>
+        <br><span class="hint"><%= t("setup.custodian.known_hint") %></span>
+      </span>
+    </label>
+
+    <label class="confirm">
+      <%= radio_button_tag :custodian_choice, "other", !chose_known %>
+      <span><%= t("setup.custodian.other") %></span>
+    </label>
+
+    <label for="custodian_base_url"><%= t("setup.custodian.base_url") %></label>
+    <%= text_field_tag :custodian_base_url,
+          (settings.custodian_base_url unless chose_known),
+          id: "custodian_base_url", placeholder: "https://pod.example.com",
+          autocomplete: "off", spellcheck: false %>
+    <p class="hint"><%= t("setup.custodian.base_url_hint") %></p>
+  </fieldset>
+
+  <label for="custodian_collection_id"><%= t("setup.custodian.collection") %></label>
+  <%= text_field_tag :custodian_collection_id, settings.custodian_collection_id, id: "custodian_collection_id",
+        autocomplete: "off" %>
+  <p class="hint"><%= t("setup.custodian.collection_hint") %></p>
+
+  <%# Only once there are passports does the distinction matter, so it is said
+      only then: an identifier carries the address it was minted with, and no
+      setting reaches back into one that has already been published. %>
+  <% if settings.setup_complete? %>
+    <p class="hint"><%= t("setup.custodian.affects_new_only") %></p>
+  <% end %>
+
+  <%= submit_tag settings.setup_complete? ? t("setup.custodian.save") : t("setup.custodian.action") %>
+<% end %>
+
+<%= form_with url: setup_custodian_path, method: :post, local: true, class: "skip" do %>
+  <%= hidden_field_tag :skip, "1" %>
+  <%= submit_tag settings.setup_complete? ? t("setup.custodian.clear_action") : t("setup.custodian.skip_action"),
+        class: "secondary" %>
+  <p class="hint"><%= t("setup.custodian.skip_hint") %></p>
+<% end %>

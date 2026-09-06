@@ -1,0 +1,14 @@
+<h1><%= t("product_types.edit_title") %></h1>
+
+<%= render "form", product_type: @product_type %>
+
+<%# Removing a type does not touch the passports made from it: those keep their
+    own copy of the data. What is lost is the ability to make new ones, and to
+    render the old ones for editing until the type is added back. %>
+<div class="danger-zone">
+  <h2><%= t("product_types.remove.title") %></h2>
+  <p class="hint"><%= t("product_types.remove.hint") %></p>
+  <%= button_to t("product_types.remove.button"), product_type_path(@product_type),
+        method: :delete, class: "link danger",
+        form: { data: { turbo_confirm: t("product_types.remove.confirm", label: @product_type.label) } } %>
+</div>

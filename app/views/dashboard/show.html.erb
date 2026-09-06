@@ -1,0 +1,69 @@
+<h1><%= t("dashboard.title") %></h1>
+
+<%= render "shared/help", key: "dashboard.help" %>
+
+<p class="lead"><%= t("dashboard.lead") %></p>
+
+<%# Only when there is something to do about it. A permanent panel saying
+    "nothing expires soon" is a panel people stop reading. %>
+<% if @mandates_due.any? %>
+  <div class="warning">
+    <strong><%= t("dashboard.mandates.title", count: @mandates_due.size) %></strong>
+    <p><%= t("dashboard.mandates.body") %></p>
+    <ul>
+      <% @mandates_due.each do |passport| %>
+        <li>
+          <%= link_to passport.label, edit_passport_path(passport) %> —
+          <% if passport.delegation_expired? %>
+            <%= t("dashboard.mandates.expired") %>
+          <% else %>
+            <%= t("dashboard.mandates.until", date: l(passport.delegation_expires_at.in_time_zone, format: :short)) %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<section class="cards">
+  <div class="card">
+    <h2><%= t("dashboard.state.title") %></h2>
+    <dl>
+      <dt><%= t("dashboard.state.file") %></dt>
+      <dd><code><%= Vault::Store.path %></code></dd>
+      <dt><%= t("dashboard.state.opened_at") %></dt>
+      <dd><%= l(Vault::Session.opened_at.in_time_zone, format: :long) %></dd>
+      <dt><%= t("dashboard.state.kdf_profile") %></dt>
+      <dd><%= Vault::Session.profile %></dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h2><%= t("dashboard.next.title") %></h2>
+    <p><%= t("dashboard.next.body") %></p>
+    <ul class="soon-list">
+      <li><%= t("nav.setup") %></li>
+      <li><%= t("nav.new_passport") %></li>
+      <li><%= t("nav.passports") %></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2><%= t("dashboard.recent_events") %></h2>
+  <% if @recent_events.any? %>
+    <table>
+      <tbody>
+        <% @recent_events.each do |event| %>
+          <tr>
+            <td class="when"><%= l(event.occurred_at.in_time_zone, format: :short) %></td>
+            <td><%= t("events.kinds.#{event.kind}") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <p><%= link_to t("dashboard.all_events"), events_path %></p>
+  <% else %>
+    <p class="muted"><%= t("events.empty") %></p>
+  <% end %>
+</section>

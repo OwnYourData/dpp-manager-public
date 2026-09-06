@@ -1,0 +1,117 @@
+# An EN 18223 element tree, read back into the LED lamp's form answers.
+#
+# The way back from DppLedLampToEN18223, and a second structure rather than a
+# second overlay in that one: `soya transform` takes the first overlay in the
+# graph that carries an `engine` field, and there is no selecting by name or
+# tag. One structure per direction.
+#
+# It is NOT a lossless inverse, and cannot be. The forward direction drops what
+# was not answered, names units, and states value types; the way back has less
+# to work with than it gave away, and a passport written by somebody else may
+# carry elements this form has no field for. So what this produces is a starting
+# point for a local draft: every answer it can place, and nothing invented for
+# the ones it cannot.
+#
+# Input is the whole document, not just `elements`. A reverse transformation has
+# to be able to see what it was handed — a Table 1 envelope with an element tree
+# inside it is what a passport looks like when it is read — and taking the whole
+# thing means the caller does not have to unwrap it first and guess wrong. What
+# comes back is only the form's answers: the identifier, the granularity and the
+# operator belong to the envelope, and the application builds those itself.
+#
+# Element ids are matched, not paths. A collection is how a document is
+# organised and another author may organise it differently; `LuminousFlux` means
+# the same thing wherever it sits.
+
+meta:
+  name: DppLedLampFromEN18223
+
+content:
+  overlays:
+    - type: OverlayTransformation
+      base: https://soya.ownyourdata.eu/DppLedLamp
+      name: DppLedLampFromEN18223Transformation
+      engine: jq
+      value: |
+        # --- helpers ------------------------------------------------------
+
+        # Every element in the document, however deeply nested. Collections
+        # carry elements, and so does a MultiValuedDataElement, so one recursion
+        # covers both.
+        def all_elements:
+          [ (.elements // [])[] | recurse(.elements[]?) ];
+
+        # The way back from valueDataType. The form's schema wants a number
+        # where the standard allows the value to be written as a string, and a
+        # JSON Forms field handed "9" for an integer renders empty — so the
+        # declared type is used for what it is worth, and a value that does not
+        # convert is passed through untouched rather than dropped.
+        def cast:
+          . as $e
+          | ($e.value) as $v
+          | ($e.valueDataType // "") as $t
+          | if $v == null then null
+            elif ($t | test("integer|decimal|double|float"; "i")) then (try ($v | tonumber) catch $v)
+            elif ($t | test("boolean"; "i")) then
+              (if $v == "true" then true elif $v == "false" then false else $v end)
+            else $v
+            end;
+
+        # A collection shares the shape of an element and has no value of its
+        # own, so it is skipped explicitly: an id that names both a group and a
+        # field would otherwise answer with the group.
+        def one($flat; $id):
+          [ $flat[] | select(.elementId == $id and (.objectType // "") != "DataElementCollection") ] | first;
+
+        def value($flat; $id):
+          (one($flat; $id) | if . == null then null else cast end);
+
+        # Repetitions: the children of a MultiValuedDataElement share one id,
+        # because they are the same field said several times.
+        def many($flat; $id):
+          [ $flat[] | select(.elementId == $id) | .value | select(. != null and . != "") ];
+
+        # A RelatedResource carries a url and no value.
+        def link($flat; $id):
+          [ $flat[] | select(.elementId == $id) | .url | select(. != null and . != "") ] | first;
+
+        # --- the answers ----------------------------------------------------
+
+        (. | all_elements) as $flat
+        | {
+            manufacturerName:          value($flat; "BrandName"),
+            productDesignation:        value($flat; "ProductDesignation"),
+            modelIdentifier:           value($flat; "ModelIdentifier"),
+            serialNumber:              value($flat; "SerialNumber"),
+            dateOfManufacture:         value($flat; "DateOfManufacture"),
+            countryOfOrigin:           value($flat; "CountryOfOrigin"),
+
+            usefulLuminousFlux:        value($flat; "LuminousFlux"),
+            onModePower:               value($flat; "OnModePower"),
+            standbyPower:              value($flat; "StandbyPower"),
+            colourTemperature:         value($flat; "CorrelatedColourTemperature"),
+            colourRenderingIndex:      value($flat; "ColourRenderingIndex"),
+            beamAngle:                 value($flat; "BeamAngle"),
+            typeOfDimming:             value($flat; "DimmingType"),
+
+            ratedLifetime:             value($flat; "RatedLifetime"),
+            guaranteedSwitchingCycles: value($flat; "SwitchingCycles"),
+            warrantyPeriodYears:       value($flat; "WarrantyPeriod"),
+
+            ceMarking:                 value($flat; "CeMarking"),
+            rohsCompliant:             value($flat; "RoHSCompliant"),
+            containsSvhc:              value($flat; "ContainsSubstancesOfVeryHighConcern"),
+            svhcSubstances:            many($flat; "SubstanceName"),
+
+            energyEfficiencyClass:     value($flat; "EnergyEfficiencyClass"),
+            carbonFootprint:           value($flat; "CarbonFootprint"),
+
+            declarationOfConformity:   link($flat; "DeclarationOfConformity"),
+            dismantlingInstructions:   link($flat; "DismantlingInstructions")
+          }
+        # What was not in the document is left out rather than set to null: an
+        # empty field and a field answered with nothing are different things,
+        # and JSON Forms shows the second as an error. `false` survives — it is
+        # an answer, and "contains no substances of very high concern" is the
+        # one worth keeping most.
+        | with_entries(select(.value != null and .value != "" and .value != []))

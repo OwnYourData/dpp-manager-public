@@ -1,0 +1,138 @@
+<%# The frame's address carries everything soya-form needs: which structure, in
+    which language, and the answers it should start from. It reports changes
+    back by postMessage, which the soya-form controller records. %>
+<%# viewMode=form-only is soya-form's own switch for exactly this situation: it
+    drops the schema picker and the language dropdowns, which are the operator's
+    choices already made on the page around it. %>
+<%# The tag has to travel too. soya-form fetches the author's YAML first and
+    picks the form overlay itself, filtering by tag and language — without the
+    tag it takes whichever matches the language first, which for a structure
+    with several forms is not necessarily the one this type was set up for. %>
+<% frame_src = "/soya-form/?" + {
+     schemaDri: product_type.resolvable_name,
+     language:  I18n.locale.to_s,
+     viewMode:  "form-only",
+     tag:       product_type.effective_form_tag,
+     data:      passport.values.to_json
+   }.compact.to_query %>
+
+<%= form_with model: passport,
+      url: (passport.persisted? ? passport_path(passport) : passports_path),
+      method: (passport.persisted? ? :patch : :post),
+      local: true,
+      data: {
+        controller: "soya-form",
+        soya_form_empty_label_value: t("passports.form.nothing_entered"),
+        soya_form_filled_label_value: t("passports.form.fields_entered")
+      } do |f| %>
+
+  <% if passport.errors.any? %>
+    <div class="flash alert">
+      <ul>
+        <% passport.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= hidden_field_tag :product_type_id, product_type.id %>
+  <%= hidden_field_tag :answers, passport.values.to_json, data: { soya_form_target: "answers" } %>
+
+  <fieldset>
+    <legend><%= t("passports.form.legend") %></legend>
+    <label for="passport_label"><%= t("passports.form.label") %></label>
+    <%= f.text_field :label, autofocus: passport.new_record? %>
+    <p class="hint"><%= t("passports.form.label_hint") %></p>
+  </fieldset>
+
+  <%# The envelope of EN 18223 Table 1, the part the operator supplies. The
+      identifier and the granularity sit next to each other on purpose: for a
+      Digital Link the one decides the other, and seeing them apart is how a
+      contradiction gets typed in the first place. %>
+  <%# The controller sits on the fieldset, not on the input: Stimulus only finds
+      targets inside its own element, and the character count and the derived
+      granularity are siblings of the field, not children of it. %>
+  <%# Once the DID exists these two are inside it, published, and pointed at by
+      whatever carrier the product bears. They are shown, not offered: an
+      editable field that the model refuses to save is worse than no field. %>
+  <fieldset data-controller="identifier">
+    <legend><%= t("passports.envelope.legend") %></legend>
+
+    <label for="passport_unique_product_identifier"><%= t("passports.envelope.identifier") %></label>
+    <%= f.text_field :unique_product_identifier,
+          placeholder: "https://id.example.com/01/09520123456788",
+          readonly: passport.minted?,
+          data: { identifier_target: "field", action: "input->identifier#derive" } %>
+    <p class="hint">
+      <%= passport.minted? ? t("passports.envelope.identifier_frozen") : t("passports.envelope.identifier_hint") %>
+      <span data-identifier-target="count"></span>
+    </p>
+
+    <label for="passport_granularity"><%= t("passports.envelope.granularity") %></label>
+    <%= f.select :granularity,
+          Dpp::ProductIdentifier::GRANULARITIES.map { |g| [ t("passports.granularities.#{g}"), g ] },
+          { include_blank: true },
+          disabled: passport.minted?,
+          data: { identifier_target: "granularity" } %>
+    <p class="hint">
+      <%= t("passports.envelope.granularity_hint") %>
+      <span data-identifier-target="derived" data-label="<%= t("passports.envelope.granularity_derived") %>"></span>
+    </p>
+
+    <label for="passport_facility_id"><%= t("passports.envelope.facility") %></label>
+    <%= f.text_field :facility_id %>
+    <p class="hint"><%= t("passports.envelope.facility_hint") %></p>
+
+    <dl class="given">
+      <dt><%= t("passports.envelope.operator") %></dt>
+      <dd><code class="break"><%= Identity.current&.did %></code></dd>
+      <dt><%= t("passports.envelope.schema") %></dt>
+      <dd><code><%= Passport::SCHEMA_VERSION %></code></dd>
+      <% if passport.minted? %>
+        <dt><%= t("passports.envelope.dpp_id") %></dt>
+        <dd><code class="break"><%= passport.dpp_id %></code></dd>
+      <% end %>
+    </dl>
+    <p class="hint"><%= t("passports.envelope.operator_hint") %></p>
+  </fieldset>
+
+  <h2><%= product_type.label %></h2>
+
+  <%# A submitted passport is editable again: correcting one is an update at the
+      service, and the answer to "what did I get wrong" has to be the same form
+      that got it wrong. What changes is what a save means — it stays here until
+      the correction is sent, which is its own act on the page below. %>
+  <% if passport.submitted? %>
+    <p class="hint"><%= t("passports.correct.editable_again") %></p>
+  <% end %>
+  <p class="hint" data-soya-form-target="state"><%= t("passports.form.nothing_entered") %></p>
+
+  <%# sandbox without allow-same-origin would break postMessage identity and
+      localStorage inside the form; the page is served by this application from
+      this origin, so the frame is not foreign code in any meaningful sense. %>
+  <%# A frame around the frame: soya-form draws to its own edges — the tab bar
+      runs the full width, the labels sit against the left margin — and the
+      inside of the frame is not ours to style. So the breathing room is put
+      around it, where it belongs to this page. %>
+  <div class="soya-frame-wrap">
+    <iframe class="soya-frame"
+            src="<%= frame_src %>"
+            title="<%= product_type.label %>"
+            data-soya-form-target="frame"></iframe>
+  </div>
+
+  <%# Two saves, because filling in a passport and finishing with it are two
+      different moments. Everything after the form — the identifier, the
+      submission, the custodian — is on this page, so a save that always left it
+      meant going back in again for the next step. The plain one stays here; the
+      second says the work is done.
+
+      A named button rather than the label of the submit: comparing what
+      `commit` contains would compare a translated string, and the destination
+      of a save must not depend on which language the page is in. %>
+  <div class="save-actions">
+    <%= f.submit t("passports.form.save") %>
+    <%= f.submit t("passports.form.save_and_close"), name: "and_close", class: "secondary" %>
+  </div>
+<% end %>

@@ -1,0 +1,31 @@
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+/storage/*
+!/storage/.keep
+
+/public/assets
+/node_modules
+
+# The vault and anything that looks like it. This is the whole point: private key
+# material and the operator's passport data must never reach a repository.
+/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.rekey-*
+
+# Key material in any of the shapes the oydid tooling produces.
+*_private_key.enc
+*_revocation_key.enc
+*.pem
+*.key
+
+# The compose overrides, which name paths on one particular computer.
+.env
+
+# The data folder a compose start creates beside the compose file. It holds
+# the operator's encrypted file and belongs in a backup, never in a commit.
+/data

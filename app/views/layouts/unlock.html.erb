@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= t("app.name") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="centered">
+    <main class="panel">
+      <% if notice %><p class="flash notice"><%= notice %></p><% end %>
+      <% if alert %><p class="flash alert"><%= alert %></p><% end %>
+
+      <%= yield %>
+
+      <form class="locale-switch" method="get" action="<%= unlock_path %>">
+        <%= link_to "English", unlock_path(locale: "en") %> ·
+        <%= link_to "Deutsch", unlock_path(locale: "de") %>
+      </form>
+    </main>
+  </body>
+</html>

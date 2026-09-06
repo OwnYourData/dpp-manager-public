@@ -1,0 +1,21 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "e7ca4ef102ea41b5f8478f06ee8495867fa117c87c5b45ac4829e1c8c80e731c",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/lib/vault/store.rb",
+      "line": 117,
+      "note": "VACUUM INTO takes a file path and SQLite does not accept a bind parameter for it, so the path has to be interpolated. It is the operator's chosen backup destination, put through the adapter's own quote before it goes in. There is no version of this statement without interpolation; the alternative would be copying the file byte for byte while it is open, which is how a backup ends up half written."
+    },
+    {
+      "fingerprint": "7628e97437cee97b650efbe64e31bb67e9513a6a542300373b4abe44db81ae7f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/lib/vault/store.rb",
+      "line": 135,
+      "note": "ATTACH DATABASE ... KEY, used to re-key the vault by exporting it into a new file. Neither the path nor the key is bindable: SQLCipher parses the key out of the statement text itself. The path is generated here and quoted, and the key is a hex literal derived from the new passphrase — no part of either is text somebody typed."
+    }
+  ],
+  "brakeman_version": "8.0.6"
+}

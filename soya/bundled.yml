@@ -1,0 +1,22 @@
+# The product types this image ships with.
+#
+# Each one names a SOyA structure and, optionally, the transformation that turns
+# its answers into the element model of EN 18223. Both are also present here as
+# .jsonld files, fetched from the repository by `rake soya:bundle`, so a fresh
+# installation has working product types without ever reaching the network.
+#
+# The rows are created when a vault is created. They are ordinary product types
+# afterwards: renameable, editable, removable, and "Fetch again" pulls the
+# current version from the repository like any other. The bundled copy is the
+# fallback, not a second source of truth.
+#
+# The label is what the operator sees in their list. It is theirs to change, so
+# this is only the first suggestion — in the language the application is in when
+# the vault is created.
+- structure: DppLedLamp
+  transformation: DppLedLampToEN18223
+  reverse_transformation: DppLedLampFromEN18223
+  repo: https://soya.ownyourdata.eu
+  label:
+    en: LED lamp
+    de: LED-Lampe
