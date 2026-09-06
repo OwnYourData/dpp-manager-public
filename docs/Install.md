@@ -48,20 +48,48 @@ a terminal and works with all three. The result is identical.
 
 ### 2a — Without a terminal (Docker Desktop)
 
-1. Open Docker Desktop and go to **Images**.
-2. Search Docker Hub for `oydeu/dpp-manager` and **pull** it. This takes a
-   minute or two once; later starts are immediate.
-3. Press **Run** on the image. A dialog opens; expand the **optional settings**.
-4. Fill in three things:
-   - **Container name**: `dpp-manager`
-   - **Host port**: `3000`
-   - **Volumes**: choose a folder on your computer — a new, empty one, for
-     example *Documents/DPP Manager* — and enter `/data` as the path inside the
-     container.
-5. **Run**.
+Before you start, make a folder for your data — a new, empty one, somewhere you
+will find it again, for example *Documents/DPP-Manager*. Avoid spaces in the
+name; they make life harder later if you ever want to copy the folder from a
+terminal.
 
-The folder you chose in step 4 is where your data will live. Section 4 explains
-why that matters.
+**Find the application.** In the blue bar at the top of Docker Desktop there is
+a **Search** field (or press ⌘K / Ctrl-K). Type `oydeu/dpp-manager` and pick the
+first result.
+
+![Searching Docker Hub for the DPP Manager](images/install/01-search.png)
+
+The panel on the right shows what it is and offers **Pull** and **Run** next to
+a tag, which should say `latest`. **Run** fetches the application if it is not
+there yet, so that is the only button you need — press **Pull** first only if
+you have used the DPP Manager before and want the current version.
+
+**Set three things.** After **Run** a dialog appears called *Run a new
+container*. Open **Optional settings** and fill in:
+
+* **Container name** — `dpp-manager`, so you can recognise it later. Left empty,
+  Docker invents something like *nostalgic_hopper*.
+* **Host port** — `3000`. The `:3000/tcp` on the right of that field is the port
+  inside the container and is not editable; what you type on the left is the
+  port on your own computer. If something else already uses 3000, type `3100`
+  here and open `http://localhost:3100` later instead.
+* **Volumes → Host path** — press the `…` button and choose the folder you made.
+  **Container path** — `/data`, exactly that.
+
+*Environment variables* stays empty.
+
+![The dialog, filled in](images/install/02-run-dialog.png)
+
+Then **Run**.
+
+**That was it.** Docker Desktop switches to the container and shows its log. The
+status says *Running*, and next to the name is `3000:3000` as a link that opens
+the application.
+
+![The container is running](images/install/03-container-running.png)
+
+The folder you chose is where your data will live. Section 4 explains why that
+matters.
 
 ### 2b — With one command (any of the three)
 
@@ -92,6 +120,8 @@ In a browser: **http://localhost:3000**
 On the first start it asks you to choose a passphrase. That passphrase encrypts
 everything the application will hold — your keys, your passports, your settings.
 
+![The first start](images/install/04-first-start.png)
+
 > **There is no way to recover it.** Not by us, not by anyone. The data is
 > encrypted with a key derived from the passphrase and from nothing else. Write
 > it down somewhere safe before you continue.
@@ -108,11 +138,12 @@ Everything is in **one file**, `dpp.db`, in the folder you chose. Not spread
 across the computer, not in a database somewhere, not in a cloud.
 
 ```
-DPP Manager/
-├── docker-compose.yml      only if you took route 2b
-└── data/
-    └── dpp.db             everything: passports, keys, settings, the log
+DPP-Manager/
+└── dpp.db      everything: passports, keys, settings, the log
 ```
+
+On route 2b the file sits one level down, in a `data` folder next to the
+configuration file — same file, same meaning.
 
 That file is encrypted with your passphrase. Copying the folder is a backup.
 Copying it to another computer and starting there with the same passphrase moves
@@ -127,16 +158,20 @@ application is writing to it.
 
 ## 5 — Every day after that
 
-It starts by itself when the computer starts, as long as the container program
-is running. You will not usually have to do anything.
-
 | | Docker Desktop | Terminal |
 |---|---|---|
 | stop it | *Containers*, the stop button | `docker compose down` |
 | start it | *Containers*, the play button | `docker compose up -d` |
-| a newer version | *Images*, pull `oydeu/dpp-manager` again, then restart the container | `docker compose pull && docker compose up -d` |
+| a newer version | search for `oydeu/dpp-manager` again, **Pull**, then delete the container and run it as in 2a | `docker compose pull && docker compose up -d` |
 
-Your folder is untouched by all of these.
+Your folder is untouched by all of these — deleting the container does not touch
+the data, which is why the update above is safe.
+
+One difference between the two routes: a container started the way 2b describes
+comes back by itself after the computer is restarted, because the configuration
+file says so. One started by clicking in 2a does not — you press the play button
+in *Containers* once after each restart. If that bothers you, route 2b is the
+one to take.
 
 ---
 
