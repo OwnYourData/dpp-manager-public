@@ -1,0 +1,121 @@
+meta:
+  name: DppEN18223ToBattery
+content:
+  overlays:
+  - type: OverlayTransformation
+    base: https://soya.ownyourdata.eu/DppBattery/Battery
+    name: DppEN18223ToBatteryOverlay
+    engine: jq
+    value: |
+      def one($stream):
+        [$stream] | if length == 0 then null else .[0] end;
+
+      def collection($id):
+        one(.elements[]? | select(.objectType == "DataElementCollection" and .elementId == $id));
+
+      def value($collection; $id):
+        if $collection == null then null
+        else one($collection.elements[]? | select(.elementId == $id) | .value)
+        end;
+
+      def multi($collection; $id):
+        if $collection == null then null
+        else one($collection.elements[]? | select(.objectType == "MultiValuedDataElement" and .elementId == $id))
+        end;
+
+      def sub($collection; $id):
+        if $collection == null then null
+        else one($collection.elements[]? | select(.objectType == "DataElementCollection" and .elementId == $id))
+        end;
+
+      . as $dpp
+      | collection("BatteryIdentification") as $batteryIdentification
+      | collection("ConformityAndLabelling") as $conformityAndLabelling
+      | collection("CarbonFootprint") as $carbonFootprint
+      | collection("DueDiligence") as $dueDiligence
+      | collection("MaterialsAndComposition") as $materialsAndComposition
+      | collection("RecycledContent") as $recycledContent
+      | collection("Circularity") as $circularity
+      | collection("EndOfLife") as $endOfLife
+      | collection("PerformanceAndDurability") as $performanceAndDurability
+      | collection("Documentation") as $documentation
+      | multi($materialsAndComposition; "CriticalRawMaterials") as $crm
+      | sub($materialsAndComposition; "HazardousSubstances") as $haz
+      |
+      {
+        batteryIdentifier: value($batteryIdentification; "BatteryIdentifier"),
+        manufacturerIdentifier: value($batteryIdentification; "ManufacturerIdentifier"),
+        manufacturerName: value($batteryIdentification; "ManufacturerName"),
+        manufacturingPlace: value($batteryIdentification; "ManufacturingPlace"),
+        manufacturingDate: value($batteryIdentification; "ManufacturingDate"),
+        placedInServiceDate: value($batteryIdentification; "DateOfPuttingIntoService"),
+        warrantyPeriod: value($batteryIdentification; "WarrantyPeriod"),
+        batteryCategory: value($batteryIdentification; "BatteryCategory"),
+        batteryMass: value($batteryIdentification; "BatteryMass"),
+        batteryStatus: value($batteryIdentification; "BatteryStatus"),
+        extinguishingAgent: value($conformityAndLabelling; "ExtinguishingAgent"),
+        meaningOfLabels: value($conformityAndLabelling; "MeaningOfLabelsAndSymbols"),
+        carbonFootprintTotal: value($carbonFootprint; "BatteryCarbonFootprint"),
+        cfRawMaterial: value($carbonFootprint; "RawMaterialAcquisitionContribution"),
+        cfProduction: value($carbonFootprint; "ProductionContribution"),
+        cfDistribution: value($carbonFootprint; "DistributionContribution"),
+        cfEndOfLife: value($carbonFootprint; "EndOfLifeContribution"),
+        carbonFootprintClass: value($carbonFootprint; "CarbonFootprintPerformanceClass"),
+        carbonFootprintStudyUrl: value($carbonFootprint; "CarbonFootprintStudy"),
+        dueDiligenceReportUrl: value($dueDiligence; "DueDiligenceReport"),
+        thirdPartyAssurance: value($dueDiligence; "ThirdPartyAssurance"),
+        batteryChemistry: value($materialsAndComposition; "BatteryChemistry"),
+        cathodeMaterials: value($materialsAndComposition; "CathodeMaterials"),
+        anodeMaterials: value($materialsAndComposition; "AnodeMaterials"),
+        electrolyteMaterials: value($materialsAndComposition; "ElectrolyteMaterials"),
+        impactOfSubstances: value($materialsAndComposition; "ImpactOfSubstances"),
+        preConsumerNickelShare: value($recycledContent; "PreConsumerRecycledNickelShare"),
+        preConsumerCobaltShare: value($recycledContent; "PreConsumerRecycledCobaltShare"),
+        preConsumerLithiumShare: value($recycledContent; "PreConsumerRecycledLithiumShare"),
+        preConsumerLeadShare: value($recycledContent; "PreConsumerRecycledLeadShare"),
+        postConsumerNickelShare: value($recycledContent; "PostConsumerRecycledNickelShare"),
+        postConsumerCobaltShare: value($recycledContent; "PostConsumerRecycledCobaltShare"),
+        postConsumerLithiumShare: value($recycledContent; "PostConsumerRecycledLithiumShare"),
+        postConsumerLeadShare: value($recycledContent; "PostConsumerRecycledLeadShare"),
+        renewableContentShare: value($recycledContent; "RenewableContentShare"),
+        dismantlingInformationUrl: value($circularity; "DismantlingInformation"),
+        partNumbersUrl: value($circularity; "PartNumbersForComponents"),
+        sparePartsUrl: value($circularity; "SourcesOfSpareParts"),
+        safetyMeasuresUrl: value($circularity; "SafetyMeasures"),
+        wastePreventionUrl: value($endOfLife; "EndUserWastePrevention"),
+        separateCollectionUrl: value($endOfLife; "SeparateCollectionInformation"),
+        endOfLifeTreatmentUrl: value($endOfLife; "EndOfLifeTreatment"),
+        ratedCapacity: value($performanceAndDurability; "RatedCapacity"),
+        remainingCapacity: value($performanceAndDurability; "RemainingCapacity"),
+        capacityFade: value($performanceAndDurability; "CapacityFade"),
+        stateOfCertifiedEnergy: value($performanceAndDurability; "StateOfCertifiedEnergy"),
+        stateOfCharge: value($performanceAndDurability; "StateOfCharge"),
+        nominalVoltage: value($performanceAndDurability; "NominalVoltage"),
+        originalPowerCapability: value($performanceAndDurability; "OriginalPowerCapability"),
+        expectedLifetimeYears: value($performanceAndDurability; "ExpectedLifetimeYears"),
+        expectedLifetimeCycles: value($performanceAndDurability; "ExpectedLifetimeCycles"),
+        fullCycles: value($performanceAndDurability; "NumberOfFullCycles"),
+        criticalRawMaterials:
+          (if $crm == null then null
+           else [ $crm.elements[]? | { materialName: .elementId, massPercentage: .value } ]
+           end),
+        hazardousSubstances:
+          (if $haz == null then null
+           else [ $haz.elements[]?
+                  | select(.objectType == "DataElementCollection")
+                  | { substanceName: .elementId }
+                    + (one(.elements[]? | select(.elementId == "CasNumber") | .value) as $c
+                       | if $c == null then {} else { casNumber: $c } end)
+                    + (one(.elements[]? | select(.elementId == "MassPercentage") | .value) as $m
+                       | if $m == null then {} else { massPercentage: $m } end) ]
+           end),
+        documents:
+          (if $documentation == null then null
+           else [ $documentation.elements[]?
+                  | select(.objectType == "RelatedResource")
+                  | { url: .url, contentType: .contentType }
+                    + (if (.resourceTitle == null) then {} else { resourceTitle: .resourceTitle } end)
+                    + (if (.language == null) then {} else { language: .language } end) ]
+           end)
+      }
+      | with_entries(select(.value != null))

@@ -1,0 +1,4129 @@
+{
+  "@graph": [
+    {
+      "@id": "Battery",
+      "@type": "owl:Class",
+      "subClassOf": "soya:Base"
+    },
+    {
+      "@id": "batteryIdentifier",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "manufacturerIdentifier",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "manufacturerName",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "manufacturingPlace",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "manufacturingDate",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "placedInServiceDate",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "warrantyPeriod",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "batteryCategory",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "batteryMass",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "batteryStatus",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "extinguishingAgent",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "meaningOfLabels",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "carbonFootprintTotal",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "cfRawMaterial",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "cfProduction",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "cfDistribution",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "cfEndOfLife",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "carbonFootprintClass",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "carbonFootprintStudyUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "dueDiligenceReportUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "thirdPartyAssurance",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "batteryChemistry",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "cathodeMaterials",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "anodeMaterials",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "electrolyteMaterials",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "impactOfSubstances",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "Battery"
+    },
+    {
+      "@id": "preConsumerNickelShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "preConsumerCobaltShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "preConsumerLithiumShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "preConsumerLeadShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "postConsumerNickelShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "postConsumerCobaltShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "postConsumerLithiumShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "postConsumerLeadShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "renewableContentShare",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "dismantlingInformationUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "partNumbersUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "sparePartsUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "safetyMeasuresUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "wastePreventionUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "separateCollectionUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "endOfLifeTreatmentUrl",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "Battery"
+    },
+    {
+      "@id": "ratedCapacity",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "remainingCapacity",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "capacityFade",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "stateOfCertifiedEnergy",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "stateOfCharge",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "nominalVoltage",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "originalPowerCapability",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "Battery"
+    },
+    {
+      "@id": "expectedLifetimeYears",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "Battery"
+    },
+    {
+      "@id": "expectedLifetimeCycles",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "Battery"
+    },
+    {
+      "@id": "fullCycles",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:integer",
+      "domain": "Battery"
+    },
+    {
+      "@id": "criticalRawMaterials",
+      "@type": "owl:ObjectProperty",
+      "range": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List",
+      "domain": "Battery",
+      "soya:containerType": "set",
+      "soya:containerElementTypes": [
+        "https://soya.ownyourdata.eu/DppBattery/CriticalRawMaterial"
+      ]
+    },
+    {
+      "@id": "hazardousSubstances",
+      "@type": "owl:ObjectProperty",
+      "range": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List",
+      "domain": "Battery",
+      "soya:containerType": "set",
+      "soya:containerElementTypes": [
+        "https://soya.ownyourdata.eu/DppBattery/HazardousSubstance"
+      ]
+    },
+    {
+      "@id": "documents",
+      "@type": "owl:ObjectProperty",
+      "range": "http://www.w3.org/1999/02/22-rdf-syntax-ns#List",
+      "domain": "Battery",
+      "soya:containerType": "set",
+      "soya:containerElementTypes": [
+        "https://soya.ownyourdata.eu/DppBattery/ProductDocument"
+      ]
+    },
+    {
+      "@id": "CriticalRawMaterial",
+      "@type": "owl:Class",
+      "subClassOf": "soya:Base"
+    },
+    {
+      "@id": "materialName",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "CriticalRawMaterial"
+    },
+    {
+      "@id": "massPercentage",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "CriticalRawMaterial"
+    },
+    {
+      "@id": "HazardousSubstance",
+      "@type": "owl:Class",
+      "subClassOf": "soya:Base"
+    },
+    {
+      "@id": "substanceName",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "HazardousSubstance"
+    },
+    {
+      "@id": "casNumber",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "HazardousSubstance"
+    },
+    {
+      "@id": "massPercentage",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:decimal",
+      "domain": "HazardousSubstance"
+    },
+    {
+      "@id": "ProductDocument",
+      "@type": "owl:Class",
+      "subClassOf": "soya:Base"
+    },
+    {
+      "@id": "url",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:anyURI",
+      "domain": "ProductDocument"
+    },
+    {
+      "@id": "contentType",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "ProductDocument"
+    },
+    {
+      "@id": "resourceTitle",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "ProductDocument"
+    },
+    {
+      "@id": "language",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "ProductDocument"
+    },
+    {
+      "@id": "Battery",
+      "label": {
+        "de": [
+          "Batterie"
+        ],
+        "en": [
+          "Battery"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Batteriepass-Daten einer Batterie, nach DIN DKE SPEC 99100:2025-02 und Anhang XIII der Verordnung (EU) 2023/1542."
+        ],
+        "en": [
+          "Battery passport data of one battery, following DIN DKE SPEC 99100:2025-02 and Annex XIII of Regulation (EU) 2023/1542."
+        ]
+      }
+    },
+    {
+      "@id": "batteryIdentifier",
+      "label": {
+        "de": [
+          "Batteriekennung"
+        ],
+        "en": [
+          "Battery identifier"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Die eindeutige Kennung genau dieser Batterie, so wie sie auf der Batterie und im Datenträger steht."
+        ],
+        "en": [
+          "The unique identifier of this individual battery, exactly as it is carried on the battery and in the data carrier."
+        ]
+      }
+    },
+    {
+      "@id": "manufacturerIdentifier",
+      "label": {
+        "de": [
+          "Herstellerkennung"
+        ],
+        "en": [
+          "Manufacturer identifier"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Kennung des Herstellers, zum Beispiel die EU-Registriernummer des Wirtschaftsteilnehmers oder eine GLN."
+        ],
+        "en": [
+          "Identifier of the manufacturer, for example the EU operator registration number or a GLN."
+        ]
+      }
+    },
+    {
+      "@id": "manufacturerName",
+      "label": {
+        "de": [
+          "Herstellername"
+        ],
+        "en": [
+          "Manufacturer name"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Firmenbezeichnung des Herstellers, der die Batterie in Verkehr bringt."
+        ],
+        "en": [
+          "Legal name of the manufacturer placing the battery on the market."
+        ]
+      }
+    },
+    {
+      "@id": "manufacturingPlace",
+      "label": {
+        "de": [
+          "Herstellungsort"
+        ],
+        "en": [
+          "Manufacturing place"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Ort der Herstellung, als Stadt und Land des Werks, in dem die Batterie gefertigt wurde."
+        ],
+        "en": [
+          "Place of manufacture, as city and country of the plant where the battery was assembled."
+        ]
+      }
+    },
+    {
+      "@id": "manufacturingDate",
+      "label": {
+        "de": [
+          "Herstellungsdatum"
+        ],
+        "en": [
+          "Manufacturing date"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Monat der Herstellung als JJJJ-MM, zum Beispiel 2026-06."
+        ],
+        "en": [
+          "Month of manufacture as YYYY-MM, for example 2026-06."
+        ]
+      }
+    },
+    {
+      "@id": "placedInServiceDate",
+      "label": {
+        "de": [
+          "Datum der Inbetriebnahme"
+        ],
+        "en": [
+          "Date of putting into service"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Monat der Inbetriebnahme als JJJJ-MM. Leer lassen, solange sie nicht in Betrieb ist."
+        ],
+        "en": [
+          "Month the battery was put into service as YYYY-MM. Leave empty as long as it has not been."
+        ]
+      }
+    },
+    {
+      "@id": "warrantyPeriod",
+      "label": {
+        "de": [
+          "Garantiezeitraum bis"
+        ],
+        "en": [
+          "Warranty period until"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Monat, in dem die Garantie der Batterie endet, als JJJJ-MM."
+        ],
+        "en": [
+          "Month the warranty of the battery ends, as YYYY-MM."
+        ]
+      }
+    },
+    {
+      "@id": "batteryCategory",
+      "label": {
+        "de": [
+          "Batteriekategorie"
+        ],
+        "en": [
+          "Battery category"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Kategorie nach der Batterieverordnung. Sie entscheidet, welche Attribute verpflichtend sind."
+        ],
+        "en": [
+          "Category under the Batteries Regulation. It decides which attributes are mandatory."
+        ]
+      }
+    },
+    {
+      "@id": "batteryMass",
+      "label": {
+        "de": [
+          "Batteriemasse (kg)"
+        ],
+        "en": [
+          "Battery mass (kg)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Gesamtmasse der Batterie in Kilogramm, einschließlich Gehäuse und Batteriemanagementsystem."
+        ],
+        "en": [
+          "Total mass of the battery in kilograms, including housing and the battery management system."
+        ]
+      }
+    },
+    {
+      "@id": "batteryStatus",
+      "label": {
+        "de": [
+          "Batteriestatus"
+        ],
+        "en": [
+          "Battery status"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Aktueller Status im Lebenszyklus. Dieses Attribut ändert sich über die Lebensdauer der Batterie."
+        ],
+        "en": [
+          "Current status in the life cycle. This attribute changes over the life of the battery."
+        ]
+      }
+    },
+    {
+      "@id": "extinguishingAgent",
+      "label": {
+        "de": [
+          "Löschmittel"
+        ],
+        "en": [
+          "Extinguishing agent"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Für diese Batteriechemie geeignetes Löschmittel, wie im Sicherheitsdatenblatt angegeben."
+        ],
+        "en": [
+          "Extinguishing agent suitable for this battery chemistry, as stated in the safety data sheet."
+        ]
+      }
+    },
+    {
+      "@id": "meaningOfLabels",
+      "label": {
+        "de": [
+          "Bedeutung von Kennzeichnungen und Symbolen"
+        ],
+        "en": [
+          "Meaning of labels and symbols"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Verständliche Erklärung der auf der Batterie angebrachten Symbole, für den Leser des Passes."
+        ],
+        "en": [
+          "Plain explanation of the symbols carried on the battery, for the person reading the passport."
+        ]
+      }
+    },
+    {
+      "@id": "carbonFootprintTotal",
+      "label": {
+        "de": [
+          "CO2-Fußabdruck (kgCO2e/kWh)"
+        ],
+        "en": [
+          "Carbon footprint (kgCO2e/kWh)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Gesamter CO2-Fußabdruck je funktionaler Einheit, also je kWh Gesamtenergie über die Lebensdauer."
+        ],
+        "en": [
+          "Total carbon footprint per functional unit, that is per kWh of total energy over the service life."
+        ]
+      }
+    },
+    {
+      "@id": "cfRawMaterial",
+      "label": {
+        "de": [
+          "Anteil: Rohstoffgewinnung"
+        ],
+        "en": [
+          "Share: raw material acquisition"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Beitrag der Rohstoffgewinnung und Vorverarbeitung zum CO2-Fußabdruck."
+        ],
+        "en": [
+          "Contribution of raw material acquisition and pre-processing to the carbon footprint."
+        ]
+      }
+    },
+    {
+      "@id": "cfProduction",
+      "label": {
+        "de": [
+          "Anteil: Herstellung"
+        ],
+        "en": [
+          "Share: production"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Beitrag der Haupt-Produktions- und Fertigungsstufe."
+        ],
+        "en": [
+          "Contribution of the main product production and manufacturing stage."
+        ]
+      }
+    },
+    {
+      "@id": "cfDistribution",
+      "label": {
+        "de": [
+          "Anteil: Distribution"
+        ],
+        "en": [
+          "Share: distribution"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Beitrag der Distributionsstufe."
+        ],
+        "en": [
+          "Contribution of the distribution stage."
+        ]
+      }
+    },
+    {
+      "@id": "cfEndOfLife",
+      "label": {
+        "de": [
+          "Anteil: Lebensende und Recycling"
+        ],
+        "en": [
+          "Share: end of life and recycling"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Beitrag der Stufe Lebensende und Recycling."
+        ],
+        "en": [
+          "Contribution of the end of life and recycling stage."
+        ]
+      }
+    },
+    {
+      "@id": "carbonFootprintClass",
+      "label": {
+        "de": [
+          "CO2-Fußabdruck-Leistungsklasse"
+        ],
+        "en": [
+          "Carbon footprint performance class"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Leistungsklasse vom CO2-Fußabdruck-Label."
+        ],
+        "en": [
+          "Performance class from the carbon footprint label."
+        ]
+      }
+    },
+    {
+      "@id": "carbonFootprintStudyUrl",
+      "label": {
+        "de": [
+          "CO2-Fußabdruck-Studie"
+        ],
+        "en": [
+          "Carbon footprint study"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse der CO2-Fußabdruck-Studie, ohne Anmeldung erreichbar."
+        ],
+        "en": [
+          "Public https address of the carbon footprint study, reachable without login."
+        ]
+      }
+    },
+    {
+      "@id": "dueDiligenceReportUrl",
+      "label": {
+        "de": [
+          "Sorgfaltspflichtenbericht"
+        ],
+        "en": [
+          "Due diligence report"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse des Berichts über die Lieferkettensorgfalt nach Artikel 52(3) der Batterieverordnung."
+        ],
+        "en": [
+          "Public https address of the supply chain due diligence report under Article 52(3) of the Batteries Regulation."
+        ]
+      }
+    },
+    {
+      "@id": "thirdPartyAssurance",
+      "label": {
+        "de": [
+          "Bestätigung durch Dritte"
+        ],
+        "en": [
+          "Third-party assurance"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anerkanntes System oder Zertifizierung, unter der die Sorgfaltspflichten bestätigt wurden, sofern vorhanden."
+        ],
+        "en": [
+          "Recognised scheme or certification under which the due diligence policy was assured, if any."
+        ]
+      }
+    },
+    {
+      "@id": "batteryChemistry",
+      "label": {
+        "de": [
+          "Batteriechemie"
+        ],
+        "en": [
+          "Battery chemistry"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Zellchemie der Batterie. Die Familie auswählen; die genaue Zusammensetzung steht in den Materialfeldern darunter."
+        ],
+        "en": [
+          "Cell chemistry of the battery. Pick the family; the exact composition goes into the material fields below."
+        ]
+      }
+    },
+    {
+      "@id": "cathodeMaterials",
+      "label": {
+        "de": [
+          "Kathodenmaterialien"
+        ],
+        "en": [
+          "Cathode materials"
+        ]
+      },
+      "comment": {
+        "de": [
+          "In der Kathode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt."
+        ],
+        "en": [
+          "Materials used in the cathode, named as in the bill of materials and separated by commas."
+        ]
+      }
+    },
+    {
+      "@id": "anodeMaterials",
+      "label": {
+        "de": [
+          "Anodenmaterialien"
+        ],
+        "en": [
+          "Anode materials"
+        ]
+      },
+      "comment": {
+        "de": [
+          "In der Anode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt."
+        ],
+        "en": [
+          "Materials used in the anode, named as in the bill of materials and separated by commas."
+        ]
+      }
+    },
+    {
+      "@id": "electrolyteMaterials",
+      "label": {
+        "de": [
+          "Elektrolytmaterialien"
+        ],
+        "en": [
+          "Electrolyte materials"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Im Elektrolyt verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt."
+        ],
+        "en": [
+          "Materials used in the electrolyte, named as in the bill of materials and separated by commas."
+        ]
+      }
+    },
+    {
+      "@id": "impactOfSubstances",
+      "label": {
+        "de": [
+          "Wirkung der Stoffe"
+        ],
+        "en": [
+          "Impact of substances"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Wirkung der enthaltenen Stoffe auf Umwelt, menschliche Gesundheit, Sicherheit und Personen."
+        ],
+        "en": [
+          "Impact of the substances contained on the environment, human health, safety and persons."
+        ]
+      }
+    },
+    {
+      "@id": "preConsumerNickelShare",
+      "label": {
+        "de": [
+          "Vorverbraucher-Rezyklat Nickel (%)"
+        ],
+        "en": [
+          "Pre-consumer recycled nickel (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an vorverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of pre-consumer recycled nickel in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "preConsumerCobaltShare",
+      "label": {
+        "de": [
+          "Vorverbraucher-Rezyklat Cobalt (%)"
+        ],
+        "en": [
+          "Pre-consumer recycled cobalt (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an vorverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of pre-consumer recycled cobalt in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "preConsumerLithiumShare",
+      "label": {
+        "de": [
+          "Vorverbraucher-Rezyklat Lithium (%)"
+        ],
+        "en": [
+          "Pre-consumer recycled lithium (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an vorverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of pre-consumer recycled lithium in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "preConsumerLeadShare",
+      "label": {
+        "de": [
+          "Vorverbraucher-Rezyklat Blei (%)"
+        ],
+        "en": [
+          "Pre-consumer recycled lead (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an vorverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of pre-consumer recycled lead in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "postConsumerNickelShare",
+      "label": {
+        "de": [
+          "Nachverbraucher-Rezyklat Nickel (%)"
+        ],
+        "en": [
+          "Post-consumer recycled nickel (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an nachverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of post-consumer recycled nickel in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "postConsumerCobaltShare",
+      "label": {
+        "de": [
+          "Nachverbraucher-Rezyklat Cobalt (%)"
+        ],
+        "en": [
+          "Post-consumer recycled cobalt (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an nachverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of post-consumer recycled cobalt in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "postConsumerLithiumShare",
+      "label": {
+        "de": [
+          "Nachverbraucher-Rezyklat Lithium (%)"
+        ],
+        "en": [
+          "Post-consumer recycled lithium (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an nachverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of post-consumer recycled lithium in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "postConsumerLeadShare",
+      "label": {
+        "de": [
+          "Nachverbraucher-Rezyklat Blei (%)"
+        ],
+        "en": [
+          "Post-consumer recycled lead (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an nachverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of post-consumer recycled lead in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "renewableContentShare",
+      "label": {
+        "de": [
+          "Erneuerbarer Anteil (%)"
+        ],
+        "en": [
+          "Renewable content (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil an erneuerbaren Materialien in der Batterie, in Prozent."
+        ],
+        "en": [
+          "Share of renewable material content in the battery, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "dismantlingInformationUrl",
+      "label": {
+        "de": [
+          "Demontageinformationen"
+        ],
+        "en": [
+          "Dismantling information"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anleitungen zum Ausbau und zur Zerlegung des Batteriepacks, als öffentliche https-Adresse."
+        ],
+        "en": [
+          "Manuals for removing and disassembling the battery pack, as a public https address."
+        ]
+      }
+    },
+    {
+      "@id": "partNumbersUrl",
+      "label": {
+        "de": [
+          "Teilenummern der Komponenten"
+        ],
+        "en": [
+          "Part numbers for components"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse der Liste der Teilenummern für die Komponenten."
+        ],
+        "en": [
+          "Public https address of the list of part numbers for the components."
+        ]
+      }
+    },
+    {
+      "@id": "sparePartsUrl",
+      "label": {
+        "de": [
+          "Bezugsquellen für Ersatzteile"
+        ],
+        "en": [
+          "Sources of spare parts"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse der Information, wo Ersatzteile bezogen werden können."
+        ],
+        "en": [
+          "Public https address of the information on where spare parts can be obtained."
+        ]
+      }
+    },
+    {
+      "@id": "safetyMeasuresUrl",
+      "label": {
+        "de": [
+          "Sicherheitsmaßnahmen"
+        ],
+        "en": [
+          "Safety measures"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse der Sicherheitsmaßnahmen für Handhabung, Lagerung und Transport der Batterie."
+        ],
+        "en": [
+          "Public https address of the safety measures for handling, storing and transporting the battery."
+        ]
+      }
+    },
+    {
+      "@id": "wastePreventionUrl",
+      "label": {
+        "de": [
+          "Rolle der Endnutzer bei der Abfallvermeidung"
+        ],
+        "en": [
+          "Role of end-users in waste prevention"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse der Information, wie Endnutzer zur Abfallvermeidung beitragen."
+        ],
+        "en": [
+          "Public https address of the information on how end-users contribute to waste prevention."
+        ]
+      }
+    },
+    {
+      "@id": "separateCollectionUrl",
+      "label": {
+        "de": [
+          "Getrenntsammlung von Altbatterien"
+        ],
+        "en": [
+          "Separate collection of waste batteries"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse der Information zur Getrenntsammlung von Altbatterien."
+        ],
+        "en": [
+          "Public https address of the information on the separate collection of waste batteries."
+        ]
+      }
+    },
+    {
+      "@id": "endOfLifeTreatmentUrl",
+      "label": {
+        "de": [
+          "Sammlung, zweites Leben und Behandlung"
+        ],
+        "en": [
+          "Collection, second life and treatment"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Öffentliche https-Adresse der Information zu Sammlung, Vorbereitung auf ein zweites Leben und Behandlung am Lebensende."
+        ],
+        "en": [
+          "Public https address of the information on collection, preparation for second life and treatment at end of life."
+        ]
+      }
+    },
+    {
+      "@id": "ratedCapacity",
+      "label": {
+        "de": [
+          "Bemessungskapazität (Ah)"
+        ],
+        "en": [
+          "Rated capacity (Ah)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Bemessungskapazität in Amperestunden, wie für die neue Batterie deklariert."
+        ],
+        "en": [
+          "Rated capacity in ampere-hours, as declared for the new battery."
+        ]
+      }
+    },
+    {
+      "@id": "remainingCapacity",
+      "label": {
+        "de": [
+          "Verbleibende Kapazität (Ah)"
+        ],
+        "en": [
+          "Remaining capacity (Ah)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Verbleibende Kapazität in Amperestunden. Dieser Wert ändert sich über die Lebensdauer der Batterie."
+        ],
+        "en": [
+          "Remaining capacity in ampere-hours. This value changes over the life of the battery."
+        ]
+      }
+    },
+    {
+      "@id": "capacityFade",
+      "label": {
+        "de": [
+          "Kapazitätsverlust (%)"
+        ],
+        "en": [
+          "Capacity fade (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Verlust an Kapazität gegenüber der Bemessungskapazität, in Prozent."
+        ],
+        "en": [
+          "Loss of capacity against the rated capacity, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "stateOfCertifiedEnergy",
+      "label": {
+        "de": [
+          "Zustand der zertifizierten Energie (%)"
+        ],
+        "en": [
+          "State of certified energy (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "SOCE: verbleibende nutzbare Energie gegenüber der zertifizierten nutzbaren Energie, in Prozent."
+        ],
+        "en": [
+          "SOCE: remaining usable energy against the certified usable energy, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "stateOfCharge",
+      "label": {
+        "de": [
+          "Ladezustand (%)"
+        ],
+        "en": [
+          "State of charge (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Ladezustand zum Zeitpunkt der letzten Aktualisierung, in Prozent."
+        ],
+        "en": [
+          "SoC at the time of the last update, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "nominalVoltage",
+      "label": {
+        "de": [
+          "Nennspannung (V)"
+        ],
+        "en": [
+          "Nominal voltage (V)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Nennspannung des Batteriepacks in Volt."
+        ],
+        "en": [
+          "Nominal voltage of the battery pack in volts."
+        ]
+      }
+    },
+    {
+      "@id": "originalPowerCapability",
+      "label": {
+        "de": [
+          "Ursprüngliche Leistungsfähigkeit (W)"
+        ],
+        "en": [
+          "Original power capability (W)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Leistungsfähigkeit der neuen Batterie in Watt."
+        ],
+        "en": [
+          "Power capability of the new battery in watts."
+        ]
+      }
+    },
+    {
+      "@id": "expectedLifetimeYears",
+      "label": {
+        "de": [
+          "Erwartete Lebensdauer (Jahre)"
+        ],
+        "en": [
+          "Expected lifetime (years)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Erwartete Lebensdauer in Kalenderjahren unter den Referenzbedingungen."
+        ],
+        "en": [
+          "Expected lifetime in calendar years under the reference conditions."
+        ]
+      }
+    },
+    {
+      "@id": "expectedLifetimeCycles",
+      "label": {
+        "de": [
+          "Erwartete Lebensdauer (Lade-Entlade-Zyklen)"
+        ],
+        "en": [
+          "Expected lifetime (charge-discharge cycles)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Erwartete Anzahl der Lade-Entlade-Zyklen im Referenztest zur Zyklenlebensdauer."
+        ],
+        "en": [
+          "Expected number of charge-discharge cycles in the cycle-life reference test."
+        ]
+      }
+    },
+    {
+      "@id": "fullCycles",
+      "label": {
+        "de": [
+          "Bisherige Vollzyklen"
+        ],
+        "en": [
+          "Full cycles so far"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anzahl der bisher gezählten vollen Lade- und Entladezyklen. Dieser Wert ändert sich über die Lebensdauer der Batterie."
+        ],
+        "en": [
+          "Number of full charging and discharging cycles counted so far. This value changes over the life of the battery."
+        ]
+      }
+    },
+    {
+      "@id": "criticalRawMaterials",
+      "label": {
+        "de": [
+          "Kritische Rohstoffe"
+        ],
+        "en": [
+          "Critical raw materials"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Enthaltene kritische Rohstoffe und ihr Masseanteil. Je Rohstoff eine Zeile."
+        ],
+        "en": [
+          "Critical raw materials contained and their mass share. One row per material."
+        ]
+      }
+    },
+    {
+      "@id": "hazardousSubstances",
+      "label": {
+        "de": [
+          "Gefahrstoffe"
+        ],
+        "en": [
+          "Hazardous substances"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Enthaltene Gefahrstoffe über Quecksilber, Cadmium und Blei hinaus. Je Stoff eine Zeile."
+        ],
+        "en": [
+          "Hazardous substances contained beyond mercury, cadmium and lead. One row per substance."
+        ]
+      }
+    },
+    {
+      "@id": "documents",
+      "label": {
+        "de": [
+          "Dokumente"
+        ],
+        "en": [
+          "Documents"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Zur Batterie gehörende Dokumente, über ihre Webadresse referenziert; es wird nichts hochgeladen. Die EU-Konformitätserklärung und die Prüfberichte gehören hierher."
+        ],
+        "en": [
+          "Documents belonging to the battery, referenced by web address; nothing is uploaded. The EU declaration of conformity and the test reports belong here."
+        ]
+      }
+    },
+    {
+      "@id": "OverlayAnnotation",
+      "name": "DppBatteryAnnotationOverlay",
+      "@type": "OverlayAnnotation",
+      "onBase": "Battery"
+    },
+    {
+      "@id": "CriticalRawMaterial",
+      "label": {
+        "de": [
+          "Kritische Rohstoffe"
+        ],
+        "en": [
+          "Critical raw material"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Enthaltene kritische Rohstoffe und ihr Masseanteil. Je Rohstoff eine Zeile."
+        ],
+        "en": [
+          "Critical raw materials contained and their mass share. One row per material."
+        ]
+      }
+    },
+    {
+      "@id": "materialName",
+      "label": {
+        "de": [
+          "Rohstoff"
+        ],
+        "en": [
+          "Material"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Bezeichnung des kritischen Rohstoffs, zum Beispiel Cobalt oder Naturgraphit."
+        ],
+        "en": [
+          "Name of the critical raw material, for example Cobalt or Natural graphite."
+        ]
+      }
+    },
+    {
+      "@id": "massPercentage",
+      "label": {
+        "de": [
+          "Masseanteil (%)"
+        ],
+        "en": [
+          "Mass share (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil dieses Rohstoffs an der Gesamtmasse, in Prozent."
+        ],
+        "en": [
+          "Share of this raw material in the total mass, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "OverlayAnnotation",
+      "name": "DppBatteryCriticalRawMaterialAnnotationOverlay",
+      "@type": "OverlayAnnotation",
+      "onBase": "CriticalRawMaterial"
+    },
+    {
+      "@id": "HazardousSubstance",
+      "label": {
+        "de": [
+          "Gefahrstoffe"
+        ],
+        "en": [
+          "Hazardous substance"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Enthaltene Gefahrstoffe über Quecksilber, Cadmium und Blei hinaus. Je Stoff eine Zeile."
+        ],
+        "en": [
+          "Hazardous substances contained beyond mercury, cadmium and lead. One row per substance."
+        ]
+      }
+    },
+    {
+      "@id": "substanceName",
+      "label": {
+        "de": [
+          "Stoff"
+        ],
+        "en": [
+          "Substance"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Bezeichnung des Stoffs wie im Sicherheitsdatenblatt."
+        ],
+        "en": [
+          "Name of the substance as in the safety data sheet."
+        ]
+      }
+    },
+    {
+      "@id": "casNumber",
+      "label": {
+        "de": [
+          "CAS-Nummer"
+        ],
+        "en": [
+          "CAS number"
+        ]
+      },
+      "comment": {
+        "de": [
+          "CAS-Registriernummer des Stoffs, zum Beispiel 7439-92-1."
+        ],
+        "en": [
+          "CAS registry number of the substance, for example 7439-92-1."
+        ]
+      }
+    },
+    {
+      "@id": "massPercentage",
+      "label": {
+        "de": [
+          "Masseanteil (%)"
+        ],
+        "en": [
+          "Mass share (%)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Anteil dieses Stoffs an der Gesamtmasse, in Prozent."
+        ],
+        "en": [
+          "Share of this substance in the total mass, in percent."
+        ]
+      }
+    },
+    {
+      "@id": "OverlayAnnotation",
+      "name": "DppBatteryHazardousSubstanceAnnotationOverlay",
+      "@type": "OverlayAnnotation",
+      "onBase": "HazardousSubstance"
+    },
+    {
+      "@id": "ProductDocument",
+      "label": {
+        "de": [
+          "Dokumente"
+        ],
+        "en": [
+          "Document"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Zur Batterie gehörende Dokumente, über ihre Webadresse referenziert; es wird nichts hochgeladen. Die EU-Konformitätserklärung und die Prüfberichte gehören hierher."
+        ],
+        "en": [
+          "Documents belonging to the battery, referenced by web address; nothing is uploaded. The EU declaration of conformity and the test reports belong here."
+        ]
+      }
+    },
+    {
+      "@id": "url",
+      "label": {
+        "de": [
+          "Webadresse"
+        ],
+        "en": [
+          "Web address"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Vollständige https-Adresse des Dokuments, ohne Anmeldung erreichbar."
+        ],
+        "en": [
+          "Full https address of the document, reachable without login."
+        ]
+      }
+    },
+    {
+      "@id": "contentType",
+      "label": {
+        "de": [
+          "Dateityp"
+        ],
+        "en": [
+          "File type"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Medientyp der Datei hinter der Adresse, zum Beispiel application/pdf."
+        ],
+        "en": [
+          "Media type of the file behind the address, for example application/pdf."
+        ]
+      }
+    },
+    {
+      "@id": "resourceTitle",
+      "label": {
+        "de": [
+          "Titel"
+        ],
+        "en": [
+          "Title"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Kurzer Titel, der dem Leser statt der nackten Adresse angezeigt wird."
+        ],
+        "en": [
+          "Short title shown to the reader instead of the bare address."
+        ]
+      }
+    },
+    {
+      "@id": "language",
+      "label": {
+        "de": [
+          "Sprache"
+        ],
+        "en": [
+          "Language"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Sprache des Dokuments als zweibuchstabiger Code, zum Beispiel de oder en."
+        ],
+        "en": [
+          "Language of the document as a two-letter code, for example de or en."
+        ]
+      }
+    },
+    {
+      "@id": "OverlayAnnotation",
+      "name": "DppBatteryProductDocumentAnnotationOverlay",
+      "@type": "OverlayAnnotation",
+      "onBase": "ProductDocument"
+    },
+    {
+      "@id": "BatteryOverlayValidation",
+      "name": "DppBatteryValidationOverlay",
+      "@type": "OverlayValidation",
+      "onBase": "Battery",
+      "sh:property": [
+        {
+          "sh:path": "batteryIdentifier",
+          "sh:message": "Batteriekennung fehlt oder enthält unzulässige Zeichen.",
+          "sh:pattern": "^[A-Za-z0-9][A-Za-z0-9 ._/-]*$",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 64,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "manufacturerIdentifier",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 64,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "manufacturerName",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 120,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "manufacturingPlace",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 120,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "manufacturingDate",
+          "sh:message": "Herstellungsdatum als JJJJ-MM angeben, zum Beispiel 2026-06.",
+          "sh:pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "placedInServiceDate",
+          "sh:pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+          "sh:maxCount": 1,
+          "sh:minCount": 0
+        },
+        {
+          "sh:path": "warrantyPeriod",
+          "sh:pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:in": {
+            "@list": [
+              "EVBattery",
+              "LMTBattery",
+              "IndustrialBattery",
+              "StationaryStorage"
+            ]
+          },
+          "sh:path": "batteryCategory",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "batteryMass",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:in": {
+            "@list": [
+              "Original",
+              "Repurposed",
+              "Reused",
+              "Remanufactured",
+              "Waste"
+            ]
+          },
+          "sh:path": "batteryStatus",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "extinguishingAgent",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 200,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "meaningOfLabels",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 1000,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "carbonFootprintTotal",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "cfRawMaterial",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "cfProduction",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "cfDistribution",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "cfEndOfLife",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:in": {
+            "@list": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "E",
+              "F",
+              "G"
+            ]
+          },
+          "sh:path": "carbonFootprintClass",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "carbonFootprintStudyUrl",
+          "sh:message": "Die Studie braucht eine öffentliche https-Adresse.",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "dueDiligenceReportUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "thirdPartyAssurance",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:maxLength": 200,
+          "sh:minLength": 1
+        },
+        {
+          "sh:in": {
+            "@list": [
+              "NMC",
+              "NCA",
+              "LFP",
+              "LMO",
+              "LTO",
+              "NaIon",
+              "LeadAcid",
+              "NiMH"
+            ]
+          },
+          "sh:path": "batteryChemistry",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "cathodeMaterials",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 500,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "anodeMaterials",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 500,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "electrolyteMaterials",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 500,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "impactOfSubstances",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxLength": 1000,
+          "sh:minLength": 1
+        },
+        {
+          "sh:path": "preConsumerNickelShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "preConsumerCobaltShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "preConsumerLithiumShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "preConsumerLeadShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "postConsumerNickelShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "postConsumerCobaltShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "postConsumerLithiumShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "postConsumerLeadShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "renewableContentShare",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "dismantlingInformationUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "partNumbersUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "sparePartsUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "safetyMeasuresUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "wastePreventionUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "separateCollectionUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "endOfLifeTreatmentUrl",
+          "sh:pattern": "^https://",
+          "sh:maxCount": 1,
+          "sh:minCount": 1
+        },
+        {
+          "sh:path": "ratedCapacity",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "remainingCapacity",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "capacityFade",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "stateOfCertifiedEnergy",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "stateOfCharge",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "nominalVoltage",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 2000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "originalPowerCapability",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 10000000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "expectedLifetimeYears",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 50,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "expectedLifetimeCycles",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "fullCycles",
+          "sh:maxCount": 1,
+          "sh:minCount": 1,
+          "sh:maxInclusive": 100000,
+          "sh:minInclusive": 0
+        },
+        {
+          "sh:path": "criticalRawMaterials",
+          "sh:maxCount": 30,
+          "sh:minCount": 0,
+          "sh:property": [
+            {
+              "@type": "sh:PropertyShape",
+              "sh:node": {
+                "@type": "sh:NodeShape",
+                "sh:property": [
+                  {
+                    "sh:path": "materialName",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 1,
+                    "sh:maxLength": 64,
+                    "sh:minLength": 1
+                  },
+                  {
+                    "sh:path": "massPercentage",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 1,
+                    "sh:maxInclusive": 100,
+                    "sh:minInclusive": 0
+                  }
+                ]
+              },
+              "sh:path": {
+                "@list": [
+                  {
+                    "sh:zeroOrMorePath": {
+                      "@id": "rdf:rest"
+                    }
+                  },
+                  {
+                    "@id": "rdf:first"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "sh:path": "hazardousSubstances",
+          "sh:maxCount": 30,
+          "sh:minCount": 0,
+          "sh:property": [
+            {
+              "@type": "sh:PropertyShape",
+              "sh:node": {
+                "@type": "sh:NodeShape",
+                "sh:property": [
+                  {
+                    "sh:path": "substanceName",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 1,
+                    "sh:maxLength": 120,
+                    "sh:minLength": 1
+                  },
+                  {
+                    "sh:path": "casNumber",
+                    "sh:message": "CAS-Nummer im Format 7439-92-1 angeben.",
+                    "sh:pattern": "^[0-9]{2,7}-[0-9]{2}-[0-9]$",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 0
+                  },
+                  {
+                    "sh:path": "massPercentage",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 0,
+                    "sh:maxInclusive": 100,
+                    "sh:minInclusive": 0
+                  }
+                ]
+              },
+              "sh:path": {
+                "@list": [
+                  {
+                    "sh:zeroOrMorePath": {
+                      "@id": "rdf:rest"
+                    }
+                  },
+                  {
+                    "@id": "rdf:first"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "sh:path": "documents",
+          "sh:maxCount": 20,
+          "sh:minCount": 0,
+          "sh:property": [
+            {
+              "@type": "sh:PropertyShape",
+              "sh:node": {
+                "@type": "sh:NodeShape",
+                "sh:property": [
+                  {
+                    "sh:path": "url",
+                    "sh:message": "Jedes Dokument braucht eine https-Adresse.",
+                    "sh:pattern": "^https://",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 1
+                  },
+                  {
+                    "sh:path": "contentType",
+                    "sh:pattern": "^[a-z]+/[A-Za-z0-9.+-]+$",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 1
+                  },
+                  {
+                    "sh:path": "resourceTitle",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 0,
+                    "sh:maxLength": 120,
+                    "sh:minLength": 1
+                  },
+                  {
+                    "sh:path": "language",
+                    "sh:pattern": "^[a-z]{2}$",
+                    "sh:maxCount": 1,
+                    "sh:minCount": 0
+                  }
+                ]
+              },
+              "sh:path": {
+                "@list": [
+                  {
+                    "sh:zeroOrMorePath": {
+                      "@id": "rdf:rest"
+                    }
+                  },
+                  {
+                    "@id": "rdf:first"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "sh:targetClass": "Battery"
+    },
+    {
+      "ui": {
+        "type": "Categorization",
+        "options": {
+          "density": "compact"
+        },
+        "elements": [
+          {
+            "type": "Category",
+            "label": "Identifikation",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Batteriekennung",
+                "scope": "#/properties/batteryIdentifier",
+                "description": "Die eindeutige Kennung genau dieser Batterie, so wie sie auf der Batterie und im Datenträger steht."
+              },
+              {
+                "type": "Control",
+                "label": "Herstellerkennung",
+                "scope": "#/properties/manufacturerIdentifier",
+                "description": "Kennung des Herstellers, zum Beispiel die EU-Registriernummer des Wirtschaftsteilnehmers oder eine GLN."
+              },
+              {
+                "type": "Control",
+                "label": "Herstellername",
+                "scope": "#/properties/manufacturerName",
+                "description": "Firmenbezeichnung des Herstellers, der die Batterie in Verkehr bringt."
+              },
+              {
+                "type": "Control",
+                "label": "Herstellungsort",
+                "scope": "#/properties/manufacturingPlace",
+                "description": "Ort der Herstellung, als Stadt und Land des Werks, in dem die Batterie gefertigt wurde."
+              },
+              {
+                "type": "Control",
+                "label": "Herstellungsdatum",
+                "scope": "#/properties/manufacturingDate",
+                "description": "Monat der Herstellung als JJJJ-MM, zum Beispiel 2026-06."
+              },
+              {
+                "type": "Control",
+                "label": "Datum der Inbetriebnahme",
+                "scope": "#/properties/placedInServiceDate",
+                "description": "Monat der Inbetriebnahme als JJJJ-MM. Leer lassen, solange sie nicht in Betrieb ist."
+              },
+              {
+                "type": "Control",
+                "label": "Garantiezeitraum bis",
+                "scope": "#/properties/warrantyPeriod",
+                "description": "Monat, in dem die Garantie der Batterie endet, als JJJJ-MM."
+              },
+              {
+                "type": "Control",
+                "label": "Batteriekategorie",
+                "scope": "#/properties/batteryCategory",
+                "description": "Kategorie nach der Batterieverordnung. Sie entscheidet, welche Attribute verpflichtend sind."
+              },
+              {
+                "type": "Control",
+                "label": "Batteriemasse (kg)",
+                "scope": "#/properties/batteryMass",
+                "description": "Gesamtmasse der Batterie in Kilogramm, einschließlich Gehäuse und Batteriemanagementsystem."
+              },
+              {
+                "type": "Control",
+                "label": "Batteriestatus",
+                "scope": "#/properties/batteryStatus",
+                "description": "Aktueller Status im Lebenszyklus. Dieses Attribut ändert sich über die Lebensdauer der Batterie."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Konformität und Kennzeichnung",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Löschmittel",
+                "scope": "#/properties/extinguishingAgent",
+                "description": "Für diese Batteriechemie geeignetes Löschmittel, wie im Sicherheitsdatenblatt angegeben."
+              },
+              {
+                "type": "Control",
+                "label": "Bedeutung von Kennzeichnungen und Symbolen",
+                "scope": "#/properties/meaningOfLabels",
+                "description": "Verständliche Erklärung der auf der Batterie angebrachten Symbole, für den Leser des Passes."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "CO2-Fußabdruck",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "CO2-Fußabdruck (kgCO2e/kWh)",
+                "scope": "#/properties/carbonFootprintTotal",
+                "description": "Gesamter CO2-Fußabdruck je funktionaler Einheit, also je kWh Gesamtenergie über die Lebensdauer."
+              },
+              {
+                "type": "Control",
+                "label": "Anteil: Rohstoffgewinnung",
+                "scope": "#/properties/cfRawMaterial",
+                "description": "Beitrag der Rohstoffgewinnung und Vorverarbeitung zum CO2-Fußabdruck."
+              },
+              {
+                "type": "Control",
+                "label": "Anteil: Herstellung",
+                "scope": "#/properties/cfProduction",
+                "description": "Beitrag der Haupt-Produktions- und Fertigungsstufe."
+              },
+              {
+                "type": "Control",
+                "label": "Anteil: Distribution",
+                "scope": "#/properties/cfDistribution",
+                "description": "Beitrag der Distributionsstufe."
+              },
+              {
+                "type": "Control",
+                "label": "Anteil: Lebensende und Recycling",
+                "scope": "#/properties/cfEndOfLife",
+                "description": "Beitrag der Stufe Lebensende und Recycling."
+              },
+              {
+                "type": "Control",
+                "label": "CO2-Fußabdruck-Leistungsklasse",
+                "scope": "#/properties/carbonFootprintClass",
+                "description": "Leistungsklasse vom CO2-Fußabdruck-Label."
+              },
+              {
+                "type": "Control",
+                "label": "CO2-Fußabdruck-Studie",
+                "scope": "#/properties/carbonFootprintStudyUrl",
+                "description": "Öffentliche https-Adresse der CO2-Fußabdruck-Studie, ohne Anmeldung erreichbar."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Lieferkettensorgfalt",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Sorgfaltspflichtenbericht",
+                "scope": "#/properties/dueDiligenceReportUrl",
+                "description": "Öffentliche https-Adresse des Berichts über die Lieferkettensorgfalt nach Artikel 52(3) der Batterieverordnung."
+              },
+              {
+                "type": "Control",
+                "label": "Bestätigung durch Dritte",
+                "scope": "#/properties/thirdPartyAssurance",
+                "description": "Anerkanntes System oder Zertifizierung, unter der die Sorgfaltspflichten bestätigt wurden, sofern vorhanden."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Materialien und Zusammensetzung",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Batteriechemie",
+                "scope": "#/properties/batteryChemistry",
+                "description": "Zellchemie der Batterie. Die Familie auswählen; die genaue Zusammensetzung steht in den Materialfeldern darunter."
+              },
+              {
+                "type": "Control",
+                "label": "Kathodenmaterialien",
+                "scope": "#/properties/cathodeMaterials",
+                "description": "In der Kathode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt."
+              },
+              {
+                "type": "Control",
+                "label": "Anodenmaterialien",
+                "scope": "#/properties/anodeMaterials",
+                "description": "In der Anode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt."
+              },
+              {
+                "type": "Control",
+                "label": "Elektrolytmaterialien",
+                "scope": "#/properties/electrolyteMaterials",
+                "description": "Im Elektrolyt verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt."
+              },
+              {
+                "type": "Control",
+                "label": "Wirkung der Stoffe",
+                "scope": "#/properties/impactOfSubstances",
+                "description": "Wirkung der enthaltenen Stoffe auf Umwelt, menschliche Gesundheit, Sicherheit und Personen."
+              },
+              {
+                "type": "Control",
+                "label": "Kritische Rohstoffe",
+                "scope": "#/properties/criticalRawMaterials",
+                "description": "Enthaltene kritische Rohstoffe und ihr Masseanteil. Je Rohstoff eine Zeile."
+              },
+              {
+                "type": "Control",
+                "label": "Gefahrstoffe",
+                "scope": "#/properties/hazardousSubstances",
+                "description": "Enthaltene Gefahrstoffe über Quecksilber, Cadmium und Blei hinaus. Je Stoff eine Zeile."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Rezyklat- und erneuerbarer Anteil",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Vorverbraucher-Rezyklat Nickel (%)",
+                "scope": "#/properties/preConsumerNickelShare",
+                "description": "Anteil an vorverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Vorverbraucher-Rezyklat Cobalt (%)",
+                "scope": "#/properties/preConsumerCobaltShare",
+                "description": "Anteil an vorverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Vorverbraucher-Rezyklat Lithium (%)",
+                "scope": "#/properties/preConsumerLithiumShare",
+                "description": "Anteil an vorverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Vorverbraucher-Rezyklat Blei (%)",
+                "scope": "#/properties/preConsumerLeadShare",
+                "description": "Anteil an vorverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Nachverbraucher-Rezyklat Nickel (%)",
+                "scope": "#/properties/postConsumerNickelShare",
+                "description": "Anteil an nachverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Nachverbraucher-Rezyklat Cobalt (%)",
+                "scope": "#/properties/postConsumerCobaltShare",
+                "description": "Anteil an nachverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Nachverbraucher-Rezyklat Lithium (%)",
+                "scope": "#/properties/postConsumerLithiumShare",
+                "description": "Anteil an nachverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Nachverbraucher-Rezyklat Blei (%)",
+                "scope": "#/properties/postConsumerLeadShare",
+                "description": "Anteil an nachverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Erneuerbarer Anteil (%)",
+                "scope": "#/properties/renewableContentShare",
+                "description": "Anteil an erneuerbaren Materialien in der Batterie, in Prozent."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Kreislauffähigkeit",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Demontageinformationen",
+                "scope": "#/properties/dismantlingInformationUrl",
+                "description": "Anleitungen zum Ausbau und zur Zerlegung des Batteriepacks, als öffentliche https-Adresse."
+              },
+              {
+                "type": "Control",
+                "label": "Teilenummern der Komponenten",
+                "scope": "#/properties/partNumbersUrl",
+                "description": "Öffentliche https-Adresse der Liste der Teilenummern für die Komponenten."
+              },
+              {
+                "type": "Control",
+                "label": "Bezugsquellen für Ersatzteile",
+                "scope": "#/properties/sparePartsUrl",
+                "description": "Öffentliche https-Adresse der Information, wo Ersatzteile bezogen werden können."
+              },
+              {
+                "type": "Control",
+                "label": "Sicherheitsmaßnahmen",
+                "scope": "#/properties/safetyMeasuresUrl",
+                "description": "Öffentliche https-Adresse der Sicherheitsmaßnahmen für Handhabung, Lagerung und Transport der Batterie."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Ende der Lebensdauer",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Rolle der Endnutzer bei der Abfallvermeidung",
+                "scope": "#/properties/wastePreventionUrl",
+                "description": "Öffentliche https-Adresse der Information, wie Endnutzer zur Abfallvermeidung beitragen."
+              },
+              {
+                "type": "Control",
+                "label": "Getrenntsammlung von Altbatterien",
+                "scope": "#/properties/separateCollectionUrl",
+                "description": "Öffentliche https-Adresse der Information zur Getrenntsammlung von Altbatterien."
+              },
+              {
+                "type": "Control",
+                "label": "Sammlung, zweites Leben und Behandlung",
+                "scope": "#/properties/endOfLifeTreatmentUrl",
+                "description": "Öffentliche https-Adresse der Information zu Sammlung, Vorbereitung auf ein zweites Leben und Behandlung am Lebensende."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Leistung und Haltbarkeit",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Bemessungskapazität (Ah)",
+                "scope": "#/properties/ratedCapacity",
+                "description": "Bemessungskapazität in Amperestunden, wie für die neue Batterie deklariert."
+              },
+              {
+                "type": "Control",
+                "label": "Verbleibende Kapazität (Ah)",
+                "scope": "#/properties/remainingCapacity",
+                "description": "Verbleibende Kapazität in Amperestunden. Dieser Wert ändert sich über die Lebensdauer der Batterie."
+              },
+              {
+                "type": "Control",
+                "label": "Kapazitätsverlust (%)",
+                "scope": "#/properties/capacityFade",
+                "description": "Verlust an Kapazität gegenüber der Bemessungskapazität, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Zustand der zertifizierten Energie (%)",
+                "scope": "#/properties/stateOfCertifiedEnergy",
+                "description": "SOCE: verbleibende nutzbare Energie gegenüber der zertifizierten nutzbaren Energie, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Ladezustand (%)",
+                "scope": "#/properties/stateOfCharge",
+                "description": "Ladezustand zum Zeitpunkt der letzten Aktualisierung, in Prozent."
+              },
+              {
+                "type": "Control",
+                "label": "Nennspannung (V)",
+                "scope": "#/properties/nominalVoltage",
+                "description": "Nennspannung des Batteriepacks in Volt."
+              },
+              {
+                "type": "Control",
+                "label": "Ursprüngliche Leistungsfähigkeit (W)",
+                "scope": "#/properties/originalPowerCapability",
+                "description": "Leistungsfähigkeit der neuen Batterie in Watt."
+              },
+              {
+                "type": "Control",
+                "label": "Erwartete Lebensdauer (Jahre)",
+                "scope": "#/properties/expectedLifetimeYears",
+                "description": "Erwartete Lebensdauer in Kalenderjahren unter den Referenzbedingungen."
+              },
+              {
+                "type": "Control",
+                "label": "Erwartete Lebensdauer (Lade-Entlade-Zyklen)",
+                "scope": "#/properties/expectedLifetimeCycles",
+                "description": "Erwartete Anzahl der Lade-Entlade-Zyklen im Referenztest zur Zyklenlebensdauer."
+              },
+              {
+                "type": "Control",
+                "label": "Bisherige Vollzyklen",
+                "scope": "#/properties/fullCycles",
+                "description": "Anzahl der bisher gezählten vollen Lade- und Entladezyklen. Dieser Wert ändert sich über die Lebensdauer der Batterie."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Dokumente",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Dokumente",
+                "scope": "#/properties/documents",
+                "description": "Zur Batterie gehörende Dokumente, über ihre Webadresse referenziert; es wird nichts hochgeladen. Die EU-Konformitätserklärung und die Prüfberichte gehören hierher."
+              }
+            ]
+          }
+        ]
+      },
+      "@id": "BatteryForm",
+      "tag": "dpp",
+      "name": "DppBatteryFormOverlayDE",
+      "@type": "OverlayForm",
+      "onBase": "Battery",
+      "schema": {
+        "type": "object",
+        "required": [
+          "batteryIdentifier",
+          "manufacturerIdentifier",
+          "manufacturerName",
+          "manufacturingPlace",
+          "manufacturingDate",
+          "warrantyPeriod",
+          "batteryCategory",
+          "batteryMass",
+          "batteryStatus",
+          "extinguishingAgent",
+          "meaningOfLabels",
+          "carbonFootprintTotal",
+          "cfRawMaterial",
+          "cfProduction",
+          "cfDistribution",
+          "cfEndOfLife",
+          "carbonFootprintClass",
+          "carbonFootprintStudyUrl",
+          "dueDiligenceReportUrl",
+          "batteryChemistry",
+          "cathodeMaterials",
+          "anodeMaterials",
+          "electrolyteMaterials",
+          "impactOfSubstances",
+          "preConsumerNickelShare",
+          "preConsumerCobaltShare",
+          "preConsumerLithiumShare",
+          "preConsumerLeadShare",
+          "postConsumerNickelShare",
+          "postConsumerCobaltShare",
+          "postConsumerLithiumShare",
+          "postConsumerLeadShare",
+          "renewableContentShare",
+          "dismantlingInformationUrl",
+          "partNumbersUrl",
+          "sparePartsUrl",
+          "safetyMeasuresUrl",
+          "wastePreventionUrl",
+          "separateCollectionUrl",
+          "endOfLifeTreatmentUrl",
+          "ratedCapacity",
+          "remainingCapacity",
+          "capacityFade",
+          "stateOfCertifiedEnergy",
+          "stateOfCharge",
+          "nominalVoltage",
+          "originalPowerCapability",
+          "expectedLifetimeYears",
+          "expectedLifetimeCycles",
+          "fullCycles"
+        ],
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "url",
+                "contentType"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "pattern": "^https://"
+                },
+                "language": {
+                  "type": "string",
+                  "pattern": "^[a-z]{2}$"
+                },
+                "contentType": {
+                  "type": "string",
+                  "pattern": "^[a-z]+/[A-Za-z0-9.+-]+$"
+                },
+                "resourceTitle": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "minLength": 1
+                }
+              }
+            },
+            "maxItems": 20
+          },
+          "fullCycles": {
+            "type": "integer",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "batteryMass": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "cfEndOfLife": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "capacityFade": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "cfProduction": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "batteryStatus": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Original",
+                "title": "Original"
+              },
+              {
+                "const": "Repurposed",
+                "title": "Umgewidmet"
+              },
+              {
+                "const": "Reused",
+                "title": "Wiederverwendet"
+              },
+              {
+                "const": "Remanufactured",
+                "title": "Wiederaufgearbeitet"
+              },
+              {
+                "const": "Waste",
+                "title": "Abfall"
+              }
+            ]
+          },
+          "cfRawMaterial": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "ratedCapacity": {
+            "type": "number",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "sparePartsUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "stateOfCharge": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "anodeMaterials": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1
+          },
+          "cfDistribution": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "nominalVoltage": {
+            "type": "number",
+            "maximum": 2000,
+            "minimum": 0
+          },
+          "partNumbersUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "warrantyPeriod": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "batteryCategory": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "EVBattery",
+                "title": "Elektrofahrzeugbatterie"
+              },
+              {
+                "const": "LMTBattery",
+                "title": "Batterie für leichte Verkehrsmittel"
+              },
+              {
+                "const": "IndustrialBattery",
+                "title": "Industriebatterie"
+              },
+              {
+                "const": "StationaryStorage",
+                "title": "Stationäres Batteriespeichersystem"
+              }
+            ]
+          },
+          "meaningOfLabels": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1
+          },
+          "batteryChemistry": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "NMC",
+                "title": "Lithium-Nickel-Mangan-Cobaltoxid (NMC)"
+              },
+              {
+                "const": "NCA",
+                "title": "Lithium-Nickel-Cobalt-Aluminiumoxid (NCA)"
+              },
+              {
+                "const": "LFP",
+                "title": "Lithium-Eisenphosphat (LFP)"
+              },
+              {
+                "const": "LMO",
+                "title": "Lithium-Manganoxid (LMO)"
+              },
+              {
+                "const": "LTO",
+                "title": "Lithium-Titanat (LTO)"
+              },
+              {
+                "const": "NaIon",
+                "title": "Natrium-Ionen"
+              },
+              {
+                "const": "LeadAcid",
+                "title": "Blei-Säure"
+              },
+              {
+                "const": "NiMH",
+                "title": "Nickel-Metallhydrid"
+              }
+            ]
+          },
+          "cathodeMaterials": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1
+          },
+          "manufacturerName": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "batteryIdentifier": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._/-]*$",
+            "maxLength": 64,
+            "minLength": 1
+          },
+          "manufacturingDate": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "remainingCapacity": {
+            "type": "number",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "safetyMeasuresUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "extinguishingAgent": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "impactOfSubstances": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1
+          },
+          "manufacturingPlace": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "wastePreventionUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "hazardousSubstances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "substanceName"
+              ],
+              "properties": {
+                "casNumber": {
+                  "type": "string",
+                  "pattern": "^[0-9]{2,7}-[0-9]{2}-[0-9]$"
+                },
+                "substanceName": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "minLength": 1
+                },
+                "massPercentage": {
+                  "type": "number",
+                  "maximum": 100,
+                  "minimum": 0
+                }
+              }
+            },
+            "maxItems": 30
+          },
+          "placedInServiceDate": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "thirdPartyAssurance": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "carbonFootprintClass": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "A",
+                "title": "Klasse A"
+              },
+              {
+                "const": "B",
+                "title": "Klasse B"
+              },
+              {
+                "const": "C",
+                "title": "Klasse C"
+              },
+              {
+                "const": "D",
+                "title": "Klasse D"
+              },
+              {
+                "const": "E",
+                "title": "Klasse E"
+              },
+              {
+                "const": "F",
+                "title": "Klasse F"
+              },
+              {
+                "const": "G",
+                "title": "Klasse G"
+              }
+            ]
+          },
+          "carbonFootprintTotal": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "criticalRawMaterials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "materialName",
+                "massPercentage"
+              ],
+              "properties": {
+                "materialName": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "minLength": 1
+                },
+                "massPercentage": {
+                  "type": "number",
+                  "maximum": 100,
+                  "minimum": 0
+                }
+              }
+            },
+            "maxItems": 30
+          },
+          "electrolyteMaterials": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1
+          },
+          "preConsumerLeadShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "dueDiligenceReportUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "endOfLifeTreatmentUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "expectedLifetimeYears": {
+            "type": "integer",
+            "maximum": 50,
+            "minimum": 0
+          },
+          "postConsumerLeadShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "renewableContentShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "separateCollectionUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "expectedLifetimeCycles": {
+            "type": "integer",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "manufacturerIdentifier": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1
+          },
+          "preConsumerCobaltShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "preConsumerNickelShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "stateOfCertifiedEnergy": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "carbonFootprintStudyUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "originalPowerCapability": {
+            "type": "number",
+            "maximum": 10000000,
+            "minimum": 0
+          },
+          "postConsumerCobaltShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "postConsumerNickelShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "preConsumerLithiumShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "postConsumerLithiumShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "dismantlingInformationUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        }
+      },
+      "language": "de"
+    },
+    {
+      "ui": {
+        "type": "Categorization",
+        "options": {
+          "density": "compact"
+        },
+        "elements": [
+          {
+            "type": "Category",
+            "label": "Identification",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Battery identifier",
+                "scope": "#/properties/batteryIdentifier",
+                "description": "The unique identifier of this individual battery, exactly as it is carried on the battery and in the data carrier."
+              },
+              {
+                "type": "Control",
+                "label": "Manufacturer identifier",
+                "scope": "#/properties/manufacturerIdentifier",
+                "description": "Identifier of the manufacturer, for example the EU operator registration number or a GLN."
+              },
+              {
+                "type": "Control",
+                "label": "Manufacturer name",
+                "scope": "#/properties/manufacturerName",
+                "description": "Legal name of the manufacturer placing the battery on the market."
+              },
+              {
+                "type": "Control",
+                "label": "Manufacturing place",
+                "scope": "#/properties/manufacturingPlace",
+                "description": "Place of manufacture, as city and country of the plant where the battery was assembled."
+              },
+              {
+                "type": "Control",
+                "label": "Manufacturing date",
+                "scope": "#/properties/manufacturingDate",
+                "description": "Month of manufacture as YYYY-MM, for example 2026-06."
+              },
+              {
+                "type": "Control",
+                "label": "Date of putting into service",
+                "scope": "#/properties/placedInServiceDate",
+                "description": "Month the battery was put into service as YYYY-MM. Leave empty as long as it has not been."
+              },
+              {
+                "type": "Control",
+                "label": "Warranty period until",
+                "scope": "#/properties/warrantyPeriod",
+                "description": "Month the warranty of the battery ends, as YYYY-MM."
+              },
+              {
+                "type": "Control",
+                "label": "Battery category",
+                "scope": "#/properties/batteryCategory",
+                "description": "Category under the Batteries Regulation. It decides which attributes are mandatory."
+              },
+              {
+                "type": "Control",
+                "label": "Battery mass (kg)",
+                "scope": "#/properties/batteryMass",
+                "description": "Total mass of the battery in kilograms, including housing and the battery management system."
+              },
+              {
+                "type": "Control",
+                "label": "Battery status",
+                "scope": "#/properties/batteryStatus",
+                "description": "Current status in the life cycle. This attribute changes over the life of the battery."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Conformity and labelling",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Extinguishing agent",
+                "scope": "#/properties/extinguishingAgent",
+                "description": "Extinguishing agent suitable for this battery chemistry, as stated in the safety data sheet."
+              },
+              {
+                "type": "Control",
+                "label": "Meaning of labels and symbols",
+                "scope": "#/properties/meaningOfLabels",
+                "description": "Plain explanation of the symbols carried on the battery, for the person reading the passport."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Carbon footprint",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Carbon footprint (kgCO2e/kWh)",
+                "scope": "#/properties/carbonFootprintTotal",
+                "description": "Total carbon footprint per functional unit, that is per kWh of total energy over the service life."
+              },
+              {
+                "type": "Control",
+                "label": "Share: raw material acquisition",
+                "scope": "#/properties/cfRawMaterial",
+                "description": "Contribution of raw material acquisition and pre-processing to the carbon footprint."
+              },
+              {
+                "type": "Control",
+                "label": "Share: production",
+                "scope": "#/properties/cfProduction",
+                "description": "Contribution of the main product production and manufacturing stage."
+              },
+              {
+                "type": "Control",
+                "label": "Share: distribution",
+                "scope": "#/properties/cfDistribution",
+                "description": "Contribution of the distribution stage."
+              },
+              {
+                "type": "Control",
+                "label": "Share: end of life and recycling",
+                "scope": "#/properties/cfEndOfLife",
+                "description": "Contribution of the end of life and recycling stage."
+              },
+              {
+                "type": "Control",
+                "label": "Carbon footprint performance class",
+                "scope": "#/properties/carbonFootprintClass",
+                "description": "Performance class from the carbon footprint label."
+              },
+              {
+                "type": "Control",
+                "label": "Carbon footprint study",
+                "scope": "#/properties/carbonFootprintStudyUrl",
+                "description": "Public https address of the carbon footprint study, reachable without login."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Supply chain due diligence",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Due diligence report",
+                "scope": "#/properties/dueDiligenceReportUrl",
+                "description": "Public https address of the supply chain due diligence report under Article 52(3) of the Batteries Regulation."
+              },
+              {
+                "type": "Control",
+                "label": "Third-party assurance",
+                "scope": "#/properties/thirdPartyAssurance",
+                "description": "Recognised scheme or certification under which the due diligence policy was assured, if any."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Materials and composition",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Battery chemistry",
+                "scope": "#/properties/batteryChemistry",
+                "description": "Cell chemistry of the battery. Pick the family; the exact composition goes into the material fields below."
+              },
+              {
+                "type": "Control",
+                "label": "Cathode materials",
+                "scope": "#/properties/cathodeMaterials",
+                "description": "Materials used in the cathode, named as in the bill of materials and separated by commas."
+              },
+              {
+                "type": "Control",
+                "label": "Anode materials",
+                "scope": "#/properties/anodeMaterials",
+                "description": "Materials used in the anode, named as in the bill of materials and separated by commas."
+              },
+              {
+                "type": "Control",
+                "label": "Electrolyte materials",
+                "scope": "#/properties/electrolyteMaterials",
+                "description": "Materials used in the electrolyte, named as in the bill of materials and separated by commas."
+              },
+              {
+                "type": "Control",
+                "label": "Impact of substances",
+                "scope": "#/properties/impactOfSubstances",
+                "description": "Impact of the substances contained on the environment, human health, safety and persons."
+              },
+              {
+                "type": "Control",
+                "label": "Critical raw materials",
+                "scope": "#/properties/criticalRawMaterials",
+                "description": "Critical raw materials contained and their mass share. One row per material."
+              },
+              {
+                "type": "Control",
+                "label": "Hazardous substances",
+                "scope": "#/properties/hazardousSubstances",
+                "description": "Hazardous substances contained beyond mercury, cadmium and lead. One row per substance."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Recycled and renewable content",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Pre-consumer recycled nickel (%)",
+                "scope": "#/properties/preConsumerNickelShare",
+                "description": "Share of pre-consumer recycled nickel in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Pre-consumer recycled cobalt (%)",
+                "scope": "#/properties/preConsumerCobaltShare",
+                "description": "Share of pre-consumer recycled cobalt in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Pre-consumer recycled lithium (%)",
+                "scope": "#/properties/preConsumerLithiumShare",
+                "description": "Share of pre-consumer recycled lithium in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Pre-consumer recycled lead (%)",
+                "scope": "#/properties/preConsumerLeadShare",
+                "description": "Share of pre-consumer recycled lead in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Post-consumer recycled nickel (%)",
+                "scope": "#/properties/postConsumerNickelShare",
+                "description": "Share of post-consumer recycled nickel in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Post-consumer recycled cobalt (%)",
+                "scope": "#/properties/postConsumerCobaltShare",
+                "description": "Share of post-consumer recycled cobalt in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Post-consumer recycled lithium (%)",
+                "scope": "#/properties/postConsumerLithiumShare",
+                "description": "Share of post-consumer recycled lithium in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Post-consumer recycled lead (%)",
+                "scope": "#/properties/postConsumerLeadShare",
+                "description": "Share of post-consumer recycled lead in the battery, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Renewable content (%)",
+                "scope": "#/properties/renewableContentShare",
+                "description": "Share of renewable material content in the battery, in percent."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Circularity",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Dismantling information",
+                "scope": "#/properties/dismantlingInformationUrl",
+                "description": "Manuals for removing and disassembling the battery pack, as a public https address."
+              },
+              {
+                "type": "Control",
+                "label": "Part numbers for components",
+                "scope": "#/properties/partNumbersUrl",
+                "description": "Public https address of the list of part numbers for the components."
+              },
+              {
+                "type": "Control",
+                "label": "Sources of spare parts",
+                "scope": "#/properties/sparePartsUrl",
+                "description": "Public https address of the information on where spare parts can be obtained."
+              },
+              {
+                "type": "Control",
+                "label": "Safety measures",
+                "scope": "#/properties/safetyMeasuresUrl",
+                "description": "Public https address of the safety measures for handling, storing and transporting the battery."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "End of life",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Role of end-users in waste prevention",
+                "scope": "#/properties/wastePreventionUrl",
+                "description": "Public https address of the information on how end-users contribute to waste prevention."
+              },
+              {
+                "type": "Control",
+                "label": "Separate collection of waste batteries",
+                "scope": "#/properties/separateCollectionUrl",
+                "description": "Public https address of the information on the separate collection of waste batteries."
+              },
+              {
+                "type": "Control",
+                "label": "Collection, second life and treatment",
+                "scope": "#/properties/endOfLifeTreatmentUrl",
+                "description": "Public https address of the information on collection, preparation for second life and treatment at end of life."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Performance and durability",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Rated capacity (Ah)",
+                "scope": "#/properties/ratedCapacity",
+                "description": "Rated capacity in ampere-hours, as declared for the new battery."
+              },
+              {
+                "type": "Control",
+                "label": "Remaining capacity (Ah)",
+                "scope": "#/properties/remainingCapacity",
+                "description": "Remaining capacity in ampere-hours. This value changes over the life of the battery."
+              },
+              {
+                "type": "Control",
+                "label": "Capacity fade (%)",
+                "scope": "#/properties/capacityFade",
+                "description": "Loss of capacity against the rated capacity, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "State of certified energy (%)",
+                "scope": "#/properties/stateOfCertifiedEnergy",
+                "description": "SOCE: remaining usable energy against the certified usable energy, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "State of charge (%)",
+                "scope": "#/properties/stateOfCharge",
+                "description": "SoC at the time of the last update, in percent."
+              },
+              {
+                "type": "Control",
+                "label": "Nominal voltage (V)",
+                "scope": "#/properties/nominalVoltage",
+                "description": "Nominal voltage of the battery pack in volts."
+              },
+              {
+                "type": "Control",
+                "label": "Original power capability (W)",
+                "scope": "#/properties/originalPowerCapability",
+                "description": "Power capability of the new battery in watts."
+              },
+              {
+                "type": "Control",
+                "label": "Expected lifetime (years)",
+                "scope": "#/properties/expectedLifetimeYears",
+                "description": "Expected lifetime in calendar years under the reference conditions."
+              },
+              {
+                "type": "Control",
+                "label": "Expected lifetime (charge-discharge cycles)",
+                "scope": "#/properties/expectedLifetimeCycles",
+                "description": "Expected number of charge-discharge cycles in the cycle-life reference test."
+              },
+              {
+                "type": "Control",
+                "label": "Full cycles so far",
+                "scope": "#/properties/fullCycles",
+                "description": "Number of full charging and discharging cycles counted so far. This value changes over the life of the battery."
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Documents",
+            "elements": [
+              {
+                "type": "Control",
+                "label": "Documents",
+                "scope": "#/properties/documents",
+                "description": "Documents belonging to the battery, referenced by web address; nothing is uploaded. The EU declaration of conformity and the test reports belong here."
+              }
+            ]
+          }
+        ]
+      },
+      "@id": "BatteryForm",
+      "tag": "dpp",
+      "name": "DppBatteryFormOverlayEN",
+      "@type": "OverlayForm",
+      "onBase": "Battery",
+      "schema": {
+        "type": "object",
+        "required": [
+          "batteryIdentifier",
+          "manufacturerIdentifier",
+          "manufacturerName",
+          "manufacturingPlace",
+          "manufacturingDate",
+          "warrantyPeriod",
+          "batteryCategory",
+          "batteryMass",
+          "batteryStatus",
+          "extinguishingAgent",
+          "meaningOfLabels",
+          "carbonFootprintTotal",
+          "cfRawMaterial",
+          "cfProduction",
+          "cfDistribution",
+          "cfEndOfLife",
+          "carbonFootprintClass",
+          "carbonFootprintStudyUrl",
+          "dueDiligenceReportUrl",
+          "batteryChemistry",
+          "cathodeMaterials",
+          "anodeMaterials",
+          "electrolyteMaterials",
+          "impactOfSubstances",
+          "preConsumerNickelShare",
+          "preConsumerCobaltShare",
+          "preConsumerLithiumShare",
+          "preConsumerLeadShare",
+          "postConsumerNickelShare",
+          "postConsumerCobaltShare",
+          "postConsumerLithiumShare",
+          "postConsumerLeadShare",
+          "renewableContentShare",
+          "dismantlingInformationUrl",
+          "partNumbersUrl",
+          "sparePartsUrl",
+          "safetyMeasuresUrl",
+          "wastePreventionUrl",
+          "separateCollectionUrl",
+          "endOfLifeTreatmentUrl",
+          "ratedCapacity",
+          "remainingCapacity",
+          "capacityFade",
+          "stateOfCertifiedEnergy",
+          "stateOfCharge",
+          "nominalVoltage",
+          "originalPowerCapability",
+          "expectedLifetimeYears",
+          "expectedLifetimeCycles",
+          "fullCycles"
+        ],
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "url",
+                "contentType"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "pattern": "^https://"
+                },
+                "language": {
+                  "type": "string",
+                  "pattern": "^[a-z]{2}$"
+                },
+                "contentType": {
+                  "type": "string",
+                  "pattern": "^[a-z]+/[A-Za-z0-9.+-]+$"
+                },
+                "resourceTitle": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "minLength": 1
+                }
+              }
+            },
+            "maxItems": 20
+          },
+          "fullCycles": {
+            "type": "integer",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "batteryMass": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "cfEndOfLife": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "capacityFade": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "cfProduction": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "batteryStatus": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "Original",
+                "title": "Original"
+              },
+              {
+                "const": "Repurposed",
+                "title": "Repurposed"
+              },
+              {
+                "const": "Reused",
+                "title": "Reused"
+              },
+              {
+                "const": "Remanufactured",
+                "title": "Remanufactured"
+              },
+              {
+                "const": "Waste",
+                "title": "Waste"
+              }
+            ]
+          },
+          "cfRawMaterial": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "ratedCapacity": {
+            "type": "number",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "sparePartsUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "stateOfCharge": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "anodeMaterials": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1
+          },
+          "cfDistribution": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "nominalVoltage": {
+            "type": "number",
+            "maximum": 2000,
+            "minimum": 0
+          },
+          "partNumbersUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "warrantyPeriod": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "batteryCategory": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "EVBattery",
+                "title": "Electric vehicle battery"
+              },
+              {
+                "const": "LMTBattery",
+                "title": "Light means of transport battery"
+              },
+              {
+                "const": "IndustrialBattery",
+                "title": "Industrial battery"
+              },
+              {
+                "const": "StationaryStorage",
+                "title": "Stationary battery energy storage system"
+              }
+            ]
+          },
+          "meaningOfLabels": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1
+          },
+          "batteryChemistry": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "NMC",
+                "title": "Lithium nickel manganese cobalt oxide (NMC)"
+              },
+              {
+                "const": "NCA",
+                "title": "Lithium nickel cobalt aluminium oxide (NCA)"
+              },
+              {
+                "const": "LFP",
+                "title": "Lithium iron phosphate (LFP)"
+              },
+              {
+                "const": "LMO",
+                "title": "Lithium manganese oxide (LMO)"
+              },
+              {
+                "const": "LTO",
+                "title": "Lithium titanate (LTO)"
+              },
+              {
+                "const": "NaIon",
+                "title": "Sodium-ion"
+              },
+              {
+                "const": "LeadAcid",
+                "title": "Lead-acid"
+              },
+              {
+                "const": "NiMH",
+                "title": "Nickel-metal hydride"
+              }
+            ]
+          },
+          "cathodeMaterials": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1
+          },
+          "manufacturerName": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "batteryIdentifier": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9 ._/-]*$",
+            "maxLength": 64,
+            "minLength": 1
+          },
+          "manufacturingDate": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "remainingCapacity": {
+            "type": "number",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "safetyMeasuresUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "extinguishingAgent": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "impactOfSubstances": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1
+          },
+          "manufacturingPlace": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1
+          },
+          "wastePreventionUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "hazardousSubstances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "substanceName"
+              ],
+              "properties": {
+                "casNumber": {
+                  "type": "string",
+                  "pattern": "^[0-9]{2,7}-[0-9]{2}-[0-9]$"
+                },
+                "substanceName": {
+                  "type": "string",
+                  "maxLength": 120,
+                  "minLength": 1
+                },
+                "massPercentage": {
+                  "type": "number",
+                  "maximum": 100,
+                  "minimum": 0
+                }
+              }
+            },
+            "maxItems": 30
+          },
+          "placedInServiceDate": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$"
+          },
+          "thirdPartyAssurance": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "carbonFootprintClass": {
+            "type": "string",
+            "oneOf": [
+              {
+                "const": "A",
+                "title": "Class A"
+              },
+              {
+                "const": "B",
+                "title": "Class B"
+              },
+              {
+                "const": "C",
+                "title": "Class C"
+              },
+              {
+                "const": "D",
+                "title": "Class D"
+              },
+              {
+                "const": "E",
+                "title": "Class E"
+              },
+              {
+                "const": "F",
+                "title": "Class F"
+              },
+              {
+                "const": "G",
+                "title": "Class G"
+              }
+            ]
+          },
+          "carbonFootprintTotal": {
+            "type": "number",
+            "maximum": 10000,
+            "minimum": 0
+          },
+          "criticalRawMaterials": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "materialName",
+                "massPercentage"
+              ],
+              "properties": {
+                "materialName": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "minLength": 1
+                },
+                "massPercentage": {
+                  "type": "number",
+                  "maximum": 100,
+                  "minimum": 0
+                }
+              }
+            },
+            "maxItems": 30
+          },
+          "electrolyteMaterials": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1
+          },
+          "preConsumerLeadShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "dueDiligenceReportUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "endOfLifeTreatmentUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "expectedLifetimeYears": {
+            "type": "integer",
+            "maximum": 50,
+            "minimum": 0
+          },
+          "postConsumerLeadShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "renewableContentShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "separateCollectionUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "expectedLifetimeCycles": {
+            "type": "integer",
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "manufacturerIdentifier": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1
+          },
+          "preConsumerCobaltShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "preConsumerNickelShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "stateOfCertifiedEnergy": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "carbonFootprintStudyUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "originalPowerCapability": {
+            "type": "number",
+            "maximum": 10000000,
+            "minimum": 0
+          },
+          "postConsumerCobaltShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "postConsumerNickelShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "preConsumerLithiumShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "postConsumerLithiumShare": {
+            "type": "number",
+            "maximum": 100,
+            "minimum": 0
+          },
+          "dismantlingInformationUrl": {
+            "type": "string",
+            "pattern": "^https://"
+          }
+        }
+      },
+      "language": "en"
+    }
+  ],
+  "@context": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Base": "soya:Base",
+    "form": "soya:form",
+    "name": {
+      "@id": "dct:title",
+      "@container": "@language"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "soya": "https://w3id.org/soya/ns#",
+    "label": {
+      "@id": "rdfs:label",
+      "@container": "@language"
+    },
+    "range": {
+      "@id": "rdfs:range",
+      "@type": "@id"
+    },
+    "domain": {
+      "@id": "rdfs:domain",
+      "@type": "@id"
+    },
+    "format": "soya:format",
+    "import": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "onBase": {
+      "@id": "soya:onBase",
+      "@type": "@id"
+    },
+    "comment": {
+      "@id": "rdfs:comment",
+      "@container": "@language"
+    },
+    "sh:path": {
+      "@type": "@id"
+    },
+    "encoding": "soya:encoding",
+    "alignment": "soya:alignment",
+    "annotation": "soya:annotation",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "validation": "soya:validation",
+    "OverlayForm": "soya:OverlayForm",
+    "sh:nodeKind": {
+      "@type": "@id"
+    },
+    "OverlayFormat": "soya:OverlayFormat",
+    "subPropertyOf": {
+      "@id": "rdfs:subPropertyOf",
+      "@type": "@id"
+    },
+    "attributeOrder": {
+      "@id": "soya:attributeOrder",
+      "@context": {
+        "list": "@list"
+      }
+    },
+    "classification": "soya:classification",
+    "renderingLabel": "soya:renderingLabel",
+    "sh:targetClass": {
+      "@type": "@id"
+    },
+    "transformation": "soya:transformation",
+    "OverlayEncoding": "soya:OverlayEncoding",
+    "OverlayAlignment": "soya:OverlayAlignment",
+    "OverlayAnnotation": "soya:OverlayAnnotation",
+    "OverlayValidation": "soya:OverlayValidation",
+    "OverlayClassification": "soya:OverlayClassification",
+    "OverlayTransformation": "soya:OverlayTransformation",
+    "@base": "https://soya.ownyourdata.eu/DppBattery/",
+    "@version": 1.1
+  }
+}

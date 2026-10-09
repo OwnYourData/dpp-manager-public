@@ -32,6 +32,10 @@ gem "oydid", "~> 0.9", ">= 0.9.6", require: false
 gem "jwt", "~> 3.2"
 gem "jwt-eddsa", "~> 0.9"
 
+# HTTP/2 to DPP Services and custodians (EN 18216:2026 clause 4); see
+# DppService::Transport. Net::HTTP speaks HTTP/1.1 only.
+gem "httpx", "~> 1.8"
+
 
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false

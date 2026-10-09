@@ -11,8 +11,7 @@ module DppService
   # delegation names in `sub` (milestone 5); getting it by hand from an email is
   # exactly how the wrong one ends up in a signed statement.
   #
-  # Net::HTTP from the standard library, no new gems, matching how the service
-  # itself talks to a custodian.
+  # Over HTTP/2 through Transport, like every call to a DPP Service.
   module Directory
     class Error < StandardError; end
 
@@ -69,17 +68,10 @@ module DppService
     end
 
     def request(uri)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == "https"
-      http.open_timeout = TIMEOUT
-      http.read_timeout = TIMEOUT
-      http.request(Net::HTTP::Get.new(uri.request_uri, { "Accept" => "application/json" }))
-    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH, SocketError
-      raise Error, "unreachable"
-    rescue Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
-      raise Error, "timeout"
-    rescue OpenSSL::SSL::SSLError
-      raise Error, "tls_failed"
+      Transport.call(Net::HTTP::Get.new(uri.request_uri, { "Accept" => "application/json" }), uri,
+                     timeout: TIMEOUT)
+    rescue Transport::Error => e
+      raise Error, e.message
     end
   end
 end

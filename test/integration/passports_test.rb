@@ -84,6 +84,10 @@ class PassportsTest < ActionDispatch::IntegrationTest
       assert_equal PassportsController::SHOWN_PROBLEMS + 1, shown.size
       assert_equal "problem 8", shown[PassportsController::SHOWN_PROBLEMS - 1]
       assert_match(/4/, shown.last)
+
+      follow_redirect!
+      assert_select ".flash.notice summary", text: I18n.t("passports.problem.show", count: 12),
+        message: "the summary counts the points, not the lines of a cut list"
     end
   end
 
@@ -123,6 +127,29 @@ class PassportsTest < ActionDispatch::IntegrationTest
       assert_equal type.resolvable_name, query["schemaDri"]
       assert_equal "form-only", query["viewMode"], "the operator must not be shown soya-form's own schema picker"
       assert_equal({ "watt" => 9 }, JSON.parse(query["data"]))
+    end
+  end
+
+  # The file picker is the only way into the form other than typing, and it is
+  # entirely a browser affair — nothing is posted, so nothing but the markup can
+  # be asserted here. What matters is that the input is inside the controller's
+  # element and carries the target and the action: a picker that opens and does
+  # nothing is worse than none.
+  test "the form offers a file of answers to be poured in" do
+    with_open_vault do
+      create_and_unlock
+      type = create_type
+      passport = Passport.create!(product_type: type, label: "Batch 5", values: {})
+
+      get edit_passport_path(passport)
+      assert_response :success
+
+      assert_select "form[data-controller='soya-form'] .load-answers input[type=file]", 1 do |input|
+        assert_equal "file", input.first["data-soya-form-target"]
+        assert_equal "change->soya-form#load", input.first["data-action"]
+      end
+      assert_select "form[data-controller='soya-form'][data-soya-form-load-failed-label-value]", 1,
+        "the controller cannot say that a file was unusable without the sentence to say it with"
     end
   end
 

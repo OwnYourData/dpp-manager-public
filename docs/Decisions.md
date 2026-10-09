@@ -314,12 +314,14 @@ It exercises the whole chain the service will walk — key material, encoding,
 resolution — writes nothing anywhere, and needs the service not to be reachable
 at all. It is the one honest answer to "do my keys still work".
 
-### The custodian address is length-checked at 35 characters
+### No length is checked on identifiers or addresses
 
-That base URL ends up inside every passport DID's `serviceEndpoint`, competing
-for the 50 characters the registry allows on a data carrier. Too long here means
-unprintable identifiers later — and by then the DID is minted and the endpoint
-frozen. Refusing at setup is the only cheap moment.
+The product identifier is what the data carrier bears. The EU registry accepts
+up to 2000 characters for it, and how much a carrier bears is the operator's
+decision; the form shows the length while typing, so the decision is made
+knowingly. The custodian address goes into each passport DID's `serviceEndpoint`
+and never onto a carrier, so it is not length-checked either. The DPP Service
+applies the same rule.
 
 ### Setup state is derived, never stored in a session
 

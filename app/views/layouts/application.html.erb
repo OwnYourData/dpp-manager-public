@@ -83,7 +83,7 @@
           <p><%= notice %></p>
           <% if flash[:problems].present? %>
             <details class="problems">
-              <summary><%= t("passports.problem.show", count: Array(flash[:problems]).size) %></summary>
+              <summary><%= t("passports.problem.show", count: flash[:problem_count] || Array(flash[:problems]).size) %></summary>
               <ul>
                 <% Array(flash[:problems]).each do |problem| %><li><%= problem %></li><% end %>
               </ul>
@@ -91,19 +91,36 @@
           <% end %>
         </div>
       <% end %>
-      <% if alert %><p class="flash alert"><%= alert %></p><% end %>
+      <% if alert %>
+        <div class="flash alert">
+          <p><%= alert %></p>
+          <% if flash[:problems].present? %>
+            <details class="problems" open>
+              <summary><%= t("passports.problem.show", count: flash[:problem_count] || Array(flash[:problems]).size) %></summary>
+              <ul>
+                <% Array(flash[:problems]).each do |problem| %><li><%= problem %></li><% end %>
+              </ul>
+            </details>
+          <% end %>
+        </div>
+      <% end %>
 
       <%= yield %>
     </main>
 
     <footer>
-      <%# The words that name the file lead to the page about it. Quiet on
-          purpose: in the same grey as the sentence around it, underlined only
-          under the cursor. A blue link in the footer would pull the eye away
-          from whatever the page is actually for. %>
+      <%# Two links, both quiet on purpose: in the same grey as the sentence
+          around them, underlined only under the cursor. A blue link in the
+          footer would pull the eye away from whatever the page is actually for.
+          The words that name the file lead to the page about it; the name of
+          the house leads out to the web, and only that one opens a new tab —
+          an application holding an open vault should not navigate away from
+          itself because somebody read the footer. %>
       <span class="by">
         <%= image_tag "oyd-mark.svg", class: "mark", alt: "" %>
         <%= t("app.footer_html", version: DppManager::VERSION,
+              home: link_to(t("app.footer_home"), "https://www.ownyourdata.eu",
+                            class: "quiet", target: "_blank", rel: "noopener"),
               link: (vault_open? ? link_to(t("app.footer_link"), vault_path, class: "quiet")
                                  : t("app.footer_link"))) %>
       </span>

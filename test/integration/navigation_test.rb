@@ -78,6 +78,22 @@ class NavigationTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # The name of the house leads out to the web. In a new tab, and only this one:
+  # an application holding an open vault must not navigate away from itself
+  # because somebody read the footer.
+  test "the footer names OwnYourData.eu and links to it in a new tab" do
+    with_open_vault do
+      create_and_unlock
+
+      get root_path
+
+      assert_select "footer a.quiet[href=?]", "https://www.ownyourdata.eu",
+        text: "OwnYourData.eu"
+      assert_select "footer a[href=?][target=?][rel=?]",
+        "https://www.ownyourdata.eu", "_blank", "noopener"
+    end
+  end
+
   test "the identity is offered only once there is one" do
     with_open_vault do
       create_and_unlock

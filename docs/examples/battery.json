@@ -1,0 +1,94 @@
+{
+  "batteryIdentifier": "VOLT-EVP-2026-000916",
+  "manufacturerIdentifier": "9520123456788",
+  "manufacturerName": "Voltaris Energy Systems GmbH",
+  "manufacturingPlace": "Graz, Austria",
+  "manufacturingDate": "2026-06",
+  "placedInServiceDate": "2026-08",
+  "warrantyPeriod": "2034-06",
+  "batteryCategory": "EVBattery",
+  "batteryMass": 412.5,
+  "batteryStatus": "Original",
+  "extinguishingAgent": "Water mist or F-500 encapsulator agent; do not use CO2",
+  "meaningOfLabels": "Crossed-out wheeled bin: do not dispose of with household waste. Li-ion: lithium-ion cell chemistry. CE: conformity with EU law.",
+  "carbonFootprintTotal": 61.4,
+  "cfRawMaterial": 38.9,
+  "cfProduction": 17.2,
+  "cfDistribution": 2.1,
+  "cfEndOfLife": 3.2,
+  "carbonFootprintClass": "C",
+  "carbonFootprintStudyUrl": "https://docs.voltaris.example/evp/carbon-footprint-study.pdf",
+  "dueDiligenceReportUrl": "https://docs.voltaris.example/evp/due-diligence-report-2026.pdf",
+  "thirdPartyAssurance": "Initiative for Responsible Mining Assurance (IRMA), audited 2026-03",
+  "batteryChemistry": "NMC",
+  "cathodeMaterials": "Lithium nickel manganese cobalt oxide, aluminium foil, PVDF binder",
+  "anodeMaterials": "Graphite, silicon oxide, copper foil, CMC/SBR binder",
+  "electrolyteMaterials": "Lithium hexafluorophosphate in ethylene carbonate and ethyl methyl carbonate",
+  "impactOfSubstances": "The cells are sealed. Electrolyte released by mechanical damage is corrosive and harmful if inhaled; damaged cells can enter thermal runaway. Do not open, crush or expose to fire.",
+  "preConsumerNickelShare": 4.2,
+  "preConsumerCobaltShare": 9.1,
+  "preConsumerLithiumShare": 2.4,
+  "preConsumerLeadShare": 0,
+  "postConsumerNickelShare": 3.1,
+  "postConsumerCobaltShare": 7.8,
+  "postConsumerLithiumShare": 1.2,
+  "postConsumerLeadShare": 0,
+  "renewableContentShare": 1.6,
+  "dismantlingInformationUrl": "https://docs.voltaris.example/evp/dismantling-manual.pdf",
+  "partNumbersUrl": "https://docs.voltaris.example/evp/part-numbers.pdf",
+  "sparePartsUrl": "https://service.voltaris.example/spare-parts",
+  "safetyMeasuresUrl": "https://docs.voltaris.example/evp/safety-measures.pdf",
+  "wastePreventionUrl": "https://docs.voltaris.example/evp/waste-prevention.pdf",
+  "separateCollectionUrl": "https://docs.voltaris.example/evp/separate-collection.pdf",
+  "endOfLifeTreatmentUrl": "https://docs.voltaris.example/evp/end-of-life.pdf",
+  "ratedCapacity": 230.5,
+  "remainingCapacity": 227.1,
+  "capacityFade": 1.3,
+  "stateOfCertifiedEnergy": 98.4,
+  "stateOfCharge": 61.5,
+  "nominalVoltage": 355.2,
+  "originalPowerCapability": 150000,
+  "expectedLifetimeYears": 15,
+  "expectedLifetimeCycles": 3000,
+  "fullCycles": 142,
+  "criticalRawMaterials": [
+    {
+      "materialName": "Cobalt",
+      "massPercentage": 2.9
+    },
+    {
+      "materialName": "Natural graphite",
+      "massPercentage": 16.4
+    },
+    {
+      "materialName": "Lithium",
+      "massPercentage": 1.8
+    }
+  ],
+  "hazardousSubstances": [
+    {
+      "substanceName": "Lithium hexafluorophosphate",
+      "casNumber": "21324-40-3",
+      "massPercentage": 1.1
+    },
+    {
+      "substanceName": "Ethylene carbonate",
+      "casNumber": "96-49-1",
+      "massPercentage": 4.6
+    }
+  ],
+  "documents": [
+    {
+      "url": "https://docs.voltaris.example/evp/declaration-of-conformity.pdf",
+      "contentType": "application/pdf",
+      "resourceTitle": "EU-Konformitätserklärung",
+      "language": "de"
+    },
+    {
+      "url": "https://docs.voltaris.example/evp/test-reports.pdf",
+      "contentType": "application/pdf",
+      "resourceTitle": "Test reports",
+      "language": "en"
+    }
+  ]
+}

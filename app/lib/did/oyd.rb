@@ -26,6 +26,11 @@ module Did
     # minted with anything else is refused on submission.
     SERVICE_TYPE = "DigitalProductPassport".freeze
 
+    # The attribute of that service entry which commits to the payload the
+    # custodian delivers (prEN 18246). The DPP Service fixes the same name in one
+    # place; a different spelling on either side is a commitment nobody can check.
+    PAYLOAD_HASH = "payloadHash".freeze
+
     module_function
 
     def location
@@ -108,13 +113,24 @@ module Did
     # document from the content on every write and drops the section silently if
     # the option is left out; a passport DID must not gain an authentication
     # method by being moved.
+    #
+    # **The document is read and changed in one place, not rebuilt.** Only the
+    # serviceEndpoint moves. A payloadHash the passport already attests stays:
+    # the document is the same one, only held somewhere else, and a rebuilt entry
+    # would silently withdraw the commitment -- the service would then report the
+    # passport as unattested after every handover.
     def move_endpoint(did, product_id:, endpoint_base:, document_key:, revocation_key:)
       require "oydid"
 
       raise Error, "there is no endpoint to point the passport at" if endpoint_base.to_s.strip.empty?
 
-      content = { "service" => [ { "type"            => SERVICE_TYPE,
-                                   "serviceEndpoint" => service_endpoint(product_id, endpoint_base) } ] }
+      content = resolved_content(did)
+      services = Array(content["service"])
+      entry = services.find { |service| service.is_a?(Hash) && service["type"].to_s == SERVICE_TYPE }
+      raise Error, "#{did} is not a product passport" if entry.nil?
+
+      entry["serviceEndpoint"] = service_endpoint(product_id, endpoint_base)
+      content["service"] = services
 
       result, message = ::Oydid.update(content, did.to_s, {
         return_secrets: true, key_type: KEY_TYPE, authentication: false,
@@ -125,6 +141,65 @@ module Did
       raise Error, (message.presence || "Oydid.update returned no result") if result.nil?
 
       { did: normalize(result["did"]), revocation_log: result["revocation_log"].to_json }
+    end
+
+    # Attest the payload the custodian delivers, by adding the hash the service
+    # reported to the passport's own DID document (prEN 18246; the procedure is
+    # dpp-service/docs/Integrity.md section 4).
+    #
+    # This is the half of variant B that cannot be delegated: the service holds no
+    # document key and therefore cannot sign this entry. It computes the hash,
+    # reports it in X-DPP-Payload-Hash and waits — the operator attests it here,
+    # with the two secrets that never left this machine.
+    #
+    # **The document is read and extended, not rebuilt.** Anything else in it
+    # would be dropped silently, and a passport whose endpoint was rebuilt from
+    # configuration would lose a commitment it already carried.
+    #
+    # Returns { did:, revocation_log: } — the log entry commits to the new
+    # document, so the caller has to store it or lose the ability to revoke. nil
+    # when the document already attests this payload, because oydid would
+    # otherwise be asked to write an entry that changes nothing.
+    def commit_payload(did, payload_hash:, document_key:, revocation_key:)
+      require "oydid"
+
+      raise Error, "there is no payload hash to attest" if payload_hash.to_s.strip.empty?
+
+      content = resolved_content(did)
+      services = Array(content["service"])
+      entry = services.find { |service| service.is_a?(Hash) && service["type"].to_s == SERVICE_TYPE }
+      raise Error, "#{did} is not a product passport" if entry.nil?
+      return nil if entry[PAYLOAD_HASH].to_s == payload_hash.to_s
+
+      entry[PAYLOAD_HASH] = payload_hash.to_s
+      content["service"] = services
+
+      result, message = ::Oydid.update(content, did.to_s, {
+        return_secrets: true, key_type: KEY_TYPE, authentication: false,
+        doc_enc: document_key, old_doc_enc: document_key,
+        rev_enc: revocation_key, old_rev_enc: revocation_key,
+        location: location, doc_location: location
+      })
+      raise Error, (message.presence || "Oydid.update returned no result") if result.nil?
+
+      { did: normalize(result["did"]), revocation_log: result["revocation_log"].to_json }
+    end
+
+    # The published content of a DID document, in the shape Oydid.update expects
+    # back. The "key" field is oydid's own bookkeeping and is rebuilt on every
+    # write, so it is dropped rather than fed back in as content.
+    def resolved_content(did)
+      require "oydid"
+
+      info = Timeout.timeout(RESOLVE_TIMEOUT) { ::Oydid.read(did.to_s, {}).first }
+      raise Error, "#{did} does not resolve" if info.nil? || info["error"].to_i != 0
+
+      content = info.dig("doc", "doc") || info["doc"]
+      raise Error, "#{did} resolves to an empty document" if content.blank?
+
+      content.is_a?(Hash) ? content.except("key") : content
+    rescue Timeout::Error
+      raise Error, "#{did} did not answer within #{RESOLVE_TIMEOUT}s"
     end
 
     def service_endpoint(product_id, endpoint_base)

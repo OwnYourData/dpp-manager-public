@@ -420,9 +420,36 @@ button.link.danger:hover, .danger-zone button[type="submit"]:hover {
   display: block;
 }
 
-/* The character count next to the identifier. It only ever needs to say two
-   things: how much of the budget is gone, and that it is gone. */
-.hint .over { color: var(--bad); font-weight: 600; }
+/* Loading a file of answers. Not a filled button: it is an alternative to
+   typing, not the action of the page, and a second blue button above the form
+   would compete with the two that save it.
+
+   The file input itself is hidden inside its label rather than removed with
+   display:none — a hidden input cannot be reached by the keyboard, and clicking
+   the label is what opens the picker. */
+.load-answers { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 10px 0 0; }
+.load-answers .hint { margin: 0; }
+
+label.link-button {
+  display: inline-block;
+  margin: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: none;
+  color: var(--oyd-blue);
+  font-weight: 500;
+  cursor: pointer;
+}
+label.link-button:hover { border-color: var(--oyd-blue); }
+label.link-button:focus-within { border-color: var(--oyd-blue); box-shadow: 0 0 0 3px var(--oyd-blue-tint); }
+label.link-button input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
 
 dl.given { margin: 16px 0 0; grid-template-columns: auto 1fr; }
 dl.given dd code { word-break: break-all; }

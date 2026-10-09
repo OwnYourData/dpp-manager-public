@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       post "mint"
       post "submit"
       post "correct"
+      post "attest"
       post "retire"
       post "delegation/renew", action: :renew_delegation, as: :renew_delegation
       post "delegation/check", action: :check_delegation, as: :check_delegation

@@ -1,0 +1,92 @@
+{
+  "@graph": [
+    {
+      "@id": "https://soya.ownyourdata.eu/DppBattery/BatteryTransformation",
+      "name": "DppBatteryToEN18223Overlay",
+      "@type": "OverlayTransformation",
+      "value": "def sv($id; $v; $t):\n  if $v == null or $v == \"\" then empty\n  else { objectType: \"SingleValuedDataElement\", elementId: $id, value: $v, valueDataType: $t }\n  end;\n\ndef svu($id; $v; $t; $u):\n  if $v == null or $v == \"\" then empty\n  else { objectType: \"SingleValuedDataElement\", elementId: $id, value: $v, valueDataType: $t, unitOfMeasure: $u }\n  end;\n\ndef coll($id; $els):\n  ($els) as $e\n  | if ($e | length) == 0 then empty\n    else { objectType: \"DataElementCollection\", elementId: $id, elements: $e }\n    end;\n\ndef mv($id; $els; $t):\n  ($els) as $e\n  | if ($e | length) == 0 then empty\n    else { objectType: \"MultiValuedDataElement\", elementId: $id, valueDataType: $t, elements: $e }\n    end;\n\ndef resource($d):\n  if ($d.url == null or $d.url == \"\") then empty\n  else\n    { objectType: \"RelatedResource\", elementId: $d.elementId, contentType: $d.contentType, url: $d.url }\n    + (if ($d.language == null) then {} else { language: $d.language } end)\n    + (if ($d.resourceTitle == null) then {} else { resourceTitle: $d.resourceTitle } end)\n  end;\n\n{\n  elements: [\n    coll(\"BatteryIdentification\"; [\n      sv(\"BatteryIdentifier\"; .batteryIdentifier; \"xsd:string\"),\n      sv(\"ManufacturerIdentifier\"; .manufacturerIdentifier; \"xsd:string\"),\n      sv(\"ManufacturerName\"; .manufacturerName; \"xsd:string\"),\n      sv(\"ManufacturingPlace\"; .manufacturingPlace; \"xsd:string\"),\n      sv(\"ManufacturingDate\"; .manufacturingDate; \"xsd:gYearMonth\"),\n      sv(\"DateOfPuttingIntoService\"; .placedInServiceDate; \"xsd:gYearMonth\"),\n      sv(\"WarrantyPeriod\"; .warrantyPeriod; \"xsd:gYearMonth\"),\n      sv(\"BatteryCategory\"; .batteryCategory; \"xsd:string\"),\n      svu(\"BatteryMass\"; .batteryMass; \"xsd:decimal\"; \"kg\"),\n      sv(\"BatteryStatus\"; .batteryStatus; \"xsd:string\")\n    ]),\n\n    coll(\"ConformityAndLabelling\"; [\n      sv(\"ExtinguishingAgent\"; .extinguishingAgent; \"xsd:string\"),\n      sv(\"MeaningOfLabelsAndSymbols\"; .meaningOfLabels; \"xsd:string\")\n    ]),\n\n    coll(\"CarbonFootprint\"; [\n      svu(\"BatteryCarbonFootprint\"; .carbonFootprintTotal; \"xsd:decimal\"; \"kgCO2e/kWh\"),\n      svu(\"RawMaterialAcquisitionContribution\"; .cfRawMaterial; \"xsd:decimal\"; \"kgCO2e/kWh\"),\n      svu(\"ProductionContribution\"; .cfProduction; \"xsd:decimal\"; \"kgCO2e/kWh\"),\n      svu(\"DistributionContribution\"; .cfDistribution; \"xsd:decimal\"; \"kgCO2e/kWh\"),\n      svu(\"EndOfLifeContribution\"; .cfEndOfLife; \"xsd:decimal\"; \"kgCO2e/kWh\"),\n      sv(\"CarbonFootprintPerformanceClass\"; .carbonFootprintClass; \"xsd:string\"),\n      sv(\"CarbonFootprintStudy\"; .carbonFootprintStudyUrl; \"xsd:anyURI\")\n    ]),\n\n    coll(\"DueDiligence\"; [\n      sv(\"DueDiligenceReport\"; .dueDiligenceReportUrl; \"xsd:anyURI\"),\n      sv(\"ThirdPartyAssurance\"; .thirdPartyAssurance; \"xsd:string\")\n    ]),\n\n    coll(\"MaterialsAndComposition\"; [\n      sv(\"BatteryChemistry\"; .batteryChemistry; \"xsd:string\"),\n      sv(\"CathodeMaterials\"; .cathodeMaterials; \"xsd:string\"),\n      sv(\"AnodeMaterials\"; .anodeMaterials; \"xsd:string\"),\n      sv(\"ElectrolyteMaterials\"; .electrolyteMaterials; \"xsd:string\"),\n      sv(\"ImpactOfSubstances\"; .impactOfSubstances; \"xsd:string\"),\n      mv(\"CriticalRawMaterials\";\n         [ (.criticalRawMaterials // [])[]\n           | select(.materialName != null and .massPercentage != null)\n           | svu(.materialName; .massPercentage; \"xsd:decimal\"; \"%\") ];\n         \"xsd:decimal\"),\n      coll(\"HazardousSubstances\";\n           [ (.hazardousSubstances // [])[]\n             | select(.substanceName != null)\n             | coll(.substanceName; [\n                 sv(\"CasNumber\"; .casNumber; \"xsd:string\"),\n                 svu(\"MassPercentage\"; .massPercentage; \"xsd:decimal\"; \"%\")\n               ]) ])\n    ]),\n\n    coll(\"RecycledContent\"; [\n      svu(\"PreConsumerRecycledNickelShare\"; .preConsumerNickelShare; \"xsd:decimal\"; \"%\"),\n      svu(\"PreConsumerRecycledCobaltShare\"; .preConsumerCobaltShare; \"xsd:decimal\"; \"%\"),\n      svu(\"PreConsumerRecycledLithiumShare\"; .preConsumerLithiumShare; \"xsd:decimal\"; \"%\"),\n      svu(\"PreConsumerRecycledLeadShare\"; .preConsumerLeadShare; \"xsd:decimal\"; \"%\"),\n      svu(\"PostConsumerRecycledNickelShare\"; .postConsumerNickelShare; \"xsd:decimal\"; \"%\"),\n      svu(\"PostConsumerRecycledCobaltShare\"; .postConsumerCobaltShare; \"xsd:decimal\"; \"%\"),\n      svu(\"PostConsumerRecycledLithiumShare\"; .postConsumerLithiumShare; \"xsd:decimal\"; \"%\"),\n      svu(\"PostConsumerRecycledLeadShare\"; .postConsumerLeadShare; \"xsd:decimal\"; \"%\"),\n      svu(\"RenewableContentShare\"; .renewableContentShare; \"xsd:decimal\"; \"%\")\n    ]),\n\n    coll(\"Circularity\"; [\n      sv(\"DismantlingInformation\"; .dismantlingInformationUrl; \"xsd:anyURI\"),\n      sv(\"PartNumbersForComponents\"; .partNumbersUrl; \"xsd:anyURI\"),\n      sv(\"SourcesOfSpareParts\"; .sparePartsUrl; \"xsd:anyURI\"),\n      sv(\"SafetyMeasures\"; .safetyMeasuresUrl; \"xsd:anyURI\")\n    ]),\n\n    coll(\"EndOfLife\"; [\n      sv(\"EndUserWastePrevention\"; .wastePreventionUrl; \"xsd:anyURI\"),\n      sv(\"SeparateCollectionInformation\"; .separateCollectionUrl; \"xsd:anyURI\"),\n      sv(\"EndOfLifeTreatment\"; .endOfLifeTreatmentUrl; \"xsd:anyURI\")\n    ]),\n\n    coll(\"PerformanceAndDurability\"; [\n      svu(\"RatedCapacity\"; .ratedCapacity; \"xsd:decimal\"; \"Ah\"),\n      svu(\"RemainingCapacity\"; .remainingCapacity; \"xsd:decimal\"; \"Ah\"),\n      svu(\"CapacityFade\"; .capacityFade; \"xsd:decimal\"; \"%\"),\n      svu(\"StateOfCertifiedEnergy\"; .stateOfCertifiedEnergy; \"xsd:decimal\"; \"%\"),\n      svu(\"StateOfCharge\"; .stateOfCharge; \"xsd:decimal\"; \"%\"),\n      svu(\"NominalVoltage\"; .nominalVoltage; \"xsd:decimal\"; \"V\"),\n      svu(\"OriginalPowerCapability\"; .originalPowerCapability; \"xsd:decimal\"; \"W\"),\n      svu(\"ExpectedLifetimeYears\"; .expectedLifetimeYears; \"xsd:integer\"; \"a\"),\n      sv(\"ExpectedLifetimeCycles\"; .expectedLifetimeCycles; \"xsd:integer\"),\n      sv(\"NumberOfFullCycles\"; .fullCycles; \"xsd:integer\")\n    ]),\n\n    coll(\"Documentation\"; [\n      (.documents // [])\n      | to_entries[]\n      | resource(.value + { elementId: (\"Document\" + ((.key + 1) | tostring)) })\n    ])\n  ]\n}\n",
+      "engine": "jq",
+      "onBase": "https://soya.ownyourdata.eu/DppBattery/Battery"
+    }
+  ],
+  "@context": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Base": "soya:Base",
+    "form": "soya:form",
+    "name": {
+      "@id": "dct:title",
+      "@container": "@language"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "soya": "https://w3id.org/soya/ns#",
+    "label": {
+      "@id": "rdfs:label",
+      "@container": "@language"
+    },
+    "range": {
+      "@id": "rdfs:range",
+      "@type": "@id"
+    },
+    "domain": {
+      "@id": "rdfs:domain",
+      "@type": "@id"
+    },
+    "format": "soya:format",
+    "import": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "onBase": {
+      "@id": "soya:onBase",
+      "@type": "@id"
+    },
+    "comment": {
+      "@id": "rdfs:comment",
+      "@container": "@language"
+    },
+    "sh:path": {
+      "@type": "@id"
+    },
+    "encoding": "soya:encoding",
+    "alignment": "soya:alignment",
+    "annotation": "soya:annotation",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "validation": "soya:validation",
+    "OverlayForm": "soya:OverlayForm",
+    "sh:nodeKind": {
+      "@type": "@id"
+    },
+    "OverlayFormat": "soya:OverlayFormat",
+    "subPropertyOf": {
+      "@id": "rdfs:subPropertyOf",
+      "@type": "@id"
+    },
+    "attributeOrder": {
+      "@id": "soya:attributeOrder",
+      "@context": {
+        "list": "@list"
+      }
+    },
+    "classification": "soya:classification",
+    "renderingLabel": "soya:renderingLabel",
+    "sh:targetClass": {
+      "@type": "@id"
+    },
+    "transformation": "soya:transformation",
+    "OverlayEncoding": "soya:OverlayEncoding",
+    "OverlayAlignment": "soya:OverlayAlignment",
+    "OverlayAnnotation": "soya:OverlayAnnotation",
+    "OverlayValidation": "soya:OverlayValidation",
+    "OverlayClassification": "soya:OverlayClassification",
+    "OverlayTransformation": "soya:OverlayTransformation",
+    "@base": "https://soya.ownyourdata.eu/DppBatteryToEN18223/",
+    "@version": 1.1
+  }
+}

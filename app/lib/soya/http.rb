@@ -7,9 +7,9 @@ module Soya
   # named after what went wrong rather than which exception class the standard
   # library happened to raise.
   #
-  # Deliberately Net::HTTP and nothing else. This application ships one runtime
-  # dependency it cannot avoid (the oydid gem, which is why it is Ruby at all);
-  # a second HTTP library to fetch three URLs would be a poor trade.
+  # Net::HTTP. A SOyA repository is not a party to DPP data exchange, so the
+  # HTTP/2 requirement of EN 18216:2026 that DppService::Transport answers does
+  # not reach it, and the local repository endpoint speaks plain HTTP anyway.
   module Http
     module_function
 

@@ -42,15 +42,13 @@ class ProductIdentifierTest < ActiveSupport::TestCase
     assert_nil identifier.granularity
   end
 
-  # Fifty characters is the whole budget, and it is spent on the host and the
-  # serial. This is the one limit worth catching before a submission, because
-  # the only remedies are a shorter host or a shorter serial — and both are
-  # decisions, not corrections.
-  test "the fifty character limit is reported with how far over it is" do
-    identifier = Dpp::ProductIdentifier.new("https://much-too-long-hostname.example.org/01/09520123456788/21/000123")
+  # How much a data carrier bears is the operator's decision, so length is not
+  # a problem this class reports. Same rule as the service.
+  test "a long identifier is accepted" do
+    identifier = Dpp::ProductIdentifier.new("https://a-rather-long-hostname-of-the-operator.example.org/01/09520123456788/21/000123")
 
-    assert_equal :too_long, identifier.problem
-    assert_equal identifier.value.length - 50, identifier.characters_over
+    assert identifier.valid?
+    assert_equal "item", identifier.granularity
   end
 
   test "a path that starts with an application identifier is judged as a Digital Link" do
@@ -72,8 +70,6 @@ class ProductIdentifierTest < ActiveSupport::TestCase
   # A query string would carry GS1 data attributes rather than identity, and two
   # identifiers differing only in their query would collide in the custodian's
   # store. Data attributes belong in the document.
-  # A short host on purpose: the checks run in the service's order, so length is
-  # reported before shape, and DIGITAL_LINK plus a query is already over fifty.
   test "a query string or a fragment is refused" do
     short = "https://id.ex.com/01/09520123456788"
 
@@ -82,12 +78,12 @@ class ProductIdentifierTest < ActiveSupport::TestCase
   end
 
   test "every problem has a sentence in both languages" do
-    problems = %i[blank not_a_url not_https too_long has_query bad_digital_link bad_path]
+    problems = %i[blank not_a_url not_https has_query bad_digital_link bad_path]
 
     %i[en de].each do |locale|
       I18n.with_locale(locale) do
         problems.each do |problem|
-          message = I18n.t("passports.identifier.#{problem}", over: 4, length: 54, raise: true)
+          message = I18n.t("passports.identifier.#{problem}", raise: true)
           assert message.present?, "#{locale}: #{problem} has no wording"
         end
       end

@@ -23,9 +23,9 @@ module Dpp
   #   Identification link  the operator's own domain and a path they assign
   #                        opaque by design, so granularity has to be declared
   class ProductIdentifier
-    # The EU DPP registry's limit, and the reason the whole identifier design is
-    # tight: it is the string on the carrier, so its length is the budget.
-    MAX_LENGTH = 50
+    # No length is checked. The EU registry accepts up to 2000 characters, and
+    # how much a data carrier bears is the operator's decision -- the form shows
+    # the length so that decision can be made knowingly.
 
     PRIMARY_AI = "01".freeze
     QUALIFIER_AIS = { "10" => "batch", "21" => "item", "22" => "model" }.freeze
@@ -73,14 +73,11 @@ module Dpp
       return :blank if value.empty?
       return :not_a_url if @uri.nil? || @uri.host.to_s.empty?
       return :not_https unless value.start_with?("https://")
-      return :too_long if value.length > MAX_LENGTH
       return :has_query if @uri.query || @uri.fragment
       return (digital_link? ? :bad_digital_link : :bad_path) if @path.nil?
 
       nil
     end
-
-    def characters_over = [ value.length - MAX_LENGTH, 0 ].max
 
     private
 

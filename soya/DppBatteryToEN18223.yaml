@@ -1,0 +1,139 @@
+meta:
+  name: DppBatteryToEN18223
+content:
+  overlays:
+  - type: OverlayTransformation
+    base: https://soya.ownyourdata.eu/DppBattery/Battery
+    name: DppBatteryToEN18223Overlay
+    engine: jq
+    value: |
+      def sv($id; $v; $t):
+        if $v == null or $v == "" then empty
+        else { objectType: "SingleValuedDataElement", elementId: $id, value: $v, valueDataType: $t }
+        end;
+
+      def svu($id; $v; $t; $u):
+        if $v == null or $v == "" then empty
+        else { objectType: "SingleValuedDataElement", elementId: $id, value: $v, valueDataType: $t, unitOfMeasure: $u }
+        end;
+
+      def coll($id; $els):
+        ($els) as $e
+        | if ($e | length) == 0 then empty
+          else { objectType: "DataElementCollection", elementId: $id, elements: $e }
+          end;
+
+      def mv($id; $els; $t):
+        ($els) as $e
+        | if ($e | length) == 0 then empty
+          else { objectType: "MultiValuedDataElement", elementId: $id, valueDataType: $t, elements: $e }
+          end;
+
+      def resource($d):
+        if ($d.url == null or $d.url == "") then empty
+        else
+          { objectType: "RelatedResource", elementId: $d.elementId, contentType: $d.contentType, url: $d.url }
+          + (if ($d.language == null) then {} else { language: $d.language } end)
+          + (if ($d.resourceTitle == null) then {} else { resourceTitle: $d.resourceTitle } end)
+        end;
+
+      {
+        elements: [
+          coll("BatteryIdentification"; [
+            sv("BatteryIdentifier"; .batteryIdentifier; "xsd:string"),
+            sv("ManufacturerIdentifier"; .manufacturerIdentifier; "xsd:string"),
+            sv("ManufacturerName"; .manufacturerName; "xsd:string"),
+            sv("ManufacturingPlace"; .manufacturingPlace; "xsd:string"),
+            sv("ManufacturingDate"; .manufacturingDate; "xsd:gYearMonth"),
+            sv("DateOfPuttingIntoService"; .placedInServiceDate; "xsd:gYearMonth"),
+            sv("WarrantyPeriod"; .warrantyPeriod; "xsd:gYearMonth"),
+            sv("BatteryCategory"; .batteryCategory; "xsd:string"),
+            svu("BatteryMass"; .batteryMass; "xsd:decimal"; "kg"),
+            sv("BatteryStatus"; .batteryStatus; "xsd:string")
+          ]),
+
+          coll("ConformityAndLabelling"; [
+            sv("ExtinguishingAgent"; .extinguishingAgent; "xsd:string"),
+            sv("MeaningOfLabelsAndSymbols"; .meaningOfLabels; "xsd:string")
+          ]),
+
+          coll("CarbonFootprint"; [
+            svu("BatteryCarbonFootprint"; .carbonFootprintTotal; "xsd:decimal"; "kgCO2e/kWh"),
+            svu("RawMaterialAcquisitionContribution"; .cfRawMaterial; "xsd:decimal"; "kgCO2e/kWh"),
+            svu("ProductionContribution"; .cfProduction; "xsd:decimal"; "kgCO2e/kWh"),
+            svu("DistributionContribution"; .cfDistribution; "xsd:decimal"; "kgCO2e/kWh"),
+            svu("EndOfLifeContribution"; .cfEndOfLife; "xsd:decimal"; "kgCO2e/kWh"),
+            sv("CarbonFootprintPerformanceClass"; .carbonFootprintClass; "xsd:string"),
+            sv("CarbonFootprintStudy"; .carbonFootprintStudyUrl; "xsd:anyURI")
+          ]),
+
+          coll("DueDiligence"; [
+            sv("DueDiligenceReport"; .dueDiligenceReportUrl; "xsd:anyURI"),
+            sv("ThirdPartyAssurance"; .thirdPartyAssurance; "xsd:string")
+          ]),
+
+          coll("MaterialsAndComposition"; [
+            sv("BatteryChemistry"; .batteryChemistry; "xsd:string"),
+            sv("CathodeMaterials"; .cathodeMaterials; "xsd:string"),
+            sv("AnodeMaterials"; .anodeMaterials; "xsd:string"),
+            sv("ElectrolyteMaterials"; .electrolyteMaterials; "xsd:string"),
+            sv("ImpactOfSubstances"; .impactOfSubstances; "xsd:string"),
+            mv("CriticalRawMaterials";
+               [ (.criticalRawMaterials // [])[]
+                 | select(.materialName != null and .massPercentage != null)
+                 | svu(.materialName; .massPercentage; "xsd:decimal"; "%") ];
+               "xsd:decimal"),
+            coll("HazardousSubstances";
+                 [ (.hazardousSubstances // [])[]
+                   | select(.substanceName != null)
+                   | coll(.substanceName; [
+                       sv("CasNumber"; .casNumber; "xsd:string"),
+                       svu("MassPercentage"; .massPercentage; "xsd:decimal"; "%")
+                     ]) ])
+          ]),
+
+          coll("RecycledContent"; [
+            svu("PreConsumerRecycledNickelShare"; .preConsumerNickelShare; "xsd:decimal"; "%"),
+            svu("PreConsumerRecycledCobaltShare"; .preConsumerCobaltShare; "xsd:decimal"; "%"),
+            svu("PreConsumerRecycledLithiumShare"; .preConsumerLithiumShare; "xsd:decimal"; "%"),
+            svu("PreConsumerRecycledLeadShare"; .preConsumerLeadShare; "xsd:decimal"; "%"),
+            svu("PostConsumerRecycledNickelShare"; .postConsumerNickelShare; "xsd:decimal"; "%"),
+            svu("PostConsumerRecycledCobaltShare"; .postConsumerCobaltShare; "xsd:decimal"; "%"),
+            svu("PostConsumerRecycledLithiumShare"; .postConsumerLithiumShare; "xsd:decimal"; "%"),
+            svu("PostConsumerRecycledLeadShare"; .postConsumerLeadShare; "xsd:decimal"; "%"),
+            svu("RenewableContentShare"; .renewableContentShare; "xsd:decimal"; "%")
+          ]),
+
+          coll("Circularity"; [
+            sv("DismantlingInformation"; .dismantlingInformationUrl; "xsd:anyURI"),
+            sv("PartNumbersForComponents"; .partNumbersUrl; "xsd:anyURI"),
+            sv("SourcesOfSpareParts"; .sparePartsUrl; "xsd:anyURI"),
+            sv("SafetyMeasures"; .safetyMeasuresUrl; "xsd:anyURI")
+          ]),
+
+          coll("EndOfLife"; [
+            sv("EndUserWastePrevention"; .wastePreventionUrl; "xsd:anyURI"),
+            sv("SeparateCollectionInformation"; .separateCollectionUrl; "xsd:anyURI"),
+            sv("EndOfLifeTreatment"; .endOfLifeTreatmentUrl; "xsd:anyURI")
+          ]),
+
+          coll("PerformanceAndDurability"; [
+            svu("RatedCapacity"; .ratedCapacity; "xsd:decimal"; "Ah"),
+            svu("RemainingCapacity"; .remainingCapacity; "xsd:decimal"; "Ah"),
+            svu("CapacityFade"; .capacityFade; "xsd:decimal"; "%"),
+            svu("StateOfCertifiedEnergy"; .stateOfCertifiedEnergy; "xsd:decimal"; "%"),
+            svu("StateOfCharge"; .stateOfCharge; "xsd:decimal"; "%"),
+            svu("NominalVoltage"; .nominalVoltage; "xsd:decimal"; "V"),
+            svu("OriginalPowerCapability"; .originalPowerCapability; "xsd:decimal"; "W"),
+            svu("ExpectedLifetimeYears"; .expectedLifetimeYears; "xsd:integer"; "a"),
+            sv("ExpectedLifetimeCycles"; .expectedLifetimeCycles; "xsd:integer"),
+            sv("NumberOfFullCycles"; .fullCycles; "xsd:integer")
+          ]),
+
+          coll("Documentation"; [
+            (.documents // [])
+            | to_entries[]
+            | resource(.value + { elementId: ("Document" + ((.key + 1) | tostring)) })
+          ])
+        ]
+      }

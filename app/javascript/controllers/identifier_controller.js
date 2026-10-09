@@ -2,10 +2,9 @@ import { Controller } from "@hotwired/stimulus"
 
 // The product identifier, read back to the operator while they type.
 //
-// Two things are worth saying at that moment and useless afterwards. The length:
-// fifty characters is the entire budget, it is spent on the host and the serial,
-// and finding out from a rejected submission that the host is four characters
-// too long is finding out too late to do anything cheap about it.
+// Two things are worth saying at that moment. The length: nothing limits it, but
+// the identifier is what goes on the data carrier, and how much a carrier bears
+// is the operator's decision -- better made while typing than after printing.
 //
 // And the granularity. For a GS1 Digital Link the path already says whether this
 // is a model, a batch or one item — /21/ means a serial number, so it is an
@@ -18,8 +17,6 @@ import { Controller } from "@hotwired/stimulus"
 // that talks; the ones behind it are the ones that decide.
 export default class extends Controller {
   static targets = ["field", "granularity", "count", "derived"]
-
-  static MAX_LENGTH = 50
 
   connect() {
     this.derive()
@@ -35,23 +32,41 @@ export default class extends Controller {
   showLength(value) {
     if (!this.hasCountTarget) return
 
-    const over = value.length - this.constructor.MAX_LENGTH
-    this.countTarget.textContent = value.length === 0 ? "" : `${value.length}/50`
-    this.countTarget.className = over > 0 ? "over" : ""
+    const unit = this.countTarget.dataset.unit || ""
+    this.countTarget.textContent = value.length === 0 ? "" : `${value.length} ${unit}`.trim()
+  }
+
+  // The operator picked a granularity themselves. From here on it is theirs.
+  chosen() {
+    this.filled = null
   }
 
   showGranularity(derived) {
     if (!this.hasGranularityTarget) return
 
+    const select = this.granularityTarget
+
+    // Typing passes through /01/<GTIN> before the qualifier arrives, so the
+    // path says "model" on its way to "item". A value this controller put in
+    // is therefore followed as the path grows. A choice somebody made is never
+    // overwritten: right most of the time and infuriating the once it is not
+    // -- and the contradiction is caught on saving anyway, with a sentence
+    // that explains it.
+    const ours = select.value === "" || (this.filled && select.value === this.filled)
+
     if (!derived) {
+      if (ours && this.filled) {
+        select.value = ""
+        this.filled = null
+      }
       if (this.hasDerivedTarget) this.derivedTarget.textContent = ""
       return
     }
 
-    // Only fill an empty field. Overwriting a choice somebody made would be
-    // right most of the time and infuriating the once it is not — and the
-    // contradiction is caught on saving anyway, with a sentence that explains it.
-    if (this.granularityTarget.value === "") this.granularityTarget.value = derived
+    if (ours) {
+      select.value = derived
+      this.filled = derived
+    }
 
     if (this.hasDerivedTarget) {
       this.derivedTarget.textContent = this.derivedTarget.dataset.label || ""

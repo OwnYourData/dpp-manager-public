@@ -1,0 +1,92 @@
+{
+  "@graph": [
+    {
+      "@id": "https://soya.ownyourdata.eu/DppBattery/BatteryTransformation",
+      "name": "DppEN18223ToBatteryOverlay",
+      "@type": "OverlayTransformation",
+      "value": "def one($stream):\n  [$stream] | if length == 0 then null else .[0] end;\n\ndef collection($id):\n  one(.elements[]? | select(.objectType == \"DataElementCollection\" and .elementId == $id));\n\ndef value($collection; $id):\n  if $collection == null then null\n  else one($collection.elements[]? | select(.elementId == $id) | .value)\n  end;\n\ndef multi($collection; $id):\n  if $collection == null then null\n  else one($collection.elements[]? | select(.objectType == \"MultiValuedDataElement\" and .elementId == $id))\n  end;\n\ndef sub($collection; $id):\n  if $collection == null then null\n  else one($collection.elements[]? | select(.objectType == \"DataElementCollection\" and .elementId == $id))\n  end;\n\n. as $dpp\n| collection(\"BatteryIdentification\") as $batteryIdentification\n| collection(\"ConformityAndLabelling\") as $conformityAndLabelling\n| collection(\"CarbonFootprint\") as $carbonFootprint\n| collection(\"DueDiligence\") as $dueDiligence\n| collection(\"MaterialsAndComposition\") as $materialsAndComposition\n| collection(\"RecycledContent\") as $recycledContent\n| collection(\"Circularity\") as $circularity\n| collection(\"EndOfLife\") as $endOfLife\n| collection(\"PerformanceAndDurability\") as $performanceAndDurability\n| collection(\"Documentation\") as $documentation\n| multi($materialsAndComposition; \"CriticalRawMaterials\") as $crm\n| sub($materialsAndComposition; \"HazardousSubstances\") as $haz\n|\n{\n  batteryIdentifier: value($batteryIdentification; \"BatteryIdentifier\"),\n  manufacturerIdentifier: value($batteryIdentification; \"ManufacturerIdentifier\"),\n  manufacturerName: value($batteryIdentification; \"ManufacturerName\"),\n  manufacturingPlace: value($batteryIdentification; \"ManufacturingPlace\"),\n  manufacturingDate: value($batteryIdentification; \"ManufacturingDate\"),\n  placedInServiceDate: value($batteryIdentification; \"DateOfPuttingIntoService\"),\n  warrantyPeriod: value($batteryIdentification; \"WarrantyPeriod\"),\n  batteryCategory: value($batteryIdentification; \"BatteryCategory\"),\n  batteryMass: value($batteryIdentification; \"BatteryMass\"),\n  batteryStatus: value($batteryIdentification; \"BatteryStatus\"),\n  extinguishingAgent: value($conformityAndLabelling; \"ExtinguishingAgent\"),\n  meaningOfLabels: value($conformityAndLabelling; \"MeaningOfLabelsAndSymbols\"),\n  carbonFootprintTotal: value($carbonFootprint; \"BatteryCarbonFootprint\"),\n  cfRawMaterial: value($carbonFootprint; \"RawMaterialAcquisitionContribution\"),\n  cfProduction: value($carbonFootprint; \"ProductionContribution\"),\n  cfDistribution: value($carbonFootprint; \"DistributionContribution\"),\n  cfEndOfLife: value($carbonFootprint; \"EndOfLifeContribution\"),\n  carbonFootprintClass: value($carbonFootprint; \"CarbonFootprintPerformanceClass\"),\n  carbonFootprintStudyUrl: value($carbonFootprint; \"CarbonFootprintStudy\"),\n  dueDiligenceReportUrl: value($dueDiligence; \"DueDiligenceReport\"),\n  thirdPartyAssurance: value($dueDiligence; \"ThirdPartyAssurance\"),\n  batteryChemistry: value($materialsAndComposition; \"BatteryChemistry\"),\n  cathodeMaterials: value($materialsAndComposition; \"CathodeMaterials\"),\n  anodeMaterials: value($materialsAndComposition; \"AnodeMaterials\"),\n  electrolyteMaterials: value($materialsAndComposition; \"ElectrolyteMaterials\"),\n  impactOfSubstances: value($materialsAndComposition; \"ImpactOfSubstances\"),\n  preConsumerNickelShare: value($recycledContent; \"PreConsumerRecycledNickelShare\"),\n  preConsumerCobaltShare: value($recycledContent; \"PreConsumerRecycledCobaltShare\"),\n  preConsumerLithiumShare: value($recycledContent; \"PreConsumerRecycledLithiumShare\"),\n  preConsumerLeadShare: value($recycledContent; \"PreConsumerRecycledLeadShare\"),\n  postConsumerNickelShare: value($recycledContent; \"PostConsumerRecycledNickelShare\"),\n  postConsumerCobaltShare: value($recycledContent; \"PostConsumerRecycledCobaltShare\"),\n  postConsumerLithiumShare: value($recycledContent; \"PostConsumerRecycledLithiumShare\"),\n  postConsumerLeadShare: value($recycledContent; \"PostConsumerRecycledLeadShare\"),\n  renewableContentShare: value($recycledContent; \"RenewableContentShare\"),\n  dismantlingInformationUrl: value($circularity; \"DismantlingInformation\"),\n  partNumbersUrl: value($circularity; \"PartNumbersForComponents\"),\n  sparePartsUrl: value($circularity; \"SourcesOfSpareParts\"),\n  safetyMeasuresUrl: value($circularity; \"SafetyMeasures\"),\n  wastePreventionUrl: value($endOfLife; \"EndUserWastePrevention\"),\n  separateCollectionUrl: value($endOfLife; \"SeparateCollectionInformation\"),\n  endOfLifeTreatmentUrl: value($endOfLife; \"EndOfLifeTreatment\"),\n  ratedCapacity: value($performanceAndDurability; \"RatedCapacity\"),\n  remainingCapacity: value($performanceAndDurability; \"RemainingCapacity\"),\n  capacityFade: value($performanceAndDurability; \"CapacityFade\"),\n  stateOfCertifiedEnergy: value($performanceAndDurability; \"StateOfCertifiedEnergy\"),\n  stateOfCharge: value($performanceAndDurability; \"StateOfCharge\"),\n  nominalVoltage: value($performanceAndDurability; \"NominalVoltage\"),\n  originalPowerCapability: value($performanceAndDurability; \"OriginalPowerCapability\"),\n  expectedLifetimeYears: value($performanceAndDurability; \"ExpectedLifetimeYears\"),\n  expectedLifetimeCycles: value($performanceAndDurability; \"ExpectedLifetimeCycles\"),\n  fullCycles: value($performanceAndDurability; \"NumberOfFullCycles\"),\n  criticalRawMaterials:\n    (if $crm == null then null\n     else [ $crm.elements[]? | { materialName: .elementId, massPercentage: .value } ]\n     end),\n  hazardousSubstances:\n    (if $haz == null then null\n     else [ $haz.elements[]?\n            | select(.objectType == \"DataElementCollection\")\n            | { substanceName: .elementId }\n              + (one(.elements[]? | select(.elementId == \"CasNumber\") | .value) as $c\n                 | if $c == null then {} else { casNumber: $c } end)\n              + (one(.elements[]? | select(.elementId == \"MassPercentage\") | .value) as $m\n                 | if $m == null then {} else { massPercentage: $m } end) ]\n     end),\n  documents:\n    (if $documentation == null then null\n     else [ $documentation.elements[]?\n            | select(.objectType == \"RelatedResource\")\n            | { url: .url, contentType: .contentType }\n              + (if (.resourceTitle == null) then {} else { resourceTitle: .resourceTitle } end)\n              + (if (.language == null) then {} else { language: .language } end) ]\n     end)\n}\n| with_entries(select(.value != null))\n",
+      "engine": "jq",
+      "onBase": "https://soya.ownyourdata.eu/DppBattery/Battery"
+    }
+  ],
+  "@context": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Base": "soya:Base",
+    "form": "soya:form",
+    "name": {
+      "@id": "dct:title",
+      "@container": "@language"
+    },
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "soya": "https://w3id.org/soya/ns#",
+    "label": {
+      "@id": "rdfs:label",
+      "@container": "@language"
+    },
+    "range": {
+      "@id": "rdfs:range",
+      "@type": "@id"
+    },
+    "domain": {
+      "@id": "rdfs:domain",
+      "@type": "@id"
+    },
+    "format": "soya:format",
+    "import": {
+      "@id": "owl:imports",
+      "@type": "@id"
+    },
+    "onBase": {
+      "@id": "soya:onBase",
+      "@type": "@id"
+    },
+    "comment": {
+      "@id": "rdfs:comment",
+      "@container": "@language"
+    },
+    "sh:path": {
+      "@type": "@id"
+    },
+    "encoding": "soya:encoding",
+    "alignment": "soya:alignment",
+    "annotation": "soya:annotation",
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
+    "validation": "soya:validation",
+    "OverlayForm": "soya:OverlayForm",
+    "sh:nodeKind": {
+      "@type": "@id"
+    },
+    "OverlayFormat": "soya:OverlayFormat",
+    "subPropertyOf": {
+      "@id": "rdfs:subPropertyOf",
+      "@type": "@id"
+    },
+    "attributeOrder": {
+      "@id": "soya:attributeOrder",
+      "@context": {
+        "list": "@list"
+      }
+    },
+    "classification": "soya:classification",
+    "renderingLabel": "soya:renderingLabel",
+    "sh:targetClass": {
+      "@type": "@id"
+    },
+    "transformation": "soya:transformation",
+    "OverlayEncoding": "soya:OverlayEncoding",
+    "OverlayAlignment": "soya:OverlayAlignment",
+    "OverlayAnnotation": "soya:OverlayAnnotation",
+    "OverlayValidation": "soya:OverlayValidation",
+    "OverlayClassification": "soya:OverlayClassification",
+    "OverlayTransformation": "soya:OverlayTransformation",
+    "@base": "https://soya.ownyourdata.eu/DppEN18223ToBattery/",
+    "@version": 1.1
+  }
+}

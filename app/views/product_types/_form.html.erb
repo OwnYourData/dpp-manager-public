@@ -53,6 +53,55 @@
     </p>
   </fieldset>
 
+  <fieldset>
+    <legend><%= t("product_types.form.legal.legend") %></legend>
+    <p class="hint"><%= t("product_types.form.legal.lead") %></p>
+
+    <label for="product_type_legal_act"><%= t("product_types.form.legal.legal_act") %></label>
+    <%= f.text_field :legal_act %>
+    <p class="hint"><%= t("product_types.form.legal.legal_act_hint") %></p>
+
+    <label for="product_type_legal_act_url"><%= t("product_types.form.legal.legal_act_url") %></label>
+    <%= f.url_field :legal_act_url %>
+    <p class="hint"><%= t("product_types.form.legal.legal_act_url_hint") %></p>
+
+    <label for="product_type_legal_act_valid_from"><%= t("product_types.form.legal.valid_from") %></label>
+    <%= f.date_field :legal_act_valid_from %>
+    <label for="product_type_legal_act_valid_until"><%= t("product_types.form.legal.valid_until") %></label>
+    <%= f.date_field :legal_act_valid_until %>
+    <p class="hint"><%= t("product_types.form.legal.valid_hint") %></p>
+
+    <label for="product_type_dpp_required_from"><%= t("product_types.form.legal.required_from") %></label>
+    <%= f.date_field :dpp_required_from %>
+    <p class="hint"><%= t("product_types.form.legal.required_from_hint") %></p>
+
+    <label for="product_type_granularity"><%= t("product_types.form.legal.granularity") %></label>
+    <%= f.select :granularity,
+          Dpp::ProductIdentifier::GRANULARITIES.map { |g| [ t("passports.granularities.#{g}"), g ] },
+          { include_blank: true } %>
+    <p class="hint"><%= t("product_types.form.legal.granularity_hint") %></p>
+
+    <p><strong><%= t("product_types.form.legal.carriers") %></strong></p>
+    <%= f.collection_check_boxes :carriers,
+          ProductType::CARRIERS.map { |c| [ c, t("product_types.form.carrier_names.#{c}") ] }, :first, :last do |b| %>
+      <%= b.label { b.check_box + " " + b.text } %>
+    <% end %>
+
+    <p><strong><%= t("product_types.form.legal.placement") %></strong></p>
+    <%= f.collection_check_boxes :carrier_placement,
+          ProductType::PLACEMENTS.map { |p| [ p, t("product_types.form.placement_names.#{p}") ] }, :first, :last do |b| %>
+      <%= b.label { b.check_box + " " + b.text } %>
+    <% end %>
+
+    <label for="product_type_carrier_layout"><%= t("product_types.form.legal.layout") %></label>
+    <%= f.text_area :carrier_layout, rows: 3 %>
+    <p class="hint"><%= t("product_types.form.legal.layout_hint") %></p>
+
+    <label for="product_type_availability_years"><%= t("product_types.form.legal.availability") %></label>
+    <%= f.number_field :availability_years, min: 1, max: 100, step: 1 %>
+    <p class="hint"><%= t("product_types.form.legal.availability_hint") %></p>
+  </fieldset>
+
   <%= f.submit t("product_types.form.save") %>
 <% end %>
 

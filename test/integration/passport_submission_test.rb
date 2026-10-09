@@ -43,7 +43,7 @@ class PassportSubmissionTest < ActionDispatch::IntegrationTest
 
       stubbing(Soya::WebCli, :transform, ->(*) { [] }) do
         stubbing(Did::Token, :issue, ->(_identity, audience:, **) { "token-for-#{audience}" }) do
-          stubbing(DppService::Client, :create, ->(document, base_url:, token:, storage: nil) {
+          stubbing(DppService::Client, :create, ->(document, base_url:, token:, storage: nil, retain_until: nil) {
             sent = { document: document, base_url: base_url, token: token, storage: storage }
             accepted
           }) do
@@ -182,6 +182,236 @@ class PassportSubmissionTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  # --- attesting the payload (prEN 18246, variant B) ---------------------------
+  #
+  # The service computes the hash of what the custodian delivers and reports it,
+  # but it cannot sign the entry that commits to it: the document key is here.
+
+  def commitment_result(state, hash = "zQmPayload")
+    DppService::Client::Result.new(ok: true, http_status: 201, problems: [],
+                                   document: { "dppStatus" => "Active" },
+                                   commitment: DppService::Client::Commitment.new(
+                                     payload_hash: hash, state: state
+                                   ))
+  end
+
+  test "a submission attests the payload, with the keys that never leave this machine" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+      seen = nil
+
+      submitting(create: ->(*, **) { commitment_result("pending") }) do
+        stubbing(Did::Oyd, :commit_payload, lambda { |did, payload_hash:, document_key:, revocation_key:|
+          seen = { did: did, hash: payload_hash, doc: document_key, rev: revocation_key }
+          { did: did, revocation_log: '[{"op":1}]' }
+        }) do
+          post submit_passport_path(passport)
+        end
+      end
+
+      passport.reload
+      assert_equal passport.dpp_id, seen[:did]
+      assert_equal "zQmPayload", seen[:hash]
+      assert_equal "doc", seen[:doc], "the service never sees this key, which is the whole point"
+      assert_equal "rev", seen[:rev]
+
+      assert_equal "zQmPayload", passport.payload_hash
+      assert passport.payload_attested?
+      assert_equal '[{"op":1}]', passport.passport_key.reload.revocation_log,
+        "the revocation record belongs to the new document, or the passport can never be retired"
+      assert Event.where(kind: "passport_payload_attested").exists?
+      assert_nil Event.verify_chain
+    end
+  end
+
+  # The passport is already with the service by then. A registry that cannot be
+  # reached must not turn a submission that worked into one that failed.
+  test "a registry that refuses the entry leaves the passport waiting and the submission standing" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+
+      submitting(create: ->(*, **) { commitment_result("pending") }) do
+        stubbing(Did::Oyd, :commit_payload, ->(*, **) { raise Did::Oyd::Error, "unreachable" }) do
+          post submit_passport_path(passport)
+        end
+      end
+
+      passport.reload
+      assert passport.submitted?, "the submission is done and stays done"
+      assert passport.payload_awaiting_attestation?
+      assert_equal "zQmPayload", passport.payload_hash
+      assert Event.where(kind: "passport_payload_attestation_failed").exists?
+      assert_match I18n.t("passports.attest.waiting"), flash[:notice]
+    end
+  end
+
+  # A service that holds the document key itself has already written the entry.
+  # Asking this machine to sign it again would fail, and calling it "waiting"
+  # would be a lie about a document that does commit to the payload.
+  test "a payload the service has already committed to is not attested a second time" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+      called = false
+
+      submitting(create: ->(*, **) { commitment_result("committed") }) do
+        stubbing(Did::Oyd, :commit_payload, ->(*, **) { called = true; nil }) do
+          post submit_passport_path(passport)
+        end
+      end
+
+      passport.reload
+      assert_not called
+      assert passport.payload_attested?
+      assert_equal "zQmPayload", passport.payload_hash
+    end
+  end
+
+  # An older service says nothing about a commitment. Nothing is recorded, and
+  # nothing claims to be waiting.
+  test "a service that reports no commitment leaves the passport as it was" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+      called = false
+
+      submitting do
+        stubbing(Did::Oyd, :commit_payload, ->(*, **) { called = true; nil }) do
+          post submit_passport_path(passport)
+        end
+      end
+
+      passport.reload
+      assert_not called
+      assert_nil passport.payload_hash
+      assert_not passport.payload_awaiting_attestation?
+    end
+  end
+
+  # The way back for a passport the registry would not take at the time. The
+  # service cannot do this instead, which is why there is a button at all.
+  def waiting_passport
+    passport = minted_passport
+    submitting(create: ->(*, **) { commitment_result("pending") }) do
+      stubbing(Did::Oyd, :commit_payload, ->(*, **) { raise Did::Oyd::Error, "unreachable" }) do
+        post submit_passport_path(passport)
+      end
+    end
+    passport.reload
+  end
+
+  test "a passport left waiting can be attested afterwards" do
+    with_open_vault do
+      create_and_unlock
+      passport = waiting_passport
+      assert passport.payload_awaiting_attestation?
+
+      get edit_passport_path(passport)
+      assert_match "zQmPayload", response.body, "the page says which hash is waiting"
+
+      stubbing(Did::Oyd, :commit_payload, ->(*, **) { { did: passport.dpp_id, revocation_log: "[]" } }) do
+        post attest_passport_path(passport)
+      end
+
+      assert_redirected_to edit_passport_path(passport)
+      assert passport.reload.payload_attested?
+      assert Event.where(kind: "passport_payload_attested").exists?
+      assert_nil Event.verify_chain
+    end
+  end
+
+  test "a refusal on the second attempt is shown with the reason and changes nothing" do
+    with_open_vault do
+      create_and_unlock
+      passport = waiting_passport
+
+      stubbing(Did::Oyd, :commit_payload, ->(*, **) { raise Did::Oyd::Error, "invalid old key" }) do
+        post attest_passport_path(passport)
+      end
+
+      assert_match "invalid old key", flash[:alert]
+      assert passport.reload.payload_awaiting_attestation?
+    end
+  end
+
+  test "attesting twice is answered rather than signed again" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+      called = false
+
+      submitting(create: ->(*, **) { commitment_result("pending") }) do
+        stubbing(Did::Oyd, :commit_payload, ->(*, **) { { did: passport.dpp_id, revocation_log: "[]" } }) do
+          post submit_passport_path(passport)
+        end
+      end
+
+      stubbing(Did::Oyd, :commit_payload, ->(*, **) { called = true; nil }) do
+        post attest_passport_path(passport)
+      end
+
+      assert_not called
+      assert_match I18n.t("passports.attest.already"), flash[:notice]
+    end
+  end
+
+  test "there is nothing to attest before the service has reported a hash" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+
+      post attest_passport_path(passport)
+
+      assert_match I18n.t("passports.attest.nothing"), flash[:alert]
+    end
+  end
+
+  # The structure's rules have to hold at the moment the passport leaves this
+  # machine, and not before: a draft may be half typed. So the check sits here,
+  # and nowhere on the way to here.
+  test "a passport that does not meet its structure is not submitted" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+      called = false
+      invalid = Soya::Validation::Result.new(valid: false, problems: [ "Leistung (W): fehlt" ])
+
+      stubbing(Soya::Validation, :check, ->(*) { invalid }) do
+        submitting(create: ->(*, **) { called = true; accepted }) do
+          post submit_passport_path(passport)
+        end
+      end
+
+      assert_not called, "the submission must not be attempted at all"
+      assert_not passport.reload.submitted?
+      assert_redirected_to edit_passport_path(passport, despite: "submit")
+      assert_equal [ "Leistung (W): fehlt" ], flash[:problems]
+      assert Event.where(kind: "passport_submit_failed").exists?
+    end
+  end
+
+  # Refused, not blocked. The structure itself can be wrong, and then the
+  # operator has to be able to overrule the application — visibly.
+  test "it goes anyway on a second, deliberate click, and the log says so" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+      invalid = Soya::Validation::Result.new(valid: false, problems: [ "Leistung (W): fehlt" ])
+
+      stubbing(Soya::Validation, :check, ->(*) { invalid }) do
+        submitting do
+          post submit_passport_path(passport, despite_problems: 1)
+        end
+      end
+
+      assert passport.reload.submitted?
+      assert_equal true, Event.where(kind: "passport_submitted").last.detail_hash["despite_problems"]
+      assert_nil Event.verify_chain
+    end
+  end
 
   def product_type
     @product_type ||= ProductType.create!(

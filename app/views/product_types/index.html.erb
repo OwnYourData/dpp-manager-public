@@ -30,7 +30,21 @@
     <tbody>
       <% @product_types.each do |type| %>
         <tr>
-          <td><%= type.label %></td>
+          <td>
+            <%= type.label %>
+            <p class="hint">
+              <% if type.configured? %>
+                <%= [ type.legal_act,
+                      (t("product_types.configuration.required_from", date: l(type.dpp_required_from)) if type.dpp_required_from),
+                      (t("passports.granularities.#{type.granularity}") if type.granularity),
+                      Array(type.carriers).map { |c| t("product_types.form.carrier_names.#{c}") }.join(", ").presence,
+                      (t("product_types.configuration.years", count: type.availability_years) if type.availability_years),
+                      t("product_types.configuration.version", version: type.config_version) ].compact.join(" · ") %>
+              <% else %>
+                <%= t("product_types.configuration.none") %>
+              <% end %>
+            </p>
+          </td>
           <td>
             <code><%= type.structure_name %></code>
             <p class="hint"><%= type.repo_base_url %></p>

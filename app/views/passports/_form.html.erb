@@ -23,7 +23,9 @@
       data: {
         controller: "soya-form",
         soya_form_empty_label_value: t("passports.form.nothing_entered"),
-        soya_form_filled_label_value: t("passports.form.fields_entered")
+        soya_form_filled_label_value: t("passports.form.fields_entered"),
+        soya_form_loaded_label_value: t("passports.form.load_json_loaded"),
+        soya_form_load_failed_label_value: t("passports.form.load_json_failed")
       } do |f| %>
 
   <% if passport.errors.any? %>
@@ -66,7 +68,7 @@
           data: { identifier_target: "field", action: "input->identifier#derive" } %>
     <p class="hint">
       <%= passport.minted? ? t("passports.envelope.identifier_frozen") : t("passports.envelope.identifier_hint") %>
-      <span data-identifier-target="count"></span>
+      <span data-identifier-target="count" data-unit="<%= t("passports.envelope.characters") %>"></span>
     </p>
 
     <label for="passport_granularity"><%= t("passports.envelope.granularity") %></label>
@@ -74,10 +76,16 @@
           Dpp::ProductIdentifier::GRANULARITIES.map { |g| [ t("passports.granularities.#{g}"), g ] },
           { include_blank: true },
           disabled: passport.minted?,
-          data: { identifier_target: "granularity" } %>
+          data: { identifier_target: "granularity", action: "change->identifier#chosen" } %>
     <p class="hint">
       <%= t("passports.envelope.granularity_hint") %>
       <span data-identifier-target="derived" data-label="<%= t("passports.envelope.granularity_derived") %>"></span>
+    </p>
+
+    <label for="passport_placed_on_market_on"><%= t("passports.envelope.placed_on_market") %></label>
+    <%= f.date_field :placed_on_market_on, disabled: passport.submitted? %>
+    <p class="hint">
+      <%= passport.submitted? ? t("passports.envelope.placed_on_market_fixed") : t("passports.envelope.placed_on_market_hint") %>
     </p>
 
     <label for="passport_facility_id"><%= t("passports.envelope.facility") %></label>
@@ -107,6 +115,26 @@
     <p class="hint"><%= t("passports.correct.editable_again") %></p>
   <% end %>
   <p class="hint" data-soya-form-target="state"><%= t("passports.form.nothing_entered") %></p>
+
+  <%# Filling twenty fields by hand to show somebody what the application does
+      is a poor use of a meeting, and an operator who already holds the data in
+      a system has it in a file long before they have it in a form. So: a file
+      of answers can be poured in.
+
+      A label wrapping a hidden input rather than a button: the file picker can
+      only be opened by a real file input, and the input itself is not something
+      to look at. Nothing is uploaded — the file is read in the browser and the
+      form is re-rendered from it. %>
+  <div class="load-answers">
+    <label class="link-button">
+      <%= t("passports.form.load_json") %>
+      <input type="file" accept="application/json,.json"
+             data-soya-form-target="file"
+             data-action="change->soya-form#load">
+    </label>
+    <span class="hint" data-soya-form-target="loadState"></span>
+  </div>
+  <p class="hint"><%= t("passports.form.load_json_hint") %></p>
 
   <%# sandbox without allow-same-origin would break postMessage identity and
       localStorage inside the form; the page is served by this application from

@@ -1,0 +1,2054 @@
+meta:
+  name: DppBattery
+content:
+  bases:
+  - name: Battery
+    attributes:
+      batteryIdentifier: String
+      manufacturerIdentifier: String
+      manufacturerName: String
+      manufacturingPlace: String
+      manufacturingDate: String
+      placedInServiceDate: String
+      warrantyPeriod: String
+      batteryCategory: String
+      batteryMass: Decimal
+      batteryStatus: String
+      extinguishingAgent: String
+      meaningOfLabels: String
+      carbonFootprintTotal: Decimal
+      cfRawMaterial: Decimal
+      cfProduction: Decimal
+      cfDistribution: Decimal
+      cfEndOfLife: Decimal
+      carbonFootprintClass: String
+      carbonFootprintStudyUrl: AnyURI
+      dueDiligenceReportUrl: AnyURI
+      thirdPartyAssurance: String
+      batteryChemistry: String
+      cathodeMaterials: String
+      anodeMaterials: String
+      electrolyteMaterials: String
+      impactOfSubstances: String
+      preConsumerNickelShare: Decimal
+      preConsumerCobaltShare: Decimal
+      preConsumerLithiumShare: Decimal
+      preConsumerLeadShare: Decimal
+      postConsumerNickelShare: Decimal
+      postConsumerCobaltShare: Decimal
+      postConsumerLithiumShare: Decimal
+      postConsumerLeadShare: Decimal
+      renewableContentShare: Decimal
+      dismantlingInformationUrl: AnyURI
+      partNumbersUrl: AnyURI
+      sparePartsUrl: AnyURI
+      safetyMeasuresUrl: AnyURI
+      wastePreventionUrl: AnyURI
+      separateCollectionUrl: AnyURI
+      endOfLifeTreatmentUrl: AnyURI
+      ratedCapacity: Decimal
+      remainingCapacity: Decimal
+      capacityFade: Decimal
+      stateOfCertifiedEnergy: Decimal
+      stateOfCharge: Decimal
+      nominalVoltage: Decimal
+      originalPowerCapability: Decimal
+      expectedLifetimeYears: Integer
+      expectedLifetimeCycles: Integer
+      fullCycles: Integer
+      criticalRawMaterials: Set<CriticalRawMaterial>
+      hazardousSubstances: Set<HazardousSubstance>
+      documents: Set<ProductDocument>
+  - name: CriticalRawMaterial
+    attributes:
+      materialName: String
+      massPercentage: Decimal
+  - name: HazardousSubstance
+    attributes:
+      substanceName: String
+      casNumber: String
+      massPercentage: Decimal
+  - name: ProductDocument
+    attributes:
+      url: AnyURI
+      contentType: String
+      resourceTitle: String
+      language: String
+  overlays:
+  - type: OverlayAnnotation
+    base: Battery
+    name: DppBatteryAnnotationOverlay
+    class:
+      label:
+        en: Battery
+        de: Batterie
+      comment:
+        en: Battery passport data of one battery, following DIN DKE SPEC 99100:2025-02 and Annex XIII of Regulation
+          (EU) 2023/1542.
+        de: Batteriepass-Daten einer Batterie, nach DIN DKE SPEC 99100:2025-02 und Anhang XIII der Verordnung (EU)
+          2023/1542.
+    attributes:
+      batteryIdentifier:
+        label:
+          en: Battery identifier
+          de: Batteriekennung
+        comment:
+          en: The unique identifier of this individual battery, exactly as it is carried on the battery and in the
+            data carrier.
+          de: Die eindeutige Kennung genau dieser Batterie, so wie sie auf der Batterie und im Datenträger steht.
+      manufacturerIdentifier:
+        label:
+          en: Manufacturer identifier
+          de: Herstellerkennung
+        comment:
+          en: Identifier of the manufacturer, for example the EU operator registration number or a GLN.
+          de: Kennung des Herstellers, zum Beispiel die EU-Registriernummer des Wirtschaftsteilnehmers oder eine
+            GLN.
+      manufacturerName:
+        label:
+          en: Manufacturer name
+          de: Herstellername
+        comment:
+          en: Legal name of the manufacturer placing the battery on the market.
+          de: Firmenbezeichnung des Herstellers, der die Batterie in Verkehr bringt.
+      manufacturingPlace:
+        label:
+          en: Manufacturing place
+          de: Herstellungsort
+        comment:
+          en: Place of manufacture, as city and country of the plant where the battery was assembled.
+          de: Ort der Herstellung, als Stadt und Land des Werks, in dem die Batterie gefertigt wurde.
+      manufacturingDate:
+        label:
+          en: Manufacturing date
+          de: Herstellungsdatum
+        comment:
+          en: Month of manufacture as YYYY-MM, for example 2026-06.
+          de: Monat der Herstellung als JJJJ-MM, zum Beispiel 2026-06.
+      placedInServiceDate:
+        label:
+          en: Date of putting into service
+          de: Datum der Inbetriebnahme
+        comment:
+          en: Month the battery was put into service as YYYY-MM. Leave empty as long as it has not been.
+          de: Monat der Inbetriebnahme als JJJJ-MM. Leer lassen, solange sie nicht in Betrieb ist.
+      warrantyPeriod:
+        label:
+          en: Warranty period until
+          de: Garantiezeitraum bis
+        comment:
+          en: Month the warranty of the battery ends, as YYYY-MM.
+          de: Monat, in dem die Garantie der Batterie endet, als JJJJ-MM.
+      batteryCategory:
+        label:
+          en: Battery category
+          de: Batteriekategorie
+        comment:
+          en: Category under the Batteries Regulation. It decides which attributes are mandatory.
+          de: Kategorie nach der Batterieverordnung. Sie entscheidet, welche Attribute verpflichtend sind.
+      batteryMass:
+        label:
+          en: Battery mass (kg)
+          de: Batteriemasse (kg)
+        comment:
+          en: Total mass of the battery in kilograms, including housing and the battery management system.
+          de: Gesamtmasse der Batterie in Kilogramm, einschließlich Gehäuse und Batteriemanagementsystem.
+      batteryStatus:
+        label:
+          en: Battery status
+          de: Batteriestatus
+        comment:
+          en: Current status in the life cycle. This attribute changes over the life of the battery.
+          de: Aktueller Status im Lebenszyklus. Dieses Attribut ändert sich über die Lebensdauer der Batterie.
+      extinguishingAgent:
+        label:
+          en: Extinguishing agent
+          de: Löschmittel
+        comment:
+          en: Extinguishing agent suitable for this battery chemistry, as stated in the safety data sheet.
+          de: Für diese Batteriechemie geeignetes Löschmittel, wie im Sicherheitsdatenblatt angegeben.
+      meaningOfLabels:
+        label:
+          en: Meaning of labels and symbols
+          de: Bedeutung von Kennzeichnungen und Symbolen
+        comment:
+          en: Plain explanation of the symbols carried on the battery, for the person reading the passport.
+          de: Verständliche Erklärung der auf der Batterie angebrachten Symbole, für den Leser des Passes.
+      carbonFootprintTotal:
+        label:
+          en: Carbon footprint (kgCO2e/kWh)
+          de: CO2-Fußabdruck (kgCO2e/kWh)
+        comment:
+          en: Total carbon footprint per functional unit, that is per kWh of total energy over the service life.
+          de: Gesamter CO2-Fußabdruck je funktionaler Einheit, also je kWh Gesamtenergie über die Lebensdauer.
+      cfRawMaterial:
+        label:
+          en: 'Share: raw material acquisition'
+          de: 'Anteil: Rohstoffgewinnung'
+        comment:
+          en: Contribution of raw material acquisition and pre-processing to the carbon footprint.
+          de: Beitrag der Rohstoffgewinnung und Vorverarbeitung zum CO2-Fußabdruck.
+      cfProduction:
+        label:
+          en: 'Share: production'
+          de: 'Anteil: Herstellung'
+        comment:
+          en: Contribution of the main product production and manufacturing stage.
+          de: Beitrag der Haupt-Produktions- und Fertigungsstufe.
+      cfDistribution:
+        label:
+          en: 'Share: distribution'
+          de: 'Anteil: Distribution'
+        comment:
+          en: Contribution of the distribution stage.
+          de: Beitrag der Distributionsstufe.
+      cfEndOfLife:
+        label:
+          en: 'Share: end of life and recycling'
+          de: 'Anteil: Lebensende und Recycling'
+        comment:
+          en: Contribution of the end of life and recycling stage.
+          de: Beitrag der Stufe Lebensende und Recycling.
+      carbonFootprintClass:
+        label:
+          en: Carbon footprint performance class
+          de: CO2-Fußabdruck-Leistungsklasse
+        comment:
+          en: Performance class from the carbon footprint label.
+          de: Leistungsklasse vom CO2-Fußabdruck-Label.
+      carbonFootprintStudyUrl:
+        label:
+          en: Carbon footprint study
+          de: CO2-Fußabdruck-Studie
+        comment:
+          en: Public https address of the carbon footprint study, reachable without login.
+          de: Öffentliche https-Adresse der CO2-Fußabdruck-Studie, ohne Anmeldung erreichbar.
+      dueDiligenceReportUrl:
+        label:
+          en: Due diligence report
+          de: Sorgfaltspflichtenbericht
+        comment:
+          en: Public https address of the supply chain due diligence report under Article 52(3) of the Batteries
+            Regulation.
+          de: Öffentliche https-Adresse des Berichts über die Lieferkettensorgfalt nach Artikel 52(3) der Batterieverordnung.
+      thirdPartyAssurance:
+        label:
+          en: Third-party assurance
+          de: Bestätigung durch Dritte
+        comment:
+          en: Recognised scheme or certification under which the due diligence policy was assured, if any.
+          de: Anerkanntes System oder Zertifizierung, unter der die Sorgfaltspflichten bestätigt wurden, sofern
+            vorhanden.
+      batteryChemistry:
+        label:
+          en: Battery chemistry
+          de: Batteriechemie
+        comment:
+          en: Cell chemistry of the battery. Pick the family; the exact composition goes into the material fields
+            below.
+          de: Zellchemie der Batterie. Die Familie auswählen; die genaue Zusammensetzung steht in den Materialfeldern
+            darunter.
+      cathodeMaterials:
+        label:
+          en: Cathode materials
+          de: Kathodenmaterialien
+        comment:
+          en: Materials used in the cathode, named as in the bill of materials and separated by commas.
+          de: In der Kathode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt.
+      anodeMaterials:
+        label:
+          en: Anode materials
+          de: Anodenmaterialien
+        comment:
+          en: Materials used in the anode, named as in the bill of materials and separated by commas.
+          de: In der Anode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt.
+      electrolyteMaterials:
+        label:
+          en: Electrolyte materials
+          de: Elektrolytmaterialien
+        comment:
+          en: Materials used in the electrolyte, named as in the bill of materials and separated by commas.
+          de: Im Elektrolyt verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt.
+      impactOfSubstances:
+        label:
+          en: Impact of substances
+          de: Wirkung der Stoffe
+        comment:
+          en: Impact of the substances contained on the environment, human health, safety and persons.
+          de: Wirkung der enthaltenen Stoffe auf Umwelt, menschliche Gesundheit, Sicherheit und Personen.
+      preConsumerNickelShare:
+        label:
+          en: Pre-consumer recycled nickel (%)
+          de: Vorverbraucher-Rezyklat Nickel (%)
+        comment:
+          en: Share of pre-consumer recycled nickel in the battery, in percent.
+          de: Anteil an vorverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent.
+      preConsumerCobaltShare:
+        label:
+          en: Pre-consumer recycled cobalt (%)
+          de: Vorverbraucher-Rezyklat Cobalt (%)
+        comment:
+          en: Share of pre-consumer recycled cobalt in the battery, in percent.
+          de: Anteil an vorverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent.
+      preConsumerLithiumShare:
+        label:
+          en: Pre-consumer recycled lithium (%)
+          de: Vorverbraucher-Rezyklat Lithium (%)
+        comment:
+          en: Share of pre-consumer recycled lithium in the battery, in percent.
+          de: Anteil an vorverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent.
+      preConsumerLeadShare:
+        label:
+          en: Pre-consumer recycled lead (%)
+          de: Vorverbraucher-Rezyklat Blei (%)
+        comment:
+          en: Share of pre-consumer recycled lead in the battery, in percent.
+          de: Anteil an vorverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent.
+      postConsumerNickelShare:
+        label:
+          en: Post-consumer recycled nickel (%)
+          de: Nachverbraucher-Rezyklat Nickel (%)
+        comment:
+          en: Share of post-consumer recycled nickel in the battery, in percent.
+          de: Anteil an nachverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent.
+      postConsumerCobaltShare:
+        label:
+          en: Post-consumer recycled cobalt (%)
+          de: Nachverbraucher-Rezyklat Cobalt (%)
+        comment:
+          en: Share of post-consumer recycled cobalt in the battery, in percent.
+          de: Anteil an nachverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent.
+      postConsumerLithiumShare:
+        label:
+          en: Post-consumer recycled lithium (%)
+          de: Nachverbraucher-Rezyklat Lithium (%)
+        comment:
+          en: Share of post-consumer recycled lithium in the battery, in percent.
+          de: Anteil an nachverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent.
+      postConsumerLeadShare:
+        label:
+          en: Post-consumer recycled lead (%)
+          de: Nachverbraucher-Rezyklat Blei (%)
+        comment:
+          en: Share of post-consumer recycled lead in the battery, in percent.
+          de: Anteil an nachverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent.
+      renewableContentShare:
+        label:
+          en: Renewable content (%)
+          de: Erneuerbarer Anteil (%)
+        comment:
+          en: Share of renewable material content in the battery, in percent.
+          de: Anteil an erneuerbaren Materialien in der Batterie, in Prozent.
+      dismantlingInformationUrl:
+        label:
+          en: Dismantling information
+          de: Demontageinformationen
+        comment:
+          en: Manuals for removing and disassembling the battery pack, as a public https address.
+          de: Anleitungen zum Ausbau und zur Zerlegung des Batteriepacks, als öffentliche https-Adresse.
+      partNumbersUrl:
+        label:
+          en: Part numbers for components
+          de: Teilenummern der Komponenten
+        comment:
+          en: Public https address of the list of part numbers for the components.
+          de: Öffentliche https-Adresse der Liste der Teilenummern für die Komponenten.
+      sparePartsUrl:
+        label:
+          en: Sources of spare parts
+          de: Bezugsquellen für Ersatzteile
+        comment:
+          en: Public https address of the information on where spare parts can be obtained.
+          de: Öffentliche https-Adresse der Information, wo Ersatzteile bezogen werden können.
+      safetyMeasuresUrl:
+        label:
+          en: Safety measures
+          de: Sicherheitsmaßnahmen
+        comment:
+          en: Public https address of the safety measures for handling, storing and transporting the battery.
+          de: Öffentliche https-Adresse der Sicherheitsmaßnahmen für Handhabung, Lagerung und Transport der Batterie.
+      wastePreventionUrl:
+        label:
+          en: Role of end-users in waste prevention
+          de: Rolle der Endnutzer bei der Abfallvermeidung
+        comment:
+          en: Public https address of the information on how end-users contribute to waste prevention.
+          de: Öffentliche https-Adresse der Information, wie Endnutzer zur Abfallvermeidung beitragen.
+      separateCollectionUrl:
+        label:
+          en: Separate collection of waste batteries
+          de: Getrenntsammlung von Altbatterien
+        comment:
+          en: Public https address of the information on the separate collection of waste batteries.
+          de: Öffentliche https-Adresse der Information zur Getrenntsammlung von Altbatterien.
+      endOfLifeTreatmentUrl:
+        label:
+          en: Collection, second life and treatment
+          de: Sammlung, zweites Leben und Behandlung
+        comment:
+          en: Public https address of the information on collection, preparation for second life and treatment at
+            end of life.
+          de: Öffentliche https-Adresse der Information zu Sammlung, Vorbereitung auf ein zweites Leben und Behandlung
+            am Lebensende.
+      ratedCapacity:
+        label:
+          en: Rated capacity (Ah)
+          de: Bemessungskapazität (Ah)
+        comment:
+          en: Rated capacity in ampere-hours, as declared for the new battery.
+          de: Bemessungskapazität in Amperestunden, wie für die neue Batterie deklariert.
+      remainingCapacity:
+        label:
+          en: Remaining capacity (Ah)
+          de: Verbleibende Kapazität (Ah)
+        comment:
+          en: Remaining capacity in ampere-hours. This value changes over the life of the battery.
+          de: Verbleibende Kapazität in Amperestunden. Dieser Wert ändert sich über die Lebensdauer der Batterie.
+      capacityFade:
+        label:
+          en: Capacity fade (%)
+          de: Kapazitätsverlust (%)
+        comment:
+          en: Loss of capacity against the rated capacity, in percent.
+          de: Verlust an Kapazität gegenüber der Bemessungskapazität, in Prozent.
+      stateOfCertifiedEnergy:
+        label:
+          en: State of certified energy (%)
+          de: Zustand der zertifizierten Energie (%)
+        comment:
+          en: 'SOCE: remaining usable energy against the certified usable energy, in percent.'
+          de: 'SOCE: verbleibende nutzbare Energie gegenüber der zertifizierten nutzbaren Energie, in Prozent.'
+      stateOfCharge:
+        label:
+          en: State of charge (%)
+          de: Ladezustand (%)
+        comment:
+          en: SoC at the time of the last update, in percent.
+          de: Ladezustand zum Zeitpunkt der letzten Aktualisierung, in Prozent.
+      nominalVoltage:
+        label:
+          en: Nominal voltage (V)
+          de: Nennspannung (V)
+        comment:
+          en: Nominal voltage of the battery pack in volts.
+          de: Nennspannung des Batteriepacks in Volt.
+      originalPowerCapability:
+        label:
+          en: Original power capability (W)
+          de: Ursprüngliche Leistungsfähigkeit (W)
+        comment:
+          en: Power capability of the new battery in watts.
+          de: Leistungsfähigkeit der neuen Batterie in Watt.
+      expectedLifetimeYears:
+        label:
+          en: Expected lifetime (years)
+          de: Erwartete Lebensdauer (Jahre)
+        comment:
+          en: Expected lifetime in calendar years under the reference conditions.
+          de: Erwartete Lebensdauer in Kalenderjahren unter den Referenzbedingungen.
+      expectedLifetimeCycles:
+        label:
+          en: Expected lifetime (charge-discharge cycles)
+          de: Erwartete Lebensdauer (Lade-Entlade-Zyklen)
+        comment:
+          en: Expected number of charge-discharge cycles in the cycle-life reference test.
+          de: Erwartete Anzahl der Lade-Entlade-Zyklen im Referenztest zur Zyklenlebensdauer.
+      fullCycles:
+        label:
+          en: Full cycles so far
+          de: Bisherige Vollzyklen
+        comment:
+          en: Number of full charging and discharging cycles counted so far. This value changes over the life of
+            the battery.
+          de: Anzahl der bisher gezählten vollen Lade- und Entladezyklen. Dieser Wert ändert sich über die Lebensdauer
+            der Batterie.
+      criticalRawMaterials:
+        label:
+          en: Critical raw materials
+          de: Kritische Rohstoffe
+        comment:
+          en: Critical raw materials contained and their mass share. One row per material.
+          de: Enthaltene kritische Rohstoffe und ihr Masseanteil. Je Rohstoff eine Zeile.
+      hazardousSubstances:
+        label:
+          en: Hazardous substances
+          de: Gefahrstoffe
+        comment:
+          en: Hazardous substances contained beyond mercury, cadmium and lead. One row per substance.
+          de: Enthaltene Gefahrstoffe über Quecksilber, Cadmium und Blei hinaus. Je Stoff eine Zeile.
+      documents:
+        label:
+          en: Documents
+          de: Dokumente
+        comment:
+          en: Documents belonging to the battery, referenced by web address; nothing is uploaded. The EU declaration
+            of conformity and the test reports belong here.
+          de: Zur Batterie gehörende Dokumente, über ihre Webadresse referenziert; es wird nichts hochgeladen. Die
+            EU-Konformitätserklärung und die Prüfberichte gehören hierher.
+  - type: OverlayAnnotation
+    base: CriticalRawMaterial
+    name: DppBatteryCriticalRawMaterialAnnotationOverlay
+    class:
+      label:
+        en: Critical raw material
+        de: Kritische Rohstoffe
+      comment:
+        en: Critical raw materials contained and their mass share. One row per material.
+        de: Enthaltene kritische Rohstoffe und ihr Masseanteil. Je Rohstoff eine Zeile.
+    attributes:
+      materialName:
+        label:
+          en: Material
+          de: Rohstoff
+        comment:
+          en: Name of the critical raw material, for example Cobalt or Natural graphite.
+          de: Bezeichnung des kritischen Rohstoffs, zum Beispiel Cobalt oder Naturgraphit.
+      massPercentage:
+        label:
+          en: Mass share (%)
+          de: Masseanteil (%)
+        comment:
+          en: Share of this raw material in the total mass, in percent.
+          de: Anteil dieses Rohstoffs an der Gesamtmasse, in Prozent.
+  - type: OverlayAnnotation
+    base: HazardousSubstance
+    name: DppBatteryHazardousSubstanceAnnotationOverlay
+    class:
+      label:
+        en: Hazardous substance
+        de: Gefahrstoffe
+      comment:
+        en: Hazardous substances contained beyond mercury, cadmium and lead. One row per substance.
+        de: Enthaltene Gefahrstoffe über Quecksilber, Cadmium und Blei hinaus. Je Stoff eine Zeile.
+    attributes:
+      substanceName:
+        label:
+          en: Substance
+          de: Stoff
+        comment:
+          en: Name of the substance as in the safety data sheet.
+          de: Bezeichnung des Stoffs wie im Sicherheitsdatenblatt.
+      casNumber:
+        label:
+          en: CAS number
+          de: CAS-Nummer
+        comment:
+          en: CAS registry number of the substance, for example 7439-92-1.
+          de: CAS-Registriernummer des Stoffs, zum Beispiel 7439-92-1.
+      massPercentage:
+        label:
+          en: Mass share (%)
+          de: Masseanteil (%)
+        comment:
+          en: Share of this substance in the total mass, in percent.
+          de: Anteil dieses Stoffs an der Gesamtmasse, in Prozent.
+  - type: OverlayAnnotation
+    base: ProductDocument
+    name: DppBatteryProductDocumentAnnotationOverlay
+    class:
+      label:
+        en: Document
+        de: Dokumente
+      comment:
+        en: Documents belonging to the battery, referenced by web address; nothing is uploaded. The EU declaration
+          of conformity and the test reports belong here.
+        de: Zur Batterie gehörende Dokumente, über ihre Webadresse referenziert; es wird nichts hochgeladen. Die
+          EU-Konformitätserklärung und die Prüfberichte gehören hierher.
+    attributes:
+      url:
+        label:
+          en: Web address
+          de: Webadresse
+        comment:
+          en: Full https address of the document, reachable without login.
+          de: Vollständige https-Adresse des Dokuments, ohne Anmeldung erreichbar.
+      contentType:
+        label:
+          en: File type
+          de: Dateityp
+        comment:
+          en: Media type of the file behind the address, for example application/pdf.
+          de: Medientyp der Datei hinter der Adresse, zum Beispiel application/pdf.
+      resourceTitle:
+        label:
+          en: Title
+          de: Titel
+        comment:
+          en: Short title shown to the reader instead of the bare address.
+          de: Kurzer Titel, der dem Leser statt der nackten Adresse angezeigt wird.
+      language:
+        label:
+          en: Language
+          de: Sprache
+        comment:
+          en: Language of the document as a two-letter code, for example de or en.
+          de: Sprache des Dokuments als zweibuchstabiger Code, zum Beispiel de oder en.
+  - type: OverlayValidation
+    base: Battery
+    name: DppBatteryValidationOverlay
+    attributes:
+      batteryIdentifier:
+        cardinality: 1..1
+        length: '[1..64]'
+        pattern: ^[A-Za-z0-9][A-Za-z0-9 ._/-]*$
+        message: Batteriekennung fehlt oder enthält unzulässige Zeichen.
+      manufacturerIdentifier:
+        cardinality: 1..1
+        length: '[1..64]'
+      manufacturerName:
+        cardinality: 1..1
+        length: '[1..120]'
+      manufacturingPlace:
+        cardinality: 1..1
+        length: '[1..120]'
+      manufacturingDate:
+        cardinality: 1..1
+        pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+        message: Herstellungsdatum als JJJJ-MM angeben, zum Beispiel 2026-06.
+      placedInServiceDate:
+        cardinality: 0..1
+        pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+      warrantyPeriod:
+        cardinality: 1..1
+        pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+      batteryCategory:
+        cardinality: 1..1
+        valueOption:
+        - EVBattery
+        - LMTBattery
+        - IndustrialBattery
+        - StationaryStorage
+      batteryMass:
+        cardinality: 1..1
+        valueRange: '[0..10000]'
+      batteryStatus:
+        cardinality: 1..1
+        valueOption:
+        - Original
+        - Repurposed
+        - Reused
+        - Remanufactured
+        - Waste
+      extinguishingAgent:
+        cardinality: 1..1
+        length: '[1..200]'
+      meaningOfLabels:
+        cardinality: 1..1
+        length: '[1..1000]'
+      carbonFootprintTotal:
+        cardinality: 1..1
+        valueRange: '[0..10000]'
+      cfRawMaterial:
+        cardinality: 1..1
+        valueRange: '[0..10000]'
+      cfProduction:
+        cardinality: 1..1
+        valueRange: '[0..10000]'
+      cfDistribution:
+        cardinality: 1..1
+        valueRange: '[0..10000]'
+      cfEndOfLife:
+        cardinality: 1..1
+        valueRange: '[0..10000]'
+      carbonFootprintClass:
+        cardinality: 1..1
+        valueOption:
+        - A
+        - B
+        - C
+        - D
+        - E
+        - F
+        - G
+      carbonFootprintStudyUrl:
+        cardinality: 1..1
+        pattern: ^https://
+        message: Die Studie braucht eine öffentliche https-Adresse.
+      dueDiligenceReportUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      thirdPartyAssurance:
+        cardinality: 0..1
+        length: '[1..200]'
+      batteryChemistry:
+        cardinality: 1..1
+        valueOption:
+        - NMC
+        - NCA
+        - LFP
+        - LMO
+        - LTO
+        - NaIon
+        - LeadAcid
+        - NiMH
+      cathodeMaterials:
+        cardinality: 1..1
+        length: '[1..500]'
+      anodeMaterials:
+        cardinality: 1..1
+        length: '[1..500]'
+      electrolyteMaterials:
+        cardinality: 1..1
+        length: '[1..500]'
+      impactOfSubstances:
+        cardinality: 1..1
+        length: '[1..1000]'
+      preConsumerNickelShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      preConsumerCobaltShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      preConsumerLithiumShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      preConsumerLeadShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      postConsumerNickelShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      postConsumerCobaltShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      postConsumerLithiumShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      postConsumerLeadShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      renewableContentShare:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      dismantlingInformationUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      partNumbersUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      sparePartsUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      safetyMeasuresUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      wastePreventionUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      separateCollectionUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      endOfLifeTreatmentUrl:
+        cardinality: 1..1
+        pattern: ^https://
+      ratedCapacity:
+        cardinality: 1..1
+        valueRange: '[0..100000]'
+      remainingCapacity:
+        cardinality: 1..1
+        valueRange: '[0..100000]'
+      capacityFade:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      stateOfCertifiedEnergy:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      stateOfCharge:
+        cardinality: 1..1
+        valueRange: '[0..100]'
+      nominalVoltage:
+        cardinality: 1..1
+        valueRange: '[0..2000]'
+      originalPowerCapability:
+        cardinality: 1..1
+        valueRange: '[0..10000000]'
+      expectedLifetimeYears:
+        cardinality: 1..1
+        valueRange: '[0..50]'
+      expectedLifetimeCycles:
+        cardinality: 1..1
+        valueRange: '[0..100000]'
+      fullCycles:
+        cardinality: 1..1
+        valueRange: '[0..100000]'
+      criticalRawMaterials:
+        attributes:
+          materialName:
+            cardinality: 1..1
+            length: '[1..64]'
+          massPercentage:
+            cardinality: 1..1
+            valueRange: '[0..100]'
+        cardinality: 0..30
+      hazardousSubstances:
+        attributes:
+          substanceName:
+            cardinality: 1..1
+            length: '[1..120]'
+          casNumber:
+            cardinality: 0..1
+            pattern: ^[0-9]{2,7}-[0-9]{2}-[0-9]$
+            message: CAS-Nummer im Format 7439-92-1 angeben.
+          massPercentage:
+            cardinality: 0..1
+            valueRange: '[0..100]'
+        cardinality: 0..30
+      documents:
+        attributes:
+          url:
+            cardinality: 1..1
+            pattern: ^https://
+            message: Jedes Dokument braucht eine https-Adresse.
+          contentType:
+            cardinality: 1..1
+            pattern: ^[a-z]+/[A-Za-z0-9.+-]+$
+          resourceTitle:
+            cardinality: 0..1
+            length: '[1..120]'
+          language:
+            cardinality: 0..1
+            pattern: ^[a-z]{2}$
+        cardinality: 0..20
+  - type: OverlayForm
+    base: Battery
+    name: DppBatteryFormOverlayDE
+    tag: dpp
+    language: de
+    schema:
+      type: object
+      properties:
+        batteryIdentifier:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: ^[A-Za-z0-9][A-Za-z0-9 ._/-]*$
+        manufacturerIdentifier:
+          type: string
+          minLength: 1
+          maxLength: 64
+        manufacturerName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        manufacturingPlace:
+          type: string
+          minLength: 1
+          maxLength: 120
+        manufacturingDate:
+          type: string
+          pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+        placedInServiceDate:
+          type: string
+          pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+        warrantyPeriod:
+          type: string
+          pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+        batteryCategory:
+          type: string
+          oneOf:
+          - const: EVBattery
+            title: Elektrofahrzeugbatterie
+          - const: LMTBattery
+            title: Batterie für leichte Verkehrsmittel
+          - const: IndustrialBattery
+            title: Industriebatterie
+          - const: StationaryStorage
+            title: Stationäres Batteriespeichersystem
+        batteryMass:
+          type: number
+          minimum: 0
+          maximum: 10000
+        batteryStatus:
+          type: string
+          oneOf:
+          - const: Original
+            title: Original
+          - const: Repurposed
+            title: Umgewidmet
+          - const: Reused
+            title: Wiederverwendet
+          - const: Remanufactured
+            title: Wiederaufgearbeitet
+          - const: Waste
+            title: Abfall
+        extinguishingAgent:
+          type: string
+          minLength: 1
+          maxLength: 200
+        meaningOfLabels:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        carbonFootprintTotal:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfRawMaterial:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfProduction:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfDistribution:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfEndOfLife:
+          type: number
+          minimum: 0
+          maximum: 10000
+        carbonFootprintClass:
+          type: string
+          oneOf:
+          - const: A
+            title: Klasse A
+          - const: B
+            title: Klasse B
+          - const: C
+            title: Klasse C
+          - const: D
+            title: Klasse D
+          - const: E
+            title: Klasse E
+          - const: F
+            title: Klasse F
+          - const: G
+            title: Klasse G
+        carbonFootprintStudyUrl:
+          type: string
+          pattern: ^https://
+        dueDiligenceReportUrl:
+          type: string
+          pattern: ^https://
+        thirdPartyAssurance:
+          type: string
+          minLength: 1
+          maxLength: 200
+        batteryChemistry:
+          type: string
+          oneOf:
+          - const: NMC
+            title: Lithium-Nickel-Mangan-Cobaltoxid (NMC)
+          - const: NCA
+            title: Lithium-Nickel-Cobalt-Aluminiumoxid (NCA)
+          - const: LFP
+            title: Lithium-Eisenphosphat (LFP)
+          - const: LMO
+            title: Lithium-Manganoxid (LMO)
+          - const: LTO
+            title: Lithium-Titanat (LTO)
+          - const: NaIon
+            title: Natrium-Ionen
+          - const: LeadAcid
+            title: Blei-Säure
+          - const: NiMH
+            title: Nickel-Metallhydrid
+        cathodeMaterials:
+          type: string
+          minLength: 1
+          maxLength: 500
+        anodeMaterials:
+          type: string
+          minLength: 1
+          maxLength: 500
+        electrolyteMaterials:
+          type: string
+          minLength: 1
+          maxLength: 500
+        impactOfSubstances:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        preConsumerNickelShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        preConsumerCobaltShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        preConsumerLithiumShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        preConsumerLeadShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerNickelShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerCobaltShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerLithiumShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerLeadShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        renewableContentShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        dismantlingInformationUrl:
+          type: string
+          pattern: ^https://
+        partNumbersUrl:
+          type: string
+          pattern: ^https://
+        sparePartsUrl:
+          type: string
+          pattern: ^https://
+        safetyMeasuresUrl:
+          type: string
+          pattern: ^https://
+        wastePreventionUrl:
+          type: string
+          pattern: ^https://
+        separateCollectionUrl:
+          type: string
+          pattern: ^https://
+        endOfLifeTreatmentUrl:
+          type: string
+          pattern: ^https://
+        ratedCapacity:
+          type: number
+          minimum: 0
+          maximum: 100000
+        remainingCapacity:
+          type: number
+          minimum: 0
+          maximum: 100000
+        capacityFade:
+          type: number
+          minimum: 0
+          maximum: 100
+        stateOfCertifiedEnergy:
+          type: number
+          minimum: 0
+          maximum: 100
+        stateOfCharge:
+          type: number
+          minimum: 0
+          maximum: 100
+        nominalVoltage:
+          type: number
+          minimum: 0
+          maximum: 2000
+        originalPowerCapability:
+          type: number
+          minimum: 0
+          maximum: 10000000
+        expectedLifetimeYears:
+          type: integer
+          minimum: 0
+          maximum: 50
+        expectedLifetimeCycles:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        fullCycles:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        criticalRawMaterials:
+          type: array
+          maxItems: 30
+          items:
+            type: object
+            properties:
+              materialName:
+                type: string
+                minLength: 1
+                maxLength: 64
+              massPercentage:
+                type: number
+                minimum: 0
+                maximum: 100
+            required:
+            - materialName
+            - massPercentage
+        hazardousSubstances:
+          type: array
+          maxItems: 30
+          items:
+            type: object
+            properties:
+              substanceName:
+                type: string
+                minLength: 1
+                maxLength: 120
+              casNumber:
+                type: string
+                pattern: ^[0-9]{2,7}-[0-9]{2}-[0-9]$
+              massPercentage:
+                type: number
+                minimum: 0
+                maximum: 100
+            required:
+            - substanceName
+        documents:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                pattern: ^https://
+              contentType:
+                type: string
+                pattern: ^[a-z]+/[A-Za-z0-9.+-]+$
+              resourceTitle:
+                type: string
+                minLength: 1
+                maxLength: 120
+              language:
+                type: string
+                pattern: ^[a-z]{2}$
+            required:
+            - url
+            - contentType
+      required:
+      - batteryIdentifier
+      - manufacturerIdentifier
+      - manufacturerName
+      - manufacturingPlace
+      - manufacturingDate
+      - warrantyPeriod
+      - batteryCategory
+      - batteryMass
+      - batteryStatus
+      - extinguishingAgent
+      - meaningOfLabels
+      - carbonFootprintTotal
+      - cfRawMaterial
+      - cfProduction
+      - cfDistribution
+      - cfEndOfLife
+      - carbonFootprintClass
+      - carbonFootprintStudyUrl
+      - dueDiligenceReportUrl
+      - batteryChemistry
+      - cathodeMaterials
+      - anodeMaterials
+      - electrolyteMaterials
+      - impactOfSubstances
+      - preConsumerNickelShare
+      - preConsumerCobaltShare
+      - preConsumerLithiumShare
+      - preConsumerLeadShare
+      - postConsumerNickelShare
+      - postConsumerCobaltShare
+      - postConsumerLithiumShare
+      - postConsumerLeadShare
+      - renewableContentShare
+      - dismantlingInformationUrl
+      - partNumbersUrl
+      - sparePartsUrl
+      - safetyMeasuresUrl
+      - wastePreventionUrl
+      - separateCollectionUrl
+      - endOfLifeTreatmentUrl
+      - ratedCapacity
+      - remainingCapacity
+      - capacityFade
+      - stateOfCertifiedEnergy
+      - stateOfCharge
+      - nominalVoltage
+      - originalPowerCapability
+      - expectedLifetimeYears
+      - expectedLifetimeCycles
+      - fullCycles
+    ui:
+      type: Categorization
+      options:
+        density: compact
+      elements:
+      - type: Category
+        label: Identifikation
+        elements:
+        - type: Control
+          scope: '#/properties/batteryIdentifier'
+          label: Batteriekennung
+          description: Die eindeutige Kennung genau dieser Batterie, so wie sie auf der Batterie und im Datenträger
+            steht.
+        - type: Control
+          scope: '#/properties/manufacturerIdentifier'
+          label: Herstellerkennung
+          description: Kennung des Herstellers, zum Beispiel die EU-Registriernummer des Wirtschaftsteilnehmers
+            oder eine GLN.
+        - type: Control
+          scope: '#/properties/manufacturerName'
+          label: Herstellername
+          description: Firmenbezeichnung des Herstellers, der die Batterie in Verkehr bringt.
+        - type: Control
+          scope: '#/properties/manufacturingPlace'
+          label: Herstellungsort
+          description: Ort der Herstellung, als Stadt und Land des Werks, in dem die Batterie gefertigt wurde.
+        - type: Control
+          scope: '#/properties/manufacturingDate'
+          label: Herstellungsdatum
+          description: Monat der Herstellung als JJJJ-MM, zum Beispiel 2026-06.
+        - type: Control
+          scope: '#/properties/placedInServiceDate'
+          label: Datum der Inbetriebnahme
+          description: Monat der Inbetriebnahme als JJJJ-MM. Leer lassen, solange sie nicht in Betrieb ist.
+        - type: Control
+          scope: '#/properties/warrantyPeriod'
+          label: Garantiezeitraum bis
+          description: Monat, in dem die Garantie der Batterie endet, als JJJJ-MM.
+        - type: Control
+          scope: '#/properties/batteryCategory'
+          label: Batteriekategorie
+          description: Kategorie nach der Batterieverordnung. Sie entscheidet, welche Attribute verpflichtend sind.
+        - type: Control
+          scope: '#/properties/batteryMass'
+          label: Batteriemasse (kg)
+          description: Gesamtmasse der Batterie in Kilogramm, einschließlich Gehäuse und Batteriemanagementsystem.
+        - type: Control
+          scope: '#/properties/batteryStatus'
+          label: Batteriestatus
+          description: Aktueller Status im Lebenszyklus. Dieses Attribut ändert sich über die Lebensdauer der Batterie.
+      - type: Category
+        label: Konformität und Kennzeichnung
+        elements:
+        - type: Control
+          scope: '#/properties/extinguishingAgent'
+          label: Löschmittel
+          description: Für diese Batteriechemie geeignetes Löschmittel, wie im Sicherheitsdatenblatt angegeben.
+        - type: Control
+          scope: '#/properties/meaningOfLabels'
+          label: Bedeutung von Kennzeichnungen und Symbolen
+          description: Verständliche Erklärung der auf der Batterie angebrachten Symbole, für den Leser des Passes.
+      - type: Category
+        label: CO2-Fußabdruck
+        elements:
+        - type: Control
+          scope: '#/properties/carbonFootprintTotal'
+          label: CO2-Fußabdruck (kgCO2e/kWh)
+          description: Gesamter CO2-Fußabdruck je funktionaler Einheit, also je kWh Gesamtenergie über die Lebensdauer.
+        - type: Control
+          scope: '#/properties/cfRawMaterial'
+          label: 'Anteil: Rohstoffgewinnung'
+          description: Beitrag der Rohstoffgewinnung und Vorverarbeitung zum CO2-Fußabdruck.
+        - type: Control
+          scope: '#/properties/cfProduction'
+          label: 'Anteil: Herstellung'
+          description: Beitrag der Haupt-Produktions- und Fertigungsstufe.
+        - type: Control
+          scope: '#/properties/cfDistribution'
+          label: 'Anteil: Distribution'
+          description: Beitrag der Distributionsstufe.
+        - type: Control
+          scope: '#/properties/cfEndOfLife'
+          label: 'Anteil: Lebensende und Recycling'
+          description: Beitrag der Stufe Lebensende und Recycling.
+        - type: Control
+          scope: '#/properties/carbonFootprintClass'
+          label: CO2-Fußabdruck-Leistungsklasse
+          description: Leistungsklasse vom CO2-Fußabdruck-Label.
+        - type: Control
+          scope: '#/properties/carbonFootprintStudyUrl'
+          label: CO2-Fußabdruck-Studie
+          description: Öffentliche https-Adresse der CO2-Fußabdruck-Studie, ohne Anmeldung erreichbar.
+      - type: Category
+        label: Lieferkettensorgfalt
+        elements:
+        - type: Control
+          scope: '#/properties/dueDiligenceReportUrl'
+          label: Sorgfaltspflichtenbericht
+          description: Öffentliche https-Adresse des Berichts über die Lieferkettensorgfalt nach Artikel 52(3) der
+            Batterieverordnung.
+        - type: Control
+          scope: '#/properties/thirdPartyAssurance'
+          label: Bestätigung durch Dritte
+          description: Anerkanntes System oder Zertifizierung, unter der die Sorgfaltspflichten bestätigt wurden,
+            sofern vorhanden.
+      - type: Category
+        label: Materialien und Zusammensetzung
+        elements:
+        - type: Control
+          scope: '#/properties/batteryChemistry'
+          label: Batteriechemie
+          description: Zellchemie der Batterie. Die Familie auswählen; die genaue Zusammensetzung steht in den Materialfeldern
+            darunter.
+        - type: Control
+          scope: '#/properties/cathodeMaterials'
+          label: Kathodenmaterialien
+          description: In der Kathode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt.
+        - type: Control
+          scope: '#/properties/anodeMaterials'
+          label: Anodenmaterialien
+          description: In der Anode verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt.
+        - type: Control
+          scope: '#/properties/electrolyteMaterials'
+          label: Elektrolytmaterialien
+          description: Im Elektrolyt verwendete Materialien, benannt wie in der Stückliste und durch Komma getrennt.
+        - type: Control
+          scope: '#/properties/impactOfSubstances'
+          label: Wirkung der Stoffe
+          description: Wirkung der enthaltenen Stoffe auf Umwelt, menschliche Gesundheit, Sicherheit und Personen.
+        - type: Control
+          scope: '#/properties/criticalRawMaterials'
+          label: Kritische Rohstoffe
+          description: Enthaltene kritische Rohstoffe und ihr Masseanteil. Je Rohstoff eine Zeile.
+        - type: Control
+          scope: '#/properties/hazardousSubstances'
+          label: Gefahrstoffe
+          description: Enthaltene Gefahrstoffe über Quecksilber, Cadmium und Blei hinaus. Je Stoff eine Zeile.
+      - type: Category
+        label: Rezyklat- und erneuerbarer Anteil
+        elements:
+        - type: Control
+          scope: '#/properties/preConsumerNickelShare'
+          label: Vorverbraucher-Rezyklat Nickel (%)
+          description: Anteil an vorverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/preConsumerCobaltShare'
+          label: Vorverbraucher-Rezyklat Cobalt (%)
+          description: Anteil an vorverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/preConsumerLithiumShare'
+          label: Vorverbraucher-Rezyklat Lithium (%)
+          description: Anteil an vorverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/preConsumerLeadShare'
+          label: Vorverbraucher-Rezyklat Blei (%)
+          description: Anteil an vorverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/postConsumerNickelShare'
+          label: Nachverbraucher-Rezyklat Nickel (%)
+          description: Anteil an nachverbrauchsseitigem Nickel-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/postConsumerCobaltShare'
+          label: Nachverbraucher-Rezyklat Cobalt (%)
+          description: Anteil an nachverbrauchsseitigem Cobalt-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/postConsumerLithiumShare'
+          label: Nachverbraucher-Rezyklat Lithium (%)
+          description: Anteil an nachverbrauchsseitigem Lithium-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/postConsumerLeadShare'
+          label: Nachverbraucher-Rezyklat Blei (%)
+          description: Anteil an nachverbrauchsseitigem Blei-Rezyklat in der Batterie, in Prozent.
+        - type: Control
+          scope: '#/properties/renewableContentShare'
+          label: Erneuerbarer Anteil (%)
+          description: Anteil an erneuerbaren Materialien in der Batterie, in Prozent.
+      - type: Category
+        label: Kreislauffähigkeit
+        elements:
+        - type: Control
+          scope: '#/properties/dismantlingInformationUrl'
+          label: Demontageinformationen
+          description: Anleitungen zum Ausbau und zur Zerlegung des Batteriepacks, als öffentliche https-Adresse.
+        - type: Control
+          scope: '#/properties/partNumbersUrl'
+          label: Teilenummern der Komponenten
+          description: Öffentliche https-Adresse der Liste der Teilenummern für die Komponenten.
+        - type: Control
+          scope: '#/properties/sparePartsUrl'
+          label: Bezugsquellen für Ersatzteile
+          description: Öffentliche https-Adresse der Information, wo Ersatzteile bezogen werden können.
+        - type: Control
+          scope: '#/properties/safetyMeasuresUrl'
+          label: Sicherheitsmaßnahmen
+          description: Öffentliche https-Adresse der Sicherheitsmaßnahmen für Handhabung, Lagerung und Transport
+            der Batterie.
+      - type: Category
+        label: Ende der Lebensdauer
+        elements:
+        - type: Control
+          scope: '#/properties/wastePreventionUrl'
+          label: Rolle der Endnutzer bei der Abfallvermeidung
+          description: Öffentliche https-Adresse der Information, wie Endnutzer zur Abfallvermeidung beitragen.
+        - type: Control
+          scope: '#/properties/separateCollectionUrl'
+          label: Getrenntsammlung von Altbatterien
+          description: Öffentliche https-Adresse der Information zur Getrenntsammlung von Altbatterien.
+        - type: Control
+          scope: '#/properties/endOfLifeTreatmentUrl'
+          label: Sammlung, zweites Leben und Behandlung
+          description: Öffentliche https-Adresse der Information zu Sammlung, Vorbereitung auf ein zweites Leben
+            und Behandlung am Lebensende.
+      - type: Category
+        label: Leistung und Haltbarkeit
+        elements:
+        - type: Control
+          scope: '#/properties/ratedCapacity'
+          label: Bemessungskapazität (Ah)
+          description: Bemessungskapazität in Amperestunden, wie für die neue Batterie deklariert.
+        - type: Control
+          scope: '#/properties/remainingCapacity'
+          label: Verbleibende Kapazität (Ah)
+          description: Verbleibende Kapazität in Amperestunden. Dieser Wert ändert sich über die Lebensdauer der
+            Batterie.
+        - type: Control
+          scope: '#/properties/capacityFade'
+          label: Kapazitätsverlust (%)
+          description: Verlust an Kapazität gegenüber der Bemessungskapazität, in Prozent.
+        - type: Control
+          scope: '#/properties/stateOfCertifiedEnergy'
+          label: Zustand der zertifizierten Energie (%)
+          description: 'SOCE: verbleibende nutzbare Energie gegenüber der zertifizierten nutzbaren Energie, in Prozent.'
+        - type: Control
+          scope: '#/properties/stateOfCharge'
+          label: Ladezustand (%)
+          description: Ladezustand zum Zeitpunkt der letzten Aktualisierung, in Prozent.
+        - type: Control
+          scope: '#/properties/nominalVoltage'
+          label: Nennspannung (V)
+          description: Nennspannung des Batteriepacks in Volt.
+        - type: Control
+          scope: '#/properties/originalPowerCapability'
+          label: Ursprüngliche Leistungsfähigkeit (W)
+          description: Leistungsfähigkeit der neuen Batterie in Watt.
+        - type: Control
+          scope: '#/properties/expectedLifetimeYears'
+          label: Erwartete Lebensdauer (Jahre)
+          description: Erwartete Lebensdauer in Kalenderjahren unter den Referenzbedingungen.
+        - type: Control
+          scope: '#/properties/expectedLifetimeCycles'
+          label: Erwartete Lebensdauer (Lade-Entlade-Zyklen)
+          description: Erwartete Anzahl der Lade-Entlade-Zyklen im Referenztest zur Zyklenlebensdauer.
+        - type: Control
+          scope: '#/properties/fullCycles'
+          label: Bisherige Vollzyklen
+          description: Anzahl der bisher gezählten vollen Lade- und Entladezyklen. Dieser Wert ändert sich über
+            die Lebensdauer der Batterie.
+      - type: Category
+        label: Dokumente
+        elements:
+        - type: Control
+          scope: '#/properties/documents'
+          label: Dokumente
+          description: Zur Batterie gehörende Dokumente, über ihre Webadresse referenziert; es wird nichts hochgeladen.
+            Die EU-Konformitätserklärung und die Prüfberichte gehören hierher.
+  - type: OverlayForm
+    base: Battery
+    name: DppBatteryFormOverlayEN
+    tag: dpp
+    language: en
+    schema:
+      type: object
+      properties:
+        batteryIdentifier:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: ^[A-Za-z0-9][A-Za-z0-9 ._/-]*$
+        manufacturerIdentifier:
+          type: string
+          minLength: 1
+          maxLength: 64
+        manufacturerName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        manufacturingPlace:
+          type: string
+          minLength: 1
+          maxLength: 120
+        manufacturingDate:
+          type: string
+          pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+        placedInServiceDate:
+          type: string
+          pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+        warrantyPeriod:
+          type: string
+          pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+        batteryCategory:
+          type: string
+          oneOf:
+          - const: EVBattery
+            title: Electric vehicle battery
+          - const: LMTBattery
+            title: Light means of transport battery
+          - const: IndustrialBattery
+            title: Industrial battery
+          - const: StationaryStorage
+            title: Stationary battery energy storage system
+        batteryMass:
+          type: number
+          minimum: 0
+          maximum: 10000
+        batteryStatus:
+          type: string
+          oneOf:
+          - const: Original
+            title: Original
+          - const: Repurposed
+            title: Repurposed
+          - const: Reused
+            title: Reused
+          - const: Remanufactured
+            title: Remanufactured
+          - const: Waste
+            title: Waste
+        extinguishingAgent:
+          type: string
+          minLength: 1
+          maxLength: 200
+        meaningOfLabels:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        carbonFootprintTotal:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfRawMaterial:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfProduction:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfDistribution:
+          type: number
+          minimum: 0
+          maximum: 10000
+        cfEndOfLife:
+          type: number
+          minimum: 0
+          maximum: 10000
+        carbonFootprintClass:
+          type: string
+          oneOf:
+          - const: A
+            title: Class A
+          - const: B
+            title: Class B
+          - const: C
+            title: Class C
+          - const: D
+            title: Class D
+          - const: E
+            title: Class E
+          - const: F
+            title: Class F
+          - const: G
+            title: Class G
+        carbonFootprintStudyUrl:
+          type: string
+          pattern: ^https://
+        dueDiligenceReportUrl:
+          type: string
+          pattern: ^https://
+        thirdPartyAssurance:
+          type: string
+          minLength: 1
+          maxLength: 200
+        batteryChemistry:
+          type: string
+          oneOf:
+          - const: NMC
+            title: Lithium nickel manganese cobalt oxide (NMC)
+          - const: NCA
+            title: Lithium nickel cobalt aluminium oxide (NCA)
+          - const: LFP
+            title: Lithium iron phosphate (LFP)
+          - const: LMO
+            title: Lithium manganese oxide (LMO)
+          - const: LTO
+            title: Lithium titanate (LTO)
+          - const: NaIon
+            title: Sodium-ion
+          - const: LeadAcid
+            title: Lead-acid
+          - const: NiMH
+            title: Nickel-metal hydride
+        cathodeMaterials:
+          type: string
+          minLength: 1
+          maxLength: 500
+        anodeMaterials:
+          type: string
+          minLength: 1
+          maxLength: 500
+        electrolyteMaterials:
+          type: string
+          minLength: 1
+          maxLength: 500
+        impactOfSubstances:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        preConsumerNickelShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        preConsumerCobaltShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        preConsumerLithiumShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        preConsumerLeadShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerNickelShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerCobaltShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerLithiumShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        postConsumerLeadShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        renewableContentShare:
+          type: number
+          minimum: 0
+          maximum: 100
+        dismantlingInformationUrl:
+          type: string
+          pattern: ^https://
+        partNumbersUrl:
+          type: string
+          pattern: ^https://
+        sparePartsUrl:
+          type: string
+          pattern: ^https://
+        safetyMeasuresUrl:
+          type: string
+          pattern: ^https://
+        wastePreventionUrl:
+          type: string
+          pattern: ^https://
+        separateCollectionUrl:
+          type: string
+          pattern: ^https://
+        endOfLifeTreatmentUrl:
+          type: string
+          pattern: ^https://
+        ratedCapacity:
+          type: number
+          minimum: 0
+          maximum: 100000
+        remainingCapacity:
+          type: number
+          minimum: 0
+          maximum: 100000
+        capacityFade:
+          type: number
+          minimum: 0
+          maximum: 100
+        stateOfCertifiedEnergy:
+          type: number
+          minimum: 0
+          maximum: 100
+        stateOfCharge:
+          type: number
+          minimum: 0
+          maximum: 100
+        nominalVoltage:
+          type: number
+          minimum: 0
+          maximum: 2000
+        originalPowerCapability:
+          type: number
+          minimum: 0
+          maximum: 10000000
+        expectedLifetimeYears:
+          type: integer
+          minimum: 0
+          maximum: 50
+        expectedLifetimeCycles:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        fullCycles:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        criticalRawMaterials:
+          type: array
+          maxItems: 30
+          items:
+            type: object
+            properties:
+              materialName:
+                type: string
+                minLength: 1
+                maxLength: 64
+              massPercentage:
+                type: number
+                minimum: 0
+                maximum: 100
+            required:
+            - materialName
+            - massPercentage
+        hazardousSubstances:
+          type: array
+          maxItems: 30
+          items:
+            type: object
+            properties:
+              substanceName:
+                type: string
+                minLength: 1
+                maxLength: 120
+              casNumber:
+                type: string
+                pattern: ^[0-9]{2,7}-[0-9]{2}-[0-9]$
+              massPercentage:
+                type: number
+                minimum: 0
+                maximum: 100
+            required:
+            - substanceName
+        documents:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                pattern: ^https://
+              contentType:
+                type: string
+                pattern: ^[a-z]+/[A-Za-z0-9.+-]+$
+              resourceTitle:
+                type: string
+                minLength: 1
+                maxLength: 120
+              language:
+                type: string
+                pattern: ^[a-z]{2}$
+            required:
+            - url
+            - contentType
+      required:
+      - batteryIdentifier
+      - manufacturerIdentifier
+      - manufacturerName
+      - manufacturingPlace
+      - manufacturingDate
+      - warrantyPeriod
+      - batteryCategory
+      - batteryMass
+      - batteryStatus
+      - extinguishingAgent
+      - meaningOfLabels
+      - carbonFootprintTotal
+      - cfRawMaterial
+      - cfProduction
+      - cfDistribution
+      - cfEndOfLife
+      - carbonFootprintClass
+      - carbonFootprintStudyUrl
+      - dueDiligenceReportUrl
+      - batteryChemistry
+      - cathodeMaterials
+      - anodeMaterials
+      - electrolyteMaterials
+      - impactOfSubstances
+      - preConsumerNickelShare
+      - preConsumerCobaltShare
+      - preConsumerLithiumShare
+      - preConsumerLeadShare
+      - postConsumerNickelShare
+      - postConsumerCobaltShare
+      - postConsumerLithiumShare
+      - postConsumerLeadShare
+      - renewableContentShare
+      - dismantlingInformationUrl
+      - partNumbersUrl
+      - sparePartsUrl
+      - safetyMeasuresUrl
+      - wastePreventionUrl
+      - separateCollectionUrl
+      - endOfLifeTreatmentUrl
+      - ratedCapacity
+      - remainingCapacity
+      - capacityFade
+      - stateOfCertifiedEnergy
+      - stateOfCharge
+      - nominalVoltage
+      - originalPowerCapability
+      - expectedLifetimeYears
+      - expectedLifetimeCycles
+      - fullCycles
+    ui:
+      type: Categorization
+      options:
+        density: compact
+      elements:
+      - type: Category
+        label: Identification
+        elements:
+        - type: Control
+          scope: '#/properties/batteryIdentifier'
+          label: Battery identifier
+          description: The unique identifier of this individual battery, exactly as it is carried on the battery
+            and in the data carrier.
+        - type: Control
+          scope: '#/properties/manufacturerIdentifier'
+          label: Manufacturer identifier
+          description: Identifier of the manufacturer, for example the EU operator registration number or a GLN.
+        - type: Control
+          scope: '#/properties/manufacturerName'
+          label: Manufacturer name
+          description: Legal name of the manufacturer placing the battery on the market.
+        - type: Control
+          scope: '#/properties/manufacturingPlace'
+          label: Manufacturing place
+          description: Place of manufacture, as city and country of the plant where the battery was assembled.
+        - type: Control
+          scope: '#/properties/manufacturingDate'
+          label: Manufacturing date
+          description: Month of manufacture as YYYY-MM, for example 2026-06.
+        - type: Control
+          scope: '#/properties/placedInServiceDate'
+          label: Date of putting into service
+          description: Month the battery was put into service as YYYY-MM. Leave empty as long as it has not been.
+        - type: Control
+          scope: '#/properties/warrantyPeriod'
+          label: Warranty period until
+          description: Month the warranty of the battery ends, as YYYY-MM.
+        - type: Control
+          scope: '#/properties/batteryCategory'
+          label: Battery category
+          description: Category under the Batteries Regulation. It decides which attributes are mandatory.
+        - type: Control
+          scope: '#/properties/batteryMass'
+          label: Battery mass (kg)
+          description: Total mass of the battery in kilograms, including housing and the battery management system.
+        - type: Control
+          scope: '#/properties/batteryStatus'
+          label: Battery status
+          description: Current status in the life cycle. This attribute changes over the life of the battery.
+      - type: Category
+        label: Conformity and labelling
+        elements:
+        - type: Control
+          scope: '#/properties/extinguishingAgent'
+          label: Extinguishing agent
+          description: Extinguishing agent suitable for this battery chemistry, as stated in the safety data sheet.
+        - type: Control
+          scope: '#/properties/meaningOfLabels'
+          label: Meaning of labels and symbols
+          description: Plain explanation of the symbols carried on the battery, for the person reading the passport.
+      - type: Category
+        label: Carbon footprint
+        elements:
+        - type: Control
+          scope: '#/properties/carbonFootprintTotal'
+          label: Carbon footprint (kgCO2e/kWh)
+          description: Total carbon footprint per functional unit, that is per kWh of total energy over the service
+            life.
+        - type: Control
+          scope: '#/properties/cfRawMaterial'
+          label: 'Share: raw material acquisition'
+          description: Contribution of raw material acquisition and pre-processing to the carbon footprint.
+        - type: Control
+          scope: '#/properties/cfProduction'
+          label: 'Share: production'
+          description: Contribution of the main product production and manufacturing stage.
+        - type: Control
+          scope: '#/properties/cfDistribution'
+          label: 'Share: distribution'
+          description: Contribution of the distribution stage.
+        - type: Control
+          scope: '#/properties/cfEndOfLife'
+          label: 'Share: end of life and recycling'
+          description: Contribution of the end of life and recycling stage.
+        - type: Control
+          scope: '#/properties/carbonFootprintClass'
+          label: Carbon footprint performance class
+          description: Performance class from the carbon footprint label.
+        - type: Control
+          scope: '#/properties/carbonFootprintStudyUrl'
+          label: Carbon footprint study
+          description: Public https address of the carbon footprint study, reachable without login.
+      - type: Category
+        label: Supply chain due diligence
+        elements:
+        - type: Control
+          scope: '#/properties/dueDiligenceReportUrl'
+          label: Due diligence report
+          description: Public https address of the supply chain due diligence report under Article 52(3) of the
+            Batteries Regulation.
+        - type: Control
+          scope: '#/properties/thirdPartyAssurance'
+          label: Third-party assurance
+          description: Recognised scheme or certification under which the due diligence policy was assured, if any.
+      - type: Category
+        label: Materials and composition
+        elements:
+        - type: Control
+          scope: '#/properties/batteryChemistry'
+          label: Battery chemistry
+          description: Cell chemistry of the battery. Pick the family; the exact composition goes into the material
+            fields below.
+        - type: Control
+          scope: '#/properties/cathodeMaterials'
+          label: Cathode materials
+          description: Materials used in the cathode, named as in the bill of materials and separated by commas.
+        - type: Control
+          scope: '#/properties/anodeMaterials'
+          label: Anode materials
+          description: Materials used in the anode, named as in the bill of materials and separated by commas.
+        - type: Control
+          scope: '#/properties/electrolyteMaterials'
+          label: Electrolyte materials
+          description: Materials used in the electrolyte, named as in the bill of materials and separated by commas.
+        - type: Control
+          scope: '#/properties/impactOfSubstances'
+          label: Impact of substances
+          description: Impact of the substances contained on the environment, human health, safety and persons.
+        - type: Control
+          scope: '#/properties/criticalRawMaterials'
+          label: Critical raw materials
+          description: Critical raw materials contained and their mass share. One row per material.
+        - type: Control
+          scope: '#/properties/hazardousSubstances'
+          label: Hazardous substances
+          description: Hazardous substances contained beyond mercury, cadmium and lead. One row per substance.
+      - type: Category
+        label: Recycled and renewable content
+        elements:
+        - type: Control
+          scope: '#/properties/preConsumerNickelShare'
+          label: Pre-consumer recycled nickel (%)
+          description: Share of pre-consumer recycled nickel in the battery, in percent.
+        - type: Control
+          scope: '#/properties/preConsumerCobaltShare'
+          label: Pre-consumer recycled cobalt (%)
+          description: Share of pre-consumer recycled cobalt in the battery, in percent.
+        - type: Control
+          scope: '#/properties/preConsumerLithiumShare'
+          label: Pre-consumer recycled lithium (%)
+          description: Share of pre-consumer recycled lithium in the battery, in percent.
+        - type: Control
+          scope: '#/properties/preConsumerLeadShare'
+          label: Pre-consumer recycled lead (%)
+          description: Share of pre-consumer recycled lead in the battery, in percent.
+        - type: Control
+          scope: '#/properties/postConsumerNickelShare'
+          label: Post-consumer recycled nickel (%)
+          description: Share of post-consumer recycled nickel in the battery, in percent.
+        - type: Control
+          scope: '#/properties/postConsumerCobaltShare'
+          label: Post-consumer recycled cobalt (%)
+          description: Share of post-consumer recycled cobalt in the battery, in percent.
+        - type: Control
+          scope: '#/properties/postConsumerLithiumShare'
+          label: Post-consumer recycled lithium (%)
+          description: Share of post-consumer recycled lithium in the battery, in percent.
+        - type: Control
+          scope: '#/properties/postConsumerLeadShare'
+          label: Post-consumer recycled lead (%)
+          description: Share of post-consumer recycled lead in the battery, in percent.
+        - type: Control
+          scope: '#/properties/renewableContentShare'
+          label: Renewable content (%)
+          description: Share of renewable material content in the battery, in percent.
+      - type: Category
+        label: Circularity
+        elements:
+        - type: Control
+          scope: '#/properties/dismantlingInformationUrl'
+          label: Dismantling information
+          description: Manuals for removing and disassembling the battery pack, as a public https address.
+        - type: Control
+          scope: '#/properties/partNumbersUrl'
+          label: Part numbers for components
+          description: Public https address of the list of part numbers for the components.
+        - type: Control
+          scope: '#/properties/sparePartsUrl'
+          label: Sources of spare parts
+          description: Public https address of the information on where spare parts can be obtained.
+        - type: Control
+          scope: '#/properties/safetyMeasuresUrl'
+          label: Safety measures
+          description: Public https address of the safety measures for handling, storing and transporting the battery.
+      - type: Category
+        label: End of life
+        elements:
+        - type: Control
+          scope: '#/properties/wastePreventionUrl'
+          label: Role of end-users in waste prevention
+          description: Public https address of the information on how end-users contribute to waste prevention.
+        - type: Control
+          scope: '#/properties/separateCollectionUrl'
+          label: Separate collection of waste batteries
+          description: Public https address of the information on the separate collection of waste batteries.
+        - type: Control
+          scope: '#/properties/endOfLifeTreatmentUrl'
+          label: Collection, second life and treatment
+          description: Public https address of the information on collection, preparation for second life and treatment
+            at end of life.
+      - type: Category
+        label: Performance and durability
+        elements:
+        - type: Control
+          scope: '#/properties/ratedCapacity'
+          label: Rated capacity (Ah)
+          description: Rated capacity in ampere-hours, as declared for the new battery.
+        - type: Control
+          scope: '#/properties/remainingCapacity'
+          label: Remaining capacity (Ah)
+          description: Remaining capacity in ampere-hours. This value changes over the life of the battery.
+        - type: Control
+          scope: '#/properties/capacityFade'
+          label: Capacity fade (%)
+          description: Loss of capacity against the rated capacity, in percent.
+        - type: Control
+          scope: '#/properties/stateOfCertifiedEnergy'
+          label: State of certified energy (%)
+          description: 'SOCE: remaining usable energy against the certified usable energy, in percent.'
+        - type: Control
+          scope: '#/properties/stateOfCharge'
+          label: State of charge (%)
+          description: SoC at the time of the last update, in percent.
+        - type: Control
+          scope: '#/properties/nominalVoltage'
+          label: Nominal voltage (V)
+          description: Nominal voltage of the battery pack in volts.
+        - type: Control
+          scope: '#/properties/originalPowerCapability'
+          label: Original power capability (W)
+          description: Power capability of the new battery in watts.
+        - type: Control
+          scope: '#/properties/expectedLifetimeYears'
+          label: Expected lifetime (years)
+          description: Expected lifetime in calendar years under the reference conditions.
+        - type: Control
+          scope: '#/properties/expectedLifetimeCycles'
+          label: Expected lifetime (charge-discharge cycles)
+          description: Expected number of charge-discharge cycles in the cycle-life reference test.
+        - type: Control
+          scope: '#/properties/fullCycles'
+          label: Full cycles so far
+          description: Number of full charging and discharging cycles counted so far. This value changes over the
+            life of the battery.
+      - type: Category
+        label: Documents
+        elements:
+        - type: Control
+          scope: '#/properties/documents'
+          label: Documents
+          description: Documents belonging to the battery, referenced by web address; nothing is uploaded. The EU
+            declaration of conformity and the test reports belong here.

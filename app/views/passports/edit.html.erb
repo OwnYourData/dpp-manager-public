@@ -72,6 +72,16 @@
         <% end %>
         <dt><%= t("passports.submit.submitted_to") %></dt>
         <dd><code class="break"><%= @passport.submitted_to %></code></dd>
+        <dt><%= t("passports.submit.retain_until") %></dt>
+        <dd><%= @passport.retain_until ? l(@passport.retain_until) : t("passports.submit.no_retention") %></dd>
+        <% if (snapshot = @passport.configuration_snapshot_hash).any? %>
+          <dt><%= t("passports.submit.issued_under") %></dt>
+          <dd>
+            <%= [ snapshot["legal_act"],
+                  t("product_types.configuration.version", version: snapshot["config_version"]),
+                  (t("passports.submit.structure_of", date: l(Time.iso8601(snapshot.dig("structure", "fetched_at")).in_time_zone, format: :short)) if snapshot.dig("structure", "fetched_at")) ].compact.join(" · ") %>
+          </dd>
+        <% end %>
       </dl>
 
       <%# Only when the two actually differ. A button that is always there
@@ -81,8 +91,14 @@
         <p class="hint"><%= t("passports.retired.not_served") %></p>
       <% elsif @passport.differs_from_service? %>
         <p class="warning-inline"><%= t("passports.correct.differs") %></p>
-        <%= button_to t("passports.correct.action"), correct_passport_path(@passport), method: :post,
-              form: { data: { turbo_confirm: t("passports.correct.confirm", service: @passport.submitted_to) } } %>
+        <% if params[:despite] == "correct" %>
+          <%= button_to t("passports.validation.despite_correct"),
+                correct_passport_path(@passport, despite_problems: 1), method: :post,
+                form: { data: { turbo_confirm: t("passports.validation.despite_confirm") } } %>
+        <% else %>
+          <%= button_to t("passports.correct.action"), correct_passport_path(@passport), method: :post,
+                form: { data: { turbo_confirm: t("passports.correct.confirm", service: @passport.submitted_to) } } %>
+        <% end %>
       <% else %>
         <p class="hint"><%= t("passports.correct.in_step") %></p>
       <% end %>
@@ -106,8 +122,14 @@
         <p><%= t("passports.submit.warning_body", service: settings.service_base_url) %></p>
       </div>
 
-      <%= button_to t("passports.submit.action"), submit_passport_path(@passport), method: :post,
-            form: { data: { turbo_confirm: t("passports.submit.confirm", service: settings.service_base_url) } } %>
+      <% if params[:despite] == "submit" %>
+        <%= button_to t("passports.validation.despite_submit"),
+              submit_passport_path(@passport, despite_problems: 1), method: :post,
+              form: { data: { turbo_confirm: t("passports.validation.despite_confirm") } } %>
+      <% else %>
+        <%= button_to t("passports.submit.action"), submit_passport_path(@passport), method: :post,
+              form: { data: { turbo_confirm: t("passports.submit.confirm", service: settings.service_base_url) } } %>
+      <% end %>
     <% end %>
   </section>
 <% end %>
@@ -197,6 +219,36 @@
                 data: { turbo_confirm: t("passports.custody.confirm_move") } %>
         <% end %>
       </details>
+    <% end %>
+  </section>
+<% end %>
+
+<%# What this machine attested about the payload the custodian delivers.
+    Shown only once the service has reported a hash: before that there is nothing
+    to say, and the passport carries no claim about its content either way.
+
+    The button is here because the service cannot do this instead. It computes the
+    hash and reports it; the key that signs the entry is in this vault, and that
+    asymmetry is the entire reason a reader can hold the custodian to the content. %>
+<% if @passport.payload_hash.present? %>
+  <section class="mint">
+    <h2><%= t("passports.attest.title") %></h2>
+
+    <dl class="given">
+      <dt><%= t("passports.attest.hash") %></dt>
+      <dd><code class="break"><%= @passport.payload_hash %></code></dd>
+
+      <% if @passport.payload_attested? %>
+        <dt><%= t("passports.attest.attested_at") %></dt>
+        <dd><%= l(@passport.payload_committed_at.in_time_zone, format: :short) %></dd>
+      <% end %>
+    </dl>
+
+    <% if @passport.payload_attested? %>
+      <p class="hint"><%= t("passports.attest.done") %></p>
+    <% else %>
+      <p class="warning-inline"><%= t("passports.attest.waiting") %></p>
+      <%= button_to t("passports.attest.action"), attest_passport_path(@passport), method: :post %>
     <% end %>
   </section>
 <% end %>

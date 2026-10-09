@@ -106,6 +106,95 @@ class ProductTypeTest < ActiveSupport::TestCase
     with_open_vault { assert_nil ProductType.new.summary }
   end
 
+  # --- the legal configuration (ESPR Art. 9) --------------------------------
+
+  test "a type without a legal configuration is valid and at version 0" do
+    with_open_vault do
+      type = create
+      assert_not type.configured?
+      assert_equal 0, type.config_version
+      assert_nil type.config_changed_at
+    end
+  end
+
+  test "a configured type starts at version 1 and counts every change of the configuration" do
+    with_open_vault do
+      type = create(legal_act: "Regulation (EU) 2023/1542", availability_years: 10)
+      assert_equal 1, type.config_version
+      assert type.config_changed_at
+
+      type.update!(granularity: "batch")
+      assert_equal 2, type.config_version
+
+      type.update!(carriers: %w[qr])
+      assert_equal 3, type.config_version
+    end
+  end
+
+  test "renaming or refetching a type is not a new configuration" do
+    with_open_vault do
+      type = create(legal_act: "Regulation (EU) 2023/1542")
+      type.update!(label: "Battery", fetched_at: 1.minute.from_now)
+      assert_equal 1, type.config_version
+    end
+  end
+
+  test "carriers and placements keep only what was ticked, once" do
+    with_open_vault do
+      type = create(carriers: [ "", "qr", "nfc", "qr" ], carrier_placement: [ "", "packaging" ])
+      assert_equal %w[qr nfc], type.reload.carriers
+      assert_equal %w[packaging], type.carrier_placement
+    end
+  end
+
+  test "carriers and placements are from the known lists" do
+    with_open_vault do
+      assert_not build(carriers: %w[barcode]).valid?
+      assert_not build(carrier_placement: %w[hologram]).valid?
+      assert build(carriers: ProductType::CARRIERS, carrier_placement: ProductType::PLACEMENTS).valid?
+    end
+  end
+
+  test "granularity, availability and the link to the legal act are checked" do
+    with_open_vault do
+      assert_not build(granularity: "pallet").valid?
+      assert build(granularity: "item").valid?
+      assert_not build(availability_years: 0).valid?
+      assert_not build(availability_years: 2.5).valid?
+      assert build(availability_years: 15).valid?
+      assert_not build(legal_act_url: "not a url").valid?
+      assert build(legal_act_url: "https://eur-lex.europa.eu/eli/reg/2023/1542/oj").valid?
+    end
+  end
+
+  test "a legal act cannot end before it starts" do
+    with_open_vault do
+      assert_not build(legal_act: "X", legal_act_valid_from: Date.new(2027, 2, 18),
+                       legal_act_valid_until: Date.new(2026, 1, 1)).valid?
+    end
+  end
+
+  test "a passport is required only from the day set, and unset means not determined" do
+    with_open_vault do
+      assert_not build.dpp_required_on?(Date.new(2030, 1, 1))
+
+      type = build(dpp_required_from: Date.new(2027, 2, 18))
+      assert_not type.dpp_required_on?(Date.new(2027, 2, 17))
+      assert type.dpp_required_on?(Date.new(2027, 2, 18))
+    end
+  end
+
+  test "a legal act is in force inside its period, and an open end stays in force" do
+    with_open_vault do
+      type = build(legal_act: "X", legal_act_valid_from: Date.new(2024, 2, 18))
+      assert_not type.legal_act_in_force_on?(Date.new(2024, 2, 17))
+      assert type.legal_act_in_force_on?(Date.new(2040, 1, 1))
+
+      type.legal_act_valid_until = Date.new(2030, 12, 31)
+      assert_not type.legal_act_in_force_on?(Date.new(2031, 1, 1))
+    end
+  end
+
   private
 
   def attributes(**overrides)

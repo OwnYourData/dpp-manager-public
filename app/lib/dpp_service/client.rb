@@ -19,8 +19,21 @@ module DppService
     # ok?      the service accepted it
     # document what it stored, as it returned it
     # problems the sentences from the Result object, ready to show
-    Result = Struct.new(:ok, :http_status, :document, :problems, keyword_init: true) do
+    Result = Struct.new(:ok, :http_status, :document, :problems, :commitment, keyword_init: true) do
       def ok? = ok
+    end
+
+    # What the service says about the payload commitment (prEN 18246). It arrives
+    # in headers and not in the document, because the payload carries the
+    # attributes of EN 18223:2026 Table 1 and nothing else.
+    #
+    # `pending?` is the state that asks something of this application: the service
+    # has computed the hash but cannot sign the log entry, because the document
+    # key is here and not there.
+    Commitment = Struct.new(:payload_hash, :state, keyword_init: true) do
+      def pending? = state == "pending"
+      def committed? = state == "committed"
+      def stale? = state == "stale"
     end
 
     module_function
@@ -40,7 +53,11 @@ module DppService
     # A header and not a field of the document, and that is the service's
     # decision rather than ours: EN 18223 says what a passport contains, and
     # where it is kept is not part of it.
-    def create(document, base_url:, token:, storage: nil)
+    #
+    # `retain_until` is the last day the passport has to stay available (ESPR
+    # Art. 9(2)(i)). A header for the same reason as the custody: it is about
+    # how the service keeps the passport, not about what the passport says.
+    def create(document, base_url:, token:, storage: nil, retain_until: nil)
       uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps")
 
       request = Net::HTTP::Post.new(uri.request_uri,
@@ -48,6 +65,7 @@ module DppService
         "Accept"        => "application/json",
         "Authorization" => "Bearer #{token}")
       request["X-DPP-Storage"] = storage_header(storage) if storage.present?
+      request["X-DPP-Retain-Until"] = retain_until.iso8601 if retain_until.present?
       request.body = JSON.generate(document)
 
       interpret(perform(request, uri))
@@ -187,18 +205,11 @@ module DppService
       raise Error, "invalid_address"
     end
 
+    # Over HTTP/2, see Transport.
     def perform(request, uri)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == "https"
-      http.open_timeout = TIMEOUT
-      http.read_timeout = TIMEOUT
-      http.request(request)
-    rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ENETUNREACH, SocketError
-      raise Error, "unreachable"
-    rescue Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
-      raise Error, "timeout"
-    rescue OpenSSL::SSL::SSLError
-      raise Error, "tls_failed"
+      Transport.call(request, uri, timeout: TIMEOUT)
+    rescue Transport::Error => e
+      raise Error, e.message
     end
 
     def interpret(response)
@@ -207,7 +218,19 @@ module DppService
 
       Result.new(ok: ok, http_status: response.code.to_i,
                  document: (body if ok && body.is_a?(Hash)),
-                 problems: (ok ? [] : problems_in(body, response)))
+                 problems: (ok ? [] : problems_in(body, response)),
+                 commitment: commitment_in(response))
+    end
+
+    # nil when the service said nothing about a commitment — which is what a
+    # passport that has never been through one looks like, and what an older
+    # service looks like too.
+    def commitment_in(response)
+      hash  = response["x-dpp-payload-hash"].presence
+      state = response["x-dpp-commit-state"].presence
+      return nil if hash.nil? && state.nil?
+
+      Commitment.new(payload_hash: hash, state: state)
     end
 
     # The Result object's messages, or something honest when the answer was not

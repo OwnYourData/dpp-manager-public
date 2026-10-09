@@ -12,8 +12,13 @@ import { Controller } from "@hotwired/stimulus"
 // time: reaching into the frame would mean reading its DOM and guessing which
 // input is which field, and the message already carries the parsed values.
 export default class extends Controller {
-  static targets = ["frame", "answers", "state"]
-  static values = { emptyLabel: String, filledLabel: String }
+  static targets = ["frame", "answers", "state", "file", "loadState"]
+  static values = {
+    emptyLabel: String,
+    filledLabel: String,
+    loadedLabel: String,
+    loadFailedLabel: String
+  }
 
   connect() {
     this.onMessage = this.onMessage.bind(this)
@@ -67,6 +72,67 @@ export default class extends Controller {
     }
 
     if (message.type === "update") this.fit()
+  }
+
+  // A file of answers poured into the form.
+  //
+  // The file is read here and never sent anywhere: it goes into the hidden
+  // field and into the frame's address, and the frame renders itself again from
+  // it. That is the whole mechanism — no upload, no endpoint, and nothing to
+  // clean up on the server if somebody picks the wrong file.
+  //
+  // Replace, not merge. Merging would leave the operator looking at a form
+  // holding two sources at once with no way to tell which value came from
+  // where, and "load this file" is a sentence about a whole document.
+  load(event) {
+    const file = event.target.files && event.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onerror = () => this.failed(event.target)
+    reader.onload = () => {
+      let data
+      try {
+        data = JSON.parse(reader.result)
+      } catch (error) {
+        this.failed(event.target)
+        return
+      }
+
+      // A JSON document can be an array, a number or null just as well as an
+      // object. Only an object is a set of answers.
+      if (data === null || typeof data !== "object" || Array.isArray(data)) {
+        this.failed(event.target)
+        return
+      }
+
+      this.apply(data, file.name)
+      event.target.value = ""
+    }
+    reader.readAsText(file)
+  }
+
+  apply(data, name) {
+    this.answersTarget.value = JSON.stringify(data)
+
+    // Re-rendering by address rather than by postMessage into the frame: the
+    // form already knows how to start from answers, because that is how an
+    // existing passport is opened. Reusing that path means there is one way in.
+    const src = new URL(this.frameTarget.src, window.location.href)
+    src.searchParams.set("data", this.answersTarget.value)
+    this.frameTarget.src = src.toString()
+
+    this.showState(data)
+    this.report(this.loadedLabelValue.replace("%{file}", name))
+  }
+
+  failed(input) {
+    input.value = ""
+    this.report(this.loadFailedLabelValue)
+  }
+
+  report(text) {
+    if (this.hasLoadStateTarget) this.loadStateTarget.textContent = text
   }
 
   showState(data) {

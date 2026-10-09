@@ -1,0 +1,33 @@
+{
+  "manufacturerName": "Nordlicht Leuchtmittel GmbH",
+  "productDesignation": "Nordlicht Pro A60 9 W E27",
+  "modelIdentifier": "NL-A60-9W-827",
+  "serialNumber": "NL2026-0004711",
+  "dateOfManufacture": "2026-06-15",
+  "countryOfOrigin": "AT",
+
+  "usefulLuminousFlux": 806,
+  "onModePower": 8.5,
+  "standbyPower": 0,
+  "colourTemperature": 2700,
+  "colourRenderingIndex": 90,
+  "beamAngle": 200,
+  "typeOfDimming": "phase",
+
+  "ratedLifetime": 25000,
+  "guaranteedSwitchingCycles": 100000,
+  "warrantyPeriodYears": 5,
+
+  "ceMarking": "CE-2026-NL-A60-0091",
+  "rohsCompliant": true,
+  "containsSvhc": true,
+  "svhcSubstances": [
+    "Lead (CAS 7439-92-1), in the solder of the driver board"
+  ],
+
+  "energyEfficiencyClass": "F",
+  "carbonFootprint": 2.4,
+
+  "declarationOfConformity": "https://example.org/nordlicht/doc/NL-A60-9W-827.pdf",
+  "dismantlingInstructions": "https://example.org/nordlicht/dismantling/NL-A60.pdf"
+}

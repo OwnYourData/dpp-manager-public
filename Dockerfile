@@ -7,7 +7,9 @@
 # passport data (milestone 2) runs through it, and rebuilding the image
 # definition for that later is churn for no reason.
 
-ARG RUBY_VERSION=3.3.6
+# The Gemfile asks for "~> 3.3" and nothing here needs a particular patch
+# release; this is pinned only so the image and .ruby-version cannot drift apart.
+ARG RUBY_VERSION=3.3.8
 
 # SOyA, pinned to a commit rather than a branch or a published image.
 #
@@ -67,8 +69,8 @@ ENV RAILS_ENV=production \
 
 COPY Gemfile Gemfile.lock ./
 
-# The base image ships whichever bundler was default for its Ruby (2.5.22 for
-# 3.3.6), and the lockfile was written by a newer one. Bundler notices, fetches
+# The base image ships whichever bundler was default for its Ruby, and the
+# lockfile was written by a newer one. Bundler notices, fetches
 # the version the lockfile names and re-executes itself. That works, but it
 # costs a download on every build and prints a warning that reads like a
 # problem — so the version is installed first, and read out of the lockfile

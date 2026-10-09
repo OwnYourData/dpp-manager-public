@@ -17,16 +17,35 @@ class SoyaValidationTest < ActiveSupport::TestCase
       "properties" => {
         "colourTemperature"     => { "type" => "integer" },
         "energyEfficiencyClass" => { "type" => "string", "enum" => %w[A B C D E F G] },
-        "manufacturerName"      => { "type" => "string", "title" => "Manufacturer" }
+        "manufacturerName"      => { "type" => "string", "title" => "Manufacturer" },
+        "countryOfOrigin"       => { "type" => "string", "pattern" => "^[A-Z]{2}$" },
+        "usefulLuminousFlux"    => { "type" => "integer" }
       }
     },
     "ui" => {
       "type" => "VerticalLayout",
       "elements" => [
         { "type" => "Control", "scope" => "#/properties/colourTemperature", "label" => "Farbtemperatur (K)" },
-        { "type" => "Control", "scope" => "#/properties/energyEfficiencyClass", "label" => "Energieeffizienzklasse" }
+        { "type" => "Control", "scope" => "#/properties/energyEfficiencyClass", "label" => "Energieeffizienzklasse" },
+        { "type" => "Control", "scope" => "#/properties/countryOfOrigin", "label" => "Ursprungsland" },
+        { "type" => "Control", "scope" => "#/properties/usefulLuminousFlux", "label" => "Nutzlichtstrom (lm)" }
       ]
     }
+  }.freeze
+
+  # The validation overlay as the structure's JSON-LD carries it: the message of
+  # countryOfOrigin in two languages, which is exactly the shape that reaches the
+  # report as a blank node.
+  STRUCTURE = {
+    "@graph" => [
+      { "@id" => "DppLedLampOverlayValidation", "@type" => "OverlayValidation",
+        "sh:property" => [
+          { "sh:path" => "countryOfOrigin", "sh:pattern" => "^[A-Z]{2}$", "sh:minCount" => 1,
+            "sh:message" => { "de" => "Zwei Großbuchstaben, zum Beispiel DE.",
+                              "en" => "Two capital letters, for example DE." } },
+          { "sh:path" => "usefulLuminousFlux", "sh:minCount" => 1 }
+        ] }
+    ]
   }.freeze
 
   def literal(text)
@@ -90,6 +109,53 @@ class SoyaValidationTest < ActiveSupport::TestCase
     assert_equal [ "Value is not a date" ], Soya::Validation.problems_in(report, type)
   end
 
+  # Seen in the probe of 25.09.2026: "Country of origin: df_13_85". The
+  # structure's own sentence was there all along, in both languages.
+  test "a message the library reports as a blank node is the structure's own, in the operator's language" do
+    report = { "results" => [
+      { "id" => { "termType" => "BlankNode", "value" => "df_16_0" },
+        "value" => "https://soya.ownyourdata.eu/DppLedLamp/countryOfOrigin",
+        "message" => literal("df_17_85") }
+    ] }
+
+    assert_equal [ "Ursprungsland: Zwei Großbuchstaben, zum Beispiel DE." ],
+      I18n.with_locale(:de) { Soya::Validation.problems_in(report, type_with_structure) }
+    assert_equal [ "Ursprungsland: Two capital letters, for example DE." ],
+      I18n.with_locale(:en) { Soya::Validation.problems_in(report, type_with_structure) }
+  end
+
+  test "a blank node with no message behind it is not shown as its name" do
+    report = { "results" => [
+      { "value" => "https://soya.ownyourdata.eu/DppLedLamp/colourTemperature", "message" => literal("df_17_85") }
+    ] }
+
+    assert_equal [ "Farbtemperatur (K): #{I18n.t('passports.problem.unnamed')}" ],
+      Soya::Validation.problems_in(report, type_with_structure)
+  end
+
+  # "Less than 1 values" is sh:minCount 1 failing: an empty mandatory field.
+  test "an empty mandatory field says so in words" do
+    report = { "results" => [
+      { "value" => "https://soya.ownyourdata.eu/DppLedLamp/usefulLuminousFlux",
+        "message" => literal("Less than 1 values") }
+    ] }
+
+    assert_equal [ "Nutzlichtstrom (lm): fehlt" ],
+      I18n.with_locale(:de) { Soya::Validation.problems_in(report, type_with_structure) }
+    assert_equal [ "Nutzlichtstrom (lm): is required" ],
+      I18n.with_locale(:en) { Soya::Validation.problems_in(report, type_with_structure) }
+  end
+
+  test "a field given twice says it takes one value" do
+    report = { "results" => [
+      { "value" => "https://soya.ownyourdata.eu/DppLedLamp/usefulLuminousFlux",
+        "message" => literal("More than 1 values") }
+    ] }
+
+    assert_equal [ "Nutzlichtstrom (lm): nimmt nur einen Wert" ],
+      I18n.with_locale(:de) { Soya::Validation.problems_in(report, type_with_structure) }
+  end
+
   test "an entry with no message at all does not become an empty bullet" do
     problems = Soya::Validation.problems_in({ "results" => [ { "id" => "_:df_5_0" } ] }, type)
 
@@ -117,9 +183,11 @@ class SoyaValidationTest < ActiveSupport::TestCase
 
   # Only the form is needed here, and a real ProductType would need a vault to be
   # open to know its own columns. What is under test is the report, not the row.
-  Type = Struct.new(:form) do
+  Type = Struct.new(:form, :structure) do
     def form_for(_language) = form
   end
 
   def type = @type ||= Type.new(FORM)
+
+  def type_with_structure = @type_with_structure ||= Type.new(FORM, STRUCTURE)
 end

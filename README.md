@@ -36,7 +36,9 @@ and ended.
   network, because the structures are in the image as well. "Fetch again" still
   asks the repository; the copy in the image is only the fallback.
 - The form itself is soya-form, embedded, so a passport looks the way its author
-  meant it to.
+  meant it to. Its answers can also come from a file — a JSON object keyed by
+  the structure's attribute names, read in the browser and never uploaded — for
+  a demonstration, or for data that already exists in another system.
 - Each passport gets its own `did:oyd`, minted here, pointing at where the
   passport will be readable. Its keys stay in the file too.
 - Submitting builds the EN 18223:2026 document — the envelope from the settings
@@ -71,8 +73,9 @@ and is exercised, but has not yet been run end to end against two real hosts.
 They are easy to confuse and nothing works if they are.
 
 The **product identifier** is the string on the data carrier — a GS1 Digital
-Link or an identification link under a domain the operator controls. At most 50
-characters, because that is what the EU registry allows.
+Link or an identification link under a domain the operator controls. No length
+is enforced: the EU registry accepts up to 2000 characters, and how much the
+carrier bears is the operator's decision.
 
 The **passport identifier** is the `did:oyd` this application mints for the
 passport. It carries a `DigitalProductPassport` service entry naming where the
@@ -138,7 +141,21 @@ and the vault is written in the clear. Check with:
 
     sqlcipher :memory: "PRAGMA cipher_version;"
 
-That has to print `4.6.1 community`, not nothing.
+That has to print a 4.x version, not nothing.
+
+On macOS the objection above does not apply — Homebrew ships SQLCipher 4, so the
+library comes from there:
+
+    brew install sqlcipher
+    sqlcipher :memory: "PRAGMA cipher_version;"
+
+The formula is keg-only, so the gem has to be told where its pkg-config file is.
+That belongs in your shell profile and **not** in `.bundle/config`: that file is
+part of the repository and carries only `--with-sqlcipher`, which is true
+everywhere. A path out of one computer's Homebrew tree would break the image
+build.
+
+    export PKG_CONFIG_PATH="$(brew --prefix sqlcipher)/lib/pkgconfig:$PKG_CONFIG_PATH"
 
 Bundler has to match the lockfile, or every command spends a moment installing
 the right version and re-executing itself:
@@ -197,6 +214,7 @@ Run the application against a directory of your choosing:
 | `config/locales/` | every visible string, in both languages |
 | `docs/Install.md` | how to install and run it, for somebody who has never used a container |
 | `docs/Decisions.md` | why the pieces are shaped the way they are |
+| `docs/examples/` | a file of answers a passport form can be filled from, instead of typing |
 
 `docs/Decisions.md` is worth reading before changing anything about the database
 layer. Several of the obvious approaches there do not work, and it records which

@@ -13,7 +13,7 @@ class PassportsController < ApplicationController
 
   before_action :find_passport,
                 only: %i[edit update destroy mint keys secure_keys export_keys
-                         submit correct retire renew_delegation check_delegation
+                         submit correct attest retire renew_delegation check_delegation
                          move_custody finish_move]
   before_action :require_product_type, only: %i[new create]
 
@@ -23,7 +23,9 @@ class PassportsController < ApplicationController
   end
 
   def new
-    @passport = Passport.new(product_type: @product_type)
+    # The granularity the product type prescribes is the starting point; the
+    # identifier's path still has the last word as it is typed.
+    @passport = Passport.new(product_type: @product_type, granularity: @product_type.granularity)
   end
 
   def create
@@ -167,15 +169,19 @@ class PassportsController < ApplicationController
                               endpoint: @passport.endpoint_host, service: storage_base))
     end
 
+    return if refused_for_problems?(:submit)
+
     mandate = @passport.custodial? ? sign_mandate : nil
     return if performed?
 
-    document = Dpp::Document.build(@passport)
-    result   = DppService::Client.create(document,
-                                         base_url: base,
-                                         token: Did::Token.issue(Identity.current,
-                                                                 audience: settings.service_audience),
-                                         storage: custody_header(mandate))
+    document     = Dpp::Document.build(@passport)
+    retain_until = @passport.retention_deadline
+    result       = DppService::Client.create(document,
+                                             base_url: base,
+                                             token: Did::Token.issue(Identity.current,
+                                                                     audience: settings.service_audience),
+                                             storage: custody_header(mandate),
+                                             retain_until: retain_until)
 
     unless result.ok?
       Event.record!(:passport_submit_failed, passport: @passport.label, did: @passport.dpp_id,
@@ -185,7 +191,7 @@ class PassportsController < ApplicationController
                                                               problems: result.problems.join(" · ")))
     end
 
-    @passport.record_submission!(result.document, base_url: base)
+    @passport.record_submission!(result.document, base_url: base, retain_until: retain_until)
 
     if mandate
       @passport.record_delegation!(mandate)
@@ -194,9 +200,13 @@ class PassportsController < ApplicationController
                                          jti: mandate.jti, expires_at: mandate.expires_at.iso8601)
     end
 
-    Event.record!(:passport_submitted, passport: @passport.label, did: @passport.dpp_id, service: base)
-    redirect_to edit_passport_path(@passport),
-      notice: mandate ? t("passports.custody.submitted", custodian: storage_base) : t("passports.submit.done")
+    attested = attest_payload(result.commitment)
+
+    Event.record!(:passport_submitted, passport: @passport.label, did: @passport.dpp_id, service: base,
+                                       **sent_despite_problems)
+    notice = mandate ? t("passports.custody.submitted", custodian: storage_base) : t("passports.submit.done")
+    notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
+    redirect_to edit_passport_path(@passport), notice: notice
   rescue Did::Oyd::Error => e
     submit_refused(t("passports.submit.token_failed", message: e.message))
   rescue Dpp::Document::Error => e
@@ -219,6 +229,7 @@ class PassportsController < ApplicationController
 
     base = @passport.submitted_to.presence || settings.service_base_url
     return submit_refused(t("passports.submit.no_service")) if base.blank?
+    return if refused_for_problems?(:correct)
 
     patch  = Dpp::Document.correction(@passport)
     result = DppService::Client.update(patch,
@@ -235,8 +246,13 @@ class PassportsController < ApplicationController
     end
 
     @passport.record_correction!(result.document)
-    Event.record!(:passport_updated, passport: @passport.label, did: @passport.dpp_id, service: base)
-    redirect_to edit_passport_path(@passport), notice: t("passports.correct.done")
+    attested = attest_payload(result.commitment)
+
+    Event.record!(:passport_updated, passport: @passport.label, did: @passport.dpp_id, service: base,
+                                     **sent_despite_problems)
+    notice = t("passports.correct.done")
+    notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
+    redirect_to edit_passport_path(@passport), notice: notice
   rescue Did::Oyd::Error => e
     submit_refused(t("passports.submit.token_failed", message: e.message))
   rescue Dpp::Document::Error => e
@@ -410,9 +426,36 @@ class PassportsController < ApplicationController
     return submit_refused(t("passports.retire.already")) if @passport.revoked?
     return submit_refused(t("passports.submit.no_identity")) if Identity.current.nil?
     return submit_refused(t("passports.custody.expired_first")) if mandate_stale? && !@passport.retired?
+    # The service refuses it anyway (ESPR Art. 9(2)(i)); said here first, in words.
+    if @passport.retained_on? && !@passport.retired?
+      return submit_refused(t("passports.retire.retained", date: l(@passport.retain_until)))
+    end
 
     withdraw_from_service or return
     revoke_identifier
+  end
+
+  # Attesting after the fact.
+  #
+  # Normally this happens as part of submitting: the service reports the hash and
+  # the entry is written in the same request. This is the way back for a passport
+  # that was left waiting — the registry was unreachable, or the passport was
+  # submitted before the service reported a hash at all. It exists because the
+  # service cannot do it instead: only the document key in this vault can sign
+  # that entry.
+  def attest
+    return submit_refused(t("passports.attest.nothing")) if @passport.payload_hash.blank?
+
+    if @passport.payload_attested?
+      return redirect_to(edit_passport_path(@passport), notice: t("passports.attest.already"))
+    end
+
+    if write_payload_attestation
+      redirect_to edit_passport_path(@passport), notice: t("passports.attest.done")
+    else
+      redirect_to edit_passport_path(@passport),
+                  alert: t("passports.attest.failed", message: @attestation_message)
+    end
   end
 
   private
@@ -482,6 +525,60 @@ class PassportsController < ApplicationController
   # failure here leaves the document at the new custodian under an identifier
   # that still names the old one, which is the only state in this sequence a
   # reader would notice.
+  # --- attesting the payload (prEN 18246, variant B) --------------------------
+  #
+  # The service computes the hash of the payload the custodian delivers and
+  # reports it in a header, but it holds no document key and cannot sign the log
+  # entry that commits to it. This is where that entry is written, with the two
+  # secrets that never leave this machine — which is the whole of the argument
+  # that the custodian cannot change a passport unnoticed.
+  #
+  # Best effort on purpose. The passport is already with the service; a registry
+  # that cannot be reached must not turn a successful submission into a failure.
+  # What is left behind is a passport that says it is waiting.
+  #
+  # Returns nil when there was nothing to attest, true when the entry is
+  # published, false when it was tried and did not work.
+  def attest_payload(commitment)
+    return nil if commitment.nil? || commitment.payload_hash.blank?
+
+    @passport.record_payload_expected!(commitment.payload_hash)
+
+    # Already attested — by this machine on an earlier attempt, or by a service
+    # that holds the document key itself. Either way the document commits to this
+    # payload, and saying "waiting" about it would be wrong.
+    if commitment.committed?
+      @passport.record_payload_committed! unless @passport.payload_attested?
+      return nil
+    end
+    return nil unless commitment.pending?
+
+    write_payload_attestation
+  end
+
+  def write_payload_attestation
+    key = @passport.passport_key
+    return attestation_failed(t("passports.attest.no_keys")) if key.nil? || key.document_key.blank?
+
+    written = Did::Oyd.commit_payload(@passport.dpp_id,
+                                     payload_hash:   @passport.payload_hash,
+                                     document_key:   key.document_key,
+                                     revocation_key: key.revocation_key)
+    @passport.record_payload_committed!(written && written[:revocation_log])
+    Event.record!(:passport_payload_attested, passport: @passport.label, did: @passport.dpp_id,
+                                              payload_hash: @passport.payload_hash)
+    true
+  rescue Did::Oyd::Error, ActiveRecord::RecordInvalid => e
+    attestation_failed(e.message)
+  end
+
+  def attestation_failed(message)
+    @attestation_message = message
+    Event.record!(:passport_payload_attestation_failed, passport: @passport.label,
+                                                        did: @passport.dpp_id, message: message)
+    false
+  end
+
   def point_identifier_at_new_custodian
     # A move within one custodian — another collection at the same pod — leaves
     # the endpoint exactly as it was. Writing it again would publish a new
@@ -525,7 +622,6 @@ class PassportsController < ApplicationController
 
     return submit_refused(t("setup.custodian.invalid_url")) && nil if base.nil?
     return submit_refused(t("setup.custodian.collection_required")) && nil if collection.blank?
-    return submit_refused(t("setup.custodian.too_long", count: base.length)) && nil if base.length > 35
 
     if base == storage_base.to_s && collection == @passport.custodian_collection_id.to_s
       return submit_refused(t("passports.custody.already_there")) && nil
@@ -672,11 +768,44 @@ class PassportsController < ApplicationController
     if passport.save
       result = validation_result(passport)
       flash[:problems] = shown_problems(result)
+      flash[:problem_count] = problem_count(result)
       redirect_to(params[:and_close].present? ? passports_path : edit_passport_path(passport),
                   notice: [ message, validation_note(result) ].compact.join(" "))
     else
       render(passport.persisted? ? :edit : :new, status: :unprocessable_entity)
     end
+  end
+
+  # The one moment the structure's rules have to hold is the moment the passport
+  # leaves this machine. Everything before that is a draft.
+  #
+  # Refused rather than blocked: the operator is told what is wrong and can send
+  # it anyway with a second, deliberate click. A hard stop would be the wrong
+  # trade -- the SOyA structure can itself be wrong or out of date, and then an
+  # application that cannot be overruled holds up a passport that has to go out.
+  # What is sent despite known problems is recorded with them, so the log says
+  # afterwards that it was a decision and which one.
+  #
+  # :unchecked does not block. "We could not look" is not "we looked and found
+  # something", and a soya-web-cli that does not answer must not stop a
+  # submission.
+  def refused_for_problems?(action)
+    return false if ActiveModel::Type::Boolean.new.cast(params[:despite_problems])
+
+    result = validation_result(@passport)
+    return false unless result.is_a?(Soya::Validation::Result) && !result.valid?
+
+    Event.record!(action == :submit ? :passport_submit_failed : :passport_update_failed,
+                  passport: @passport.label, did: @passport.dpp_id, problems: result.problems)
+    redirect_to edit_passport_path(@passport, despite: action),
+                alert: t("passports.validation.blocked", count: result.problems.size),
+                flash: { problems: shown_problems(result), problem_count: problem_count(result) }
+    true
+  end
+
+  # What is recorded alongside a submission that was sent anyway.
+  def sent_despite_problems
+    ActiveModel::Type::Boolean.new.cast(params[:despite_problems]) ? { despite_problems: true } : {}
   end
 
   # A draft is saved whether or not it validates. The alternative — refusing to
@@ -714,6 +843,13 @@ class PassportsController < ApplicationController
     over.positive? ? shown + [ t("passports.more_problems", count: over) ] : shown
   end
 
+  # How many points there are, not how many lines the list has: a cut list ends
+  # in a line that says what was cut, and counting that line as a point made the
+  # summary say "9" over eight points and four more.
+  def problem_count(result)
+    result.problems.size if result.is_a?(Soya::Validation::Result) && result.problems.any?
+  end
+
   # The form's answers arrive as one JSON string, put there by the page from
   # what soya-form sent it. Parsed here rather than trusted: it is a value that
   # travelled through the browser, and a broken one must not take down the save.
@@ -725,6 +861,7 @@ class PassportsController < ApplicationController
   end
 
   def permitted
-    params.require(:passport).permit(:label, :unique_product_identifier, :granularity, :facility_id)
+    params.require(:passport).permit(:label, :unique_product_identifier, :granularity, :facility_id,
+                                     :placed_on_market_on)
   end
 end

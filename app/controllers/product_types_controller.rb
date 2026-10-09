@@ -108,6 +108,9 @@ class ProductTypesController < ApplicationController
 
   def permitted
     params.require(:product_type).permit(:label, :repo_base_url, :structure_name, :form_tag, :transformation_name,
-                                        :reverse_transformation_name)
+                                        :reverse_transformation_name,
+                                        :legal_act, :legal_act_url, :legal_act_valid_from, :legal_act_valid_until,
+                                        :dpp_required_from, :granularity, :carrier_layout, :availability_years,
+                                        carriers: [], carrier_placement: [])
   end
 end

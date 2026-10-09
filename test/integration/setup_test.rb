@@ -128,7 +128,9 @@ class SetupTest < ActionDispatch::IntegrationTest
     assert_not settings.custodian_configured?
   end
 
-  test "a custodian address too long for a data carrier is refused" do
+  # The address goes into each passport DID, never onto a data carrier, so its
+  # length is nobody's budget.
+  test "a long custodian address is accepted" do
     ready_for_custodian!
 
     post setup_custodian_path, params: {
@@ -136,8 +138,8 @@ class SetupTest < ActionDispatch::IntegrationTest
       custodian_collection_id: "4"
     }
 
-    assert_response :unprocessable_entity
-    assert_not settings.reload.custodian_configured?
+    assert settings.reload.custodian_configured?
+    assert_equal "https://a-really-quite-long-custodian-name.example.org", settings.custodian_base_url
   end
 
   test "a custodian address without a collection is refused" do

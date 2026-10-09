@@ -9,8 +9,9 @@ class Setting < ApplicationRecord
   # runs the arrangement this application expects — turns the question from
   # "what is this" into "this one, or somebody else". Anyone else is a field.
   #
-  # The address is short on purpose: it is frozen into every passport identifier
-  # minted against it, where the registry allows 50 characters in total.
+  # Its address goes into the service entry of every passport identifier minted
+  # against it. It never reaches a data carrier, which bears the product
+  # identifier under the operator's own host.
   KNOWN_CUSTODIAN = { name: "DID Daten-Intermediär-Dienste FlexCo",
                       base_url: "https://dpp.go-data.at" }.freeze
 

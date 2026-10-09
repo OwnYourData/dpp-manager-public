@@ -20,6 +20,7 @@ class Passport < ApplicationRecord
   validates :granularity, inclusion: { in: Dpp::ProductIdentifier::GRANULARITIES }, allow_blank: true
   validate  :identifier_is_carrier_borne
   validate  :granularity_agrees_with_the_path
+  validate  :placing_on_market_fixed_once_submitted
   validate  :envelope_is_frozen_after_minting
 
   normalizes :label, with: ->(value) { value.to_s.strip }
@@ -48,6 +49,45 @@ class Passport < ApplicationRecord
   end
 
   def minted? = dpp_id.present?
+
+  # --- availability (ESPR Art. 9(2)(i)) ---------------------------------------
+
+  # The last day the passport has to stay available, worked out from the start
+  # of the period and the years the product type prescribes. nil when the type
+  # prescribes none. The period starts when the product was placed on the
+  # market; without that date, on the day of submission.
+  def retention_deadline(submitted_on = Date.current)
+    years = product_type&.availability_years
+    return nil if years.blank?
+
+    (placed_on_market_on || submitted_on).advance(years: years)
+  end
+
+  # Whether the passport may not be ended yet. The last day is inside the
+  # period, as it is at the service, which refuses the deletion on that day too.
+  def retained_on?(date = Date.current) = retain_until.present? && date <= retain_until
+
+  def configuration_snapshot_hash
+    configuration_snapshot.present? ? JSON.parse(configuration_snapshot) : {}
+  rescue JSON::ParserError
+    {}
+  end
+
+  # What the product type's configuration says about this passport, worded like
+  # the structure's own problems so both land in the same list.
+  #
+  # A problem and not a validation, as decided for the structure's rules: the
+  # configuration can itself be out of date, and the operator has to be able to
+  # send the passport anyway with a deliberate second click.
+  def configuration_problems
+    type = product_type
+    return [] if type.nil? || type.granularity.blank? || granularity.blank?
+    return [] if granularity == type.granularity
+
+    [ "#{I18n.t('passports.envelope.granularity')}: " \
+      "#{I18n.t('passports.problem.granularity_config',
+                expected: I18n.t("passports.granularities.#{type.granularity}"))}" ]
+  end
 
   # Mint this passport's own DID and keep its keys.
   #
@@ -135,6 +175,28 @@ class Passport < ApplicationRecord
     end
   end
 
+  # The service has told us which hash it expects to see attested. Recording it
+  # clears the attestation: a changed payload means whatever was signed before is
+  # about an older version.
+  def record_payload_expected!(payload_hash)
+    return if payload_hash.blank? || payload_hash == self.payload_hash
+
+    update!(payload_hash: payload_hash, payload_committed_at: nil)
+  end
+
+  # The log entry is published. The revocation record belongs to the new document
+  # and replaces the stored one, or the passport can no longer be retired.
+  def record_payload_committed!(revocation_log = nil)
+    transaction do
+      update!(payload_committed_at: Time.current)
+      passport_key&.update!(revocation_log: revocation_log) if revocation_log.present?
+    end
+  end
+
+  def payload_attested? = payload_hash.present? && payload_committed_at.present?
+
+  def payload_awaiting_attestation? = payload_hash.present? && payload_committed_at.nil?
+
   def record_delegation!(signed)
     update!(delegation_jti: signed.jti,
             delegation_signed_at: Time.current,
@@ -188,10 +250,27 @@ class Passport < ApplicationRecord
     host.present? && host == endpoint_host
   end
 
-  def record_submission!(document, base_url:)
+  def record_submission!(document, base_url:, retain_until: nil)
     update!(status: "submitted", submitted_at: Time.current, submitted_to: base_url,
             submitted_digest: input_digest,
-            service_document: document.present? ? JSON.generate(document) : nil)
+            service_document: document.present? ? JSON.generate(document) : nil,
+            retain_until: retain_until,
+            configuration_snapshot: JSON.generate(snapshot_of_configuration))
+  end
+
+  # What the product type said when this passport was issued (CFG-011): its
+  # legal configuration with the version number, and which copy of the SOyA
+  # structure and transformation the passport was built from.
+  def snapshot_of_configuration
+    type = product_type
+    fields = ProductType::CONFIGURATION.index_with { |field| type[field] }
+    fields.transform_values { |value| value.respond_to?(:iso8601) ? value.iso8601 : value }
+          .merge("config_version" => type.config_version,
+                 "structure" => { "name" => type.structure_name, "repo" => type.repo_base_url,
+                                  "fetched_at" => type.fetched_at&.utc&.iso8601,
+                                  "transformation" => type.transformation_name,
+                                  "transformation_fetched_at" => type.transformation_fetched_at&.utc&.iso8601 })
+          .stringify_keys
   end
 
   def record_correction!(document)
@@ -262,14 +341,21 @@ class Passport < ApplicationRecord
     return if problem.nil?
 
     errors.add(:unique_product_identifier,
-      I18n.t("passports.identifier.#{problem}", over: identifier.characters_over,
-                                                length: unique_product_identifier.length))
+      I18n.t("passports.identifier.#{problem}"))
   end
 
   # The rule that is invisible until it fails. A Digital Link path expresses the
   # granularity, and the service refuses a declaration that contradicts it — so
   # the contradiction is shown here, next to the two fields that disagree,
   # rather than arriving later as a rejected submission.
+  # The period the service holds the passport for was fixed from this date at
+  # submission, so changing it afterwards would change nothing but the record.
+  def placing_on_market_fixed_once_submitted
+    return unless will_save_change_to_placed_on_market_on? && submitted_at.present? && !will_save_change_to_submitted_at?
+
+    errors.add(:placed_on_market_on, I18n.t("passports.envelope.placed_on_market_fixed"))
+  end
+
   def granularity_agrees_with_the_path
     return if granularity.blank? || unique_product_identifier.blank?
 

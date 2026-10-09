@@ -20,7 +20,7 @@ class PassportCustodyTest < ActionDispatch::IntegrationTest
       passport = minted_passport
 
       header = nil
-      submitting(create: ->(_document, base_url:, token:, storage: nil) {
+      submitting(create: ->(_document, base_url:, token:, storage: nil, retain_until: nil) {
         header = storage
         accepted
       }) { post submit_passport_path(passport) }

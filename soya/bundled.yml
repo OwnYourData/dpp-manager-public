@@ -20,3 +20,10 @@
   label:
     en: LED lamp
     de: LED-Lampe
+- structure: DppBattery
+  transformation: DppBatteryToEN18223
+  reverse_transformation: DppEN18223ToBattery
+  repo: https://soya.ownyourdata.eu
+  label:
+    en: Traction battery
+    de: Traktionsbatterie

@@ -116,14 +116,6 @@ class SetupController < ApplicationController
     return fail_with(:custodian, t("setup.custodian.invalid_url")) if base.nil?
     return fail_with(:custodian, t("setup.custodian.collection_required")) if collection.blank?
 
-    # The base URL ends up inside every passport DID's serviceEndpoint, where it
-    # competes for the 50 characters the registry allows on a data carrier. Too
-    # long here means unprintable identifiers later, and by then the DID is
-    # minted and the endpoint frozen.
-    if base.length > 35
-      return fail_with(:custodian, t("setup.custodian.too_long", count: base.length))
-    end
-
     settings.update!(custodian_base_url: base, custodian_collection_id: collection)
     Event.record!(:custodian_configured, base_url: base, collection_id: collection)
 
