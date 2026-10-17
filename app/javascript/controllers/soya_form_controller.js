@@ -126,6 +126,25 @@ export default class extends Controller {
     this.report(this.loadedLabelValue.replace("%{file}", name))
   }
 
+  // The page came back after a lock, and resume_controller put the answers
+  // that were sent back into the hidden field. The frame still shows what the
+  // server rendered, so it is started again from the field, the same way a
+  // loaded file is.
+  restored() {
+    let data
+    try {
+      data = JSON.parse(this.answersTarget.value || "{}")
+    } catch (error) {
+      return
+    }
+    if (data === null || typeof data !== "object" || Array.isArray(data)) return
+
+    const src = new URL(this.frameTarget.src, window.location.href)
+    src.searchParams.set("data", this.answersTarget.value)
+    this.frameTarget.src = src.toString()
+    this.showState(data)
+  }
+
   failed(input) {
     input.value = ""
     this.report(this.loadFailedLabelValue)

@@ -37,7 +37,12 @@
       <p class="warning-inline"><%= t("passports.mint.keys_not_secured") %></p>
     <% end %>
 
-    <p><%= link_to t("passports.mint.to_keys"), keys_passport_path(@passport) %></p>
+    <%# Only while the keys are still on show: once they are confirmed as stored,
+        the keys page shows the identifier and says where they went, and a link
+        promising the keys would promise something that is not there. %>
+    <% unless @passport.keys_secured? %>
+      <p><%= link_to t("passports.mint.to_keys"), keys_passport_path(@passport) %></p>
+    <% end %>
   <% elsif !@passport.envelope_complete? %>
     <p class="hint"><%= t("passports.mint.envelope_first") %></p>
   <% elsif mint_endpoint_base.blank? %>

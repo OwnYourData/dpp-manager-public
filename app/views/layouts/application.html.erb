@@ -10,7 +10,10 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <%# resume: what was typed into a form survives a lock that interrupted it.
+      confirm: the application's own confirmation step instead of window.confirm. %>
+  <body data-controller="resume confirm"
+        <% if flash[:resume_action].present? %>data-resume-restore-value="<%= flash[:resume_action] %>"<% end %>>
     <%# The bar spans the window so the page has a lid, but everything in it
         sits in a block as wide as `main` — otherwise the navigation starts at
         the window edge while the content it belongs to starts a quarter of the
@@ -127,5 +130,15 @@
       </span>
       <p class="funding" lang="en"><%= funding_notice %></p>
     </footer>
+
+    <dialog class="confirm-step" data-confirm-target="dialog"
+            aria-labelledby="confirm-step-title" aria-describedby="confirm-step-message">
+      <h2 id="confirm-step-title"><%= t("confirm_step.title") %></h2>
+      <p id="confirm-step-message" data-confirm-target="message"></p>
+      <div class="actions">
+        <button type="button" class="secondary" data-confirm-target="cancel"><%= t("confirm_step.cancel") %></button>
+        <button type="button" data-confirm-target="accept"><%= t("confirm_step.accept") %></button>
+      </div>
+    </dialog>
   </body>
 </html>

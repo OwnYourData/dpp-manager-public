@@ -1,8 +1,21 @@
 <%= image_tag "oyd-logo.svg", class: "logo", alt: "OwnYourData" %>
 <h1><%= t("app.name") %></h1>
 
+<% if @storage_problem %>
+  <% kind, facts = @storage_problem %>
+  <div class="warning" role="alert">
+    <strong><%= t("unlock.storage.title") %></strong>
+    <p><%= t("unlock.storage.#{kind}", **facts.symbolize_keys) %></p>
+    <p><%= t("unlock.storage.fix") %></p>
+  </div>
+<% end %>
+
 <% if @vault_exists %>
   <p class="lead"><%= t("unlock.existing.lead") %></p>
+
+  <% if @interrupted %>
+    <p class="hint"><%= t("unlock.existing.interrupted") %></p>
+  <% end %>
 
   <%= form_with url: unlock_path, method: :post, local: true do |f| %>
     <label for="passphrase"><%= t("unlock.passphrase") %></label>

@@ -543,3 +543,30 @@ details.handover > *:not(summary) { margin-top: 12px; }
 /* --- access classes -------------------------------------------------------- */
 table.access select { width: auto; margin: 0; }
 table.access td code { font-size: 0.85rem; }
+
+/* --- the confirmation step (confirm_controller.js) ------------------------ */
+
+dialog.confirm-step {
+  max-width: 32rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+dialog.confirm-step::backdrop { background: rgba(0, 0, 0, 0.35); }
+dialog.confirm-step h2 { margin: 0 0 8px; font-size: 1.05rem; }
+dialog.confirm-step p { margin: 0 0 16px; }
+dialog.confirm-step .actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+dialog.confirm-step button {
+  padding: 8px 16px;
+  background: var(--oyd-blue);
+  color: #fff;
+  border: 1px solid var(--oyd-blue);
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+dialog.confirm-step button:hover { background: var(--oyd-blue-dark); }
+dialog.confirm-step button.secondary { background: none; color: var(--oyd-blue); border-color: var(--line); }
+dialog.confirm-step button.secondary:hover { background: none; border-color: var(--oyd-blue); }
+dialog.confirm-step button:focus-visible { outline: 2px solid var(--oyd-blue); outline-offset: 2px; }

@@ -523,6 +523,53 @@ that also count in production. Local runs therefore mint a DID for the test
 service and revoke it afterwards, together with the test identities and test
 passports.
 
+## The lock interrupts, it does not discard
+
+The data file closes itself after a while unattended. Whatever is sent after
+that moment is not carried out — not partly, not at all — because every check
+runs before any action does. What was lost before was everything around that:
+the person landed on the unlock screen without being told, and after unlocking
+on the overview, with the form they had filled in gone.
+
+Now the request that found the file closed is remembered by where it came from:
+which page, and whether it was an action. The lock is logged with that action
+named as not carried out, the unlock screen says so, and unlocking leads back
+to the page with a message.
+
+The values of the form are deliberately not remembered by the server. A locked
+file is supposed to mean that nothing readable is left in the application, and a
+copy of a passport's content in the session cookie or in memory would undo that.
+They stay where they were typed: the browser tab keeps a copy of the last form
+it sent and pours it back into the same form after unlocking. Passwords, files
+and every field whose name says it holds a key or a token are never kept, so
+those are typed in again.
+
+There was a second way the file closed, and it was not ours. Active Record's
+connection pool disconnects connections that sat unused for five minutes, and
+the vault's one connection is the vault: it closed after five minutes whatever
+the setting said, with no log entry and no message. The pool's idle timeout is
+off; the setting decides.
+
+## Times are shown in UTC, and say so
+
+Every time on screen carries its zone, and the zone is UTC. The event log, the
+DPP Service, the custodian's trail and every mandate's expiry count in UTC, so a
+time copied from this screen into a support request or compared with a log
+means the same thing everywhere. The container does not know where its user
+sits, and a page that silently converts would show a different number than the
+log next to it. Local time in the browser would be friendlier to read and is a
+possible addition, but not in place of the zone being named.
+
+## "Are you sure?" is part of the page
+
+Confirmations used to be `window.confirm`: outside the page, announced by a
+screen reader as something foreign, unreachable for a test or automation, and
+blocking everything while open. They are a `<dialog>` in the page now — modal,
+Escape cancels, the focus starts on *Cancel* so that Enter on an unread
+question does not do the thing that cannot be undone. Every place keeps asking
+the way it did, with `data-turbo-confirm`; forms outside Turbo, which used to
+skip the question entirely, are asked as well.
+
 ## Two repositories, and why the public one has no history
 
 The work happens in a private repository. The public one, `dpp-manager-public`,

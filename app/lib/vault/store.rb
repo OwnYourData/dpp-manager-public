@@ -33,6 +33,29 @@ module Vault
         path.exist? && path.size >= SALT_BYTES
       end
 
+      # Why the data file cannot be used here, or nil when it can.
+      #
+      # SQLite needs more than the file: it writes a journal beside it for every
+      # change, so the directory has to be writable too. Without this check the
+      # first sign of a mount the container cannot write to is a 500 out of the
+      # adapter (SQLite3::CantOpenException), on the page where somebody has just
+      # typed a passphrase.
+      #
+      # A symbol for the message and the facts that belong into it — never a
+      # guess at the cause. The usual one is a bind mount owned by another user
+      # than the one this process runs as, but the check only says what it saw.
+      def storage_problem
+        dir = data_dir
+        return [ :missing, { directory: dir.to_s } ] unless dir.directory?
+        return [ :directory_not_writable, { directory: dir.to_s, uid: Process.euid } ] unless writable?(dir)
+
+        if path.exist? && !(path.readable? && path.writable?)
+          return [ :file_not_writable, { file: path.to_s, uid: Process.euid } ]
+        end
+
+        nil
+      end
+
       def stored_salt
         raise NotOpenError, "no vault at #{path}" unless exists?
 
@@ -175,6 +198,14 @@ module Vault
           "adapter"  => "sqlite3",
           "database" => path.to_s,
           "timeout"  => 5_000,
+          # The vault is open exactly as long as its one connection is. Active
+          # Record's pool reaper closes connections that sat unused for
+          # idle_timeout seconds (300 by default) — and with it the vault, five
+          # minutes into a pause, without the lock, the log entry or the message
+          # that the application's own idle timer gives. Zero turns the reaper's
+          # flushing off; the idle timer in ApplicationController is the one
+          # that decides.
+          "idle_timeout" => 0,
           # No WAL. WAL means a -wal and a -shm file beside the database, and the
           # requirement here is one file the user can copy. A single local writer
           # gains nothing from WAL anyway.
@@ -183,6 +214,20 @@ module Vault
       end
 
       private
+
+      # File.writable? answers from the permission bits, which a network or
+      # FUSE mount can report differently from what a write then does. Trying
+      # is the only answer that cannot be wrong.
+      def writable?(dir)
+        return false unless dir.writable?
+
+        probe = dir.join(".write-test-#{SecureRandom.hex(4)}")
+        File.open(probe, File::WRONLY | File::CREAT | File::EXCL, 0o600) { }
+        File.delete(probe)
+        true
+      rescue SystemCallError
+        false
+      end
 
       def connect!
         ActiveRecord::Base.establish_connection(database_config)

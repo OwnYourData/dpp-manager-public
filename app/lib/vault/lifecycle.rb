@@ -61,8 +61,10 @@ module Vault
       false
     end
 
-    def lock!(reason: "manual")
-      Event.record!(:vault_locked, reason: reason) if Store.open?
+    # `detail` says what else belongs on the record: an action that arrived
+    # after the vault should have closed, and so was not carried out.
+    def lock!(reason: "manual", **detail)
+      Event.record!(:vault_locked, reason: reason, **detail) if Store.open?
       Store.close!
       true
     end

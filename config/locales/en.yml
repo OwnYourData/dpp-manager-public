@@ -1,4 +1,12 @@
 en:
+  # Every time this application shows carries its zone. The data file, the
+  # event log, the DPP Service, the custodian's trail and every mandate count in
+  # UTC, so the screen does too — and says so, instead of leaving a reader to
+  # guess whether 16:36 was their afternoon or the server's.
+  time:
+    formats:
+      short: "%Y-%m-%d %H:%M %Z"
+      long: "%Y-%m-%d %H:%M:%S %Z"
   app:
     name: "DPP Manager"
     tagline: "Create and manage digital product passports on your own machine."
@@ -34,13 +42,24 @@ en:
     switch_off_hint: "You can switch these explanations off under Settings."
     close: "Close for now"
 
+  confirm_step:
+    title: "Please confirm"
+    cancel: "Cancel"
+    accept: "Yes, go ahead"
   unlock:
+    storage:
+      title: "The data file cannot be stored here."
+      missing: "The data directory %{directory} does not exist inside the container."
+      directory_not_writable: "The data directory %{directory} is there, but this application (user id %{uid}) cannot write to it."
+      file_not_writable: "The data file %{file} is there, but this application (user id %{uid}) cannot read and write it."
+      fix: "Nothing has been written. Mount a folder of your computer onto the data directory that this user may write to — on Linux, give it to user id 1000 (sudo chown -R 1000:1000 on the folder) — and restart the container. The installation guide, section 7, has the details."
     passphrase: "Passphrase"
     open: "Open"
     existing:
       lead: "Enter your passphrase to open your data."
       purpose: "Everything this application knows is kept in one encrypted file. The passphrase is what turns that file back into readable data; without it nothing on this page works."
       no_recovery: "There is no way to recover the passphrase. Not by us, not by anyone. If it is lost, the data in the file is lost with it."
+      interrupted: "What you sent last was not carried out. Once the file is open, you are taken back to that page, with what you had typed — except passphrases and keys."
     new:
       lead: "No data file was found. Choose a passphrase and one will be created."
       warning_title: "Choose it carefully."
@@ -60,6 +79,9 @@ en:
     seeded: "It already contains the product types this installation ships with: %{labels}."
     locked: "Locked."
     locked_after_idle: "Locked because the application sat unused."
+    locked_after_idle_action: "Locked because the application sat unused. What you sent was not carried out."
+    action_not_done: "The data file is locked, so what you sent was not carried out."
+    action_not_done_after_unlock: "The data file is open again. What you sent before the lock was not carried out: nothing of it was saved or sent anywhere. Check the form and send it again — passphrases and keys have to be typed in again."
     wrong_passphrase: "That passphrase does not open this file."
     wrong_current_passphrase: "The current passphrase is not correct."
     passphrase_too_short: "The passphrase must be at least %{count} characters long."
@@ -259,7 +281,7 @@ en:
       action: "Create the passport identifier"
       minted_at: "Created"
       endpoint: "Where it points"
-      to_keys: "Show the keys again"
+      to_keys: "Show the keys — they stay visible until you confirm that they are stored"
       already: "This passport already has an identifier."
       not_minted: "This passport has no identifier yet."
       envelope_first: "The product identifier and what the passport describes have to be filled in first — they go inside the identifier and cannot be changed afterwards."
@@ -268,8 +290,8 @@ en:
       frozen: "cannot be changed once the passport identifier has been created"
       keys_not_secured: "The keys of this identifier have not been confirmed as stored yet."
       warning_title: "This step cannot be undone."
-      warning_body: "A document is published to the registry, and it says the passport can be read at %{endpoint}. Both the product identifier and that address are fixed from then on — moving the passport elsewhere later means a new identifier and a new data carrier."
-      confirm: "Create the identifier now? It will point at %{endpoint} and cannot be changed afterwards."
+      warning_body: "A document is published to the registry, and it says the passport can be read at %{endpoint}. From then on the product identifier is fixed, and so is the passport identifier. Where it points can be changed later only by handing the passport to another custodian, with the passport's keys; both identifiers stay the same."
+      confirm: "Create the identifier now? It will point at %{endpoint}, and the product identifier cannot be changed afterwards."
       help:
         purpose: "The passport gets an identifier of its own, separate from your identity: it names the product, your identity signs on its behalf."
         steps:
@@ -282,7 +304,7 @@ en:
       did: "Passport identifier"
       endpoint: "Points at"
       endpoint_hint: "Where the passport will be readable. The DPP Service checks this address against where you submit, so it is part of the identifier rather than a note about it."
-      warning_title: "You will not see these again."
+      warning_title: "Once you confirm below, these keys are not shown again."
       warning_body: "The registry published the document and kept no secret. Whoever holds the document key can change what this identifier points at; the revocation key is the only way to end it. Nobody can issue them a second time."
       export_body: "Written as a file next to your data file, in %{directory}. It is plain text — that is what a key backup is."
       confirm_label: "I have stored both keys somewhere safe."
@@ -291,10 +313,10 @@ en:
       secured: "Noted. The keys are not shown again."
       already_secured: "Confirmed as stored on %{when}. The keys are not shown again."
       help:
-        purpose: "These two keys belong to the product, not to you as an operator — they are what makes it possible to move or retire this passport later."
+        purpose: "These two keys belong to the product, not to you as an operator — they are what makes it possible to hand this passport to another custodian or to retire it later."
         steps:
           - "The document key changes where the identifier points. The revocation key ends it."
-          - "Store them the way you stored your identity keys. A passport whose keys are lost can still be read, but never moved or retired."
+          - "Store them the way you stored your identity keys. A passport whose keys are lost can still be read, but never handed to another custodian or retired."
     access_policy:
       title: "Who may read what"
       policy: "Access policy"
@@ -375,7 +397,7 @@ en:
       check_unsupported: "%{service} cannot say which mandate it holds — that question does not exist there. Nothing about the mandate itself changes; what is shown here still stands."
       expired_first: "The mandate has expired, so the service can no longer write to the custodian holding this passport. Sign a fresh mandate first — it takes one click and changes nothing else."
       move_title: "Hand this passport to another custodian"
-      move_hint: "Signs a mandate for the new custodian, has the service move the document there, and then points the passport’s own identifier at it. The identifier printed on the product does not change and keeps resolving throughout."
+      move_hint: "Signs a mandate for the new custodian, has the service move the document there, and then points the passport identifier at it. The passport identifier and the product identifier stay the same. A data carrier that encodes a link on the previous custodian’s address keeps working only as long as that custodian still answers for the passport."
       move_action: "Hand it over"
       confirm_move: "Hand this passport to the custodian you named? The document is moved and the identifier follows."
       moved: "The passport is held at %{custodian} now, and its identifier says so."
@@ -462,7 +484,7 @@ en:
         purpose: "The document is assembled here and sent in one request: the envelope from your settings and your identity, the elements from the product type's transformation."
         steps:
           - "It is signed with your identity, not with the passport's keys — the passport names a thing, you are the one who speaks for it."
-          - "The service checks that the passport's identifier resolves and that it points at the service's own host before it stores anything."
+          - "Before it stores anything, the service checks that the passport's identifier resolves and that it points at the host where the passport will be read: the custodian's, when one holds it, otherwise the service's own."
           - "What comes back is stored here too, so you can see what was accepted without the service being reachable."
     granularities:
       model: "a model — every item of this type"
@@ -815,7 +837,7 @@ en:
         not_a_dpp_service: "Something answered at that address, but it is not a DPP Service."
         invalid_url: "That is not a usable web address."
       help:
-        purpose: "The first of three things this application needs to know: where your passports go. Everything else about the service — its identity, what a token has to be addressed to — is asked of the service rather than typed in here."
+        purpose: "The first of four steps: where your passports go. Everything else about the service — its identity, what a token has to be addressed to — is asked of the service rather than typed in here."
         steps:
           - "You can change this later under Settings."
           - "Nothing is sent to the service at this step; it is only asked whether it is there."
@@ -871,7 +893,7 @@ en:
       heading: "Who holds your passports?"
       what_it_is: "A custodian is not storage space like a cloud folder. It is a data intermediary: it holds the document, and what it may do with it is one signed sentence about one passport — which you can take back at any time, without asking anybody."
       which: "Which one?"
-      known_hint: "The data intermediary behind this application, registered under the Data Governance Act. You get your collection when you sign up."
+      known_hint: "A data intermediary registered under the Data Governance Act, which holds passports as custodian. It does not run this application — you do. You get your collection when you sign a hosting agreement with it."
       other: "A different custodian"
       collection_hint: "The number of your collection at the custodian. It is in the confirmation they sent you."
       affects_new_only: "A change here applies to passports you create from now on. Passports already minted carry their address in their identifier and stay where they are — you move one of those on its own page, under “Hand this passport to a different custodian”."

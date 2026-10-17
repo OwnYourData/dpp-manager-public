@@ -11,6 +11,13 @@ if [ ! -w "${DPP_DATA_DIR}" ]; then
   exit 1
 fi
 
+data_file="${DPP_DATA_DIR}/${DPP_DATABASE_FILENAME:-dpp.db}"
+if [ -e "${data_file}" ] && { [ ! -r "${data_file}" ] || [ ! -w "${data_file}" ]; }; then
+  echo "The data file ${data_file} is there, but this container (uid $(id -u)) cannot read and write it." >&2
+  echo "On Linux, chown the directory and the file to uid 1000 (chown -R 1000:1000)." >&2
+  exit 1
+fi
+
 # soya-web-cli: soya-js behind an HTTP interface, on the loopback address only.
 #
 # Its repository is this application. That single environment variable is what

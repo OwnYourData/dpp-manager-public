@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.8
+
+- **The automatic lock no longer throws work away.** When the data file locks
+  itself while a form is open, what is sent next is not carried out — and now
+  the application says so: on the unlock screen, and again after unlocking,
+  which leads back to the page the form was on. The browser puts back what was
+  typed, except passphrases, keys and files. The event log records the lock
+  together with the action that was not carried out.
+  - The data file also closed itself after five minutes without use,
+    whatever the setting said, without a log entry or a message. It now stays
+    open for exactly the time set under *Settings*.
+- **A data folder the container cannot write to is explained.** Instead of an
+  error page, the unlock screen says which folder or file cannot be written and
+  by which user id, and nothing is written. The container also refuses to start
+  when an existing data file belongs to another user. The installation guide
+  says how to fix the ownership on Linux.
+- **Confirmations are part of the page.** "Are you sure?" is a dialog in the
+  application instead of the browser's own box: usable with the keyboard and a
+  screen reader, Escape cancels, and the focus starts on *Cancel*. Handing a
+  passport to another custodian asks for confirmation now as well.
+- **Times say which zone they are in.** Every time is shown in UTC and labelled
+  so, the same time base as the event log, the DPP Service and the custodian.
+- **Texts say what actually happens.**
+  - Creating a passport identifier: the product identifier and the passport
+    identifier are fixed; where it points can be changed later by handing the
+    passport to another custodian, and both identifiers stay the same.
+  - The keys of a passport are shown until you confirm that they are stored,
+    and the link to them says so.
+  - Setup: step 1 is the first of four; the named custodian holds passports and
+    does not run this application.
+  - Submitting: the passport identifier has to point at the host where the
+    passport will be read — the custodian's when one holds it.
+
 ## 0.1.7
 
 - **The passphrase no longer reaches the log.** Up to 0.1.6, creating the data

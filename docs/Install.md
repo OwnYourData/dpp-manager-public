@@ -216,9 +216,21 @@ the image, or, on route 2b, create a file called `.env` next to
 `docker-compose.yml` containing `DPP_MANAGER_PORT=3100`. Then open
 `http://localhost:3100`.
 
-**"The data directory is not writable."** On Linux the folder has to belong to
-user id 1000, which is the user inside the container:
-`sudo chown 1000:1000 data`. macOS and Windows handle this themselves.
+**"The data directory is not writable"** in the container's log, or **"The data
+file cannot be stored here"** on the page. The application runs as user id
+1000 inside the container and has to be able to write into the folder you
+mounted — not only into the data file, because SQLite writes a journal next to
+it with every change. On Linux give the folder, and a data file already in it,
+to that user, then restart the container (*Containers* → restart, or
+`docker compose restart` on route 2b):
+
+```
+sudo chown -R 1000:1000 data
+```
+
+`ls -ln data` shows the owner as a number; it should say `1000 1000`. macOS and
+Windows handle this themselves with Docker Desktop. Nothing is written while the
+message is showing, so no data is lost by it.
 
 **You forgot the passphrase.** There is nothing anybody can do. If the file
 holds nothing you need yet, delete `dpp.db` and start again; the application

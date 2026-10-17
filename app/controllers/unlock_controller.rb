@@ -9,6 +9,8 @@ class UnlockController < ApplicationController
     return redirect_to root_path if vault_open?
 
     @vault_exists = Vault::Store.exists?
+    @interrupted  = session.dig(:resume, "action").present?
+    @storage_problem = Vault::Store.storage_problem
   end
 
   # Creating and opening are the same button to the user — the application knows
@@ -16,13 +18,22 @@ class UnlockController < ApplicationController
   def create
     if vault_open?
       redirect_to root_path
+    elsif (problem = Vault::Store.storage_problem)
+      storage_unusable(problem)
     elsif Vault::Store.exists?
       unlock
     else
       create_vault
     end
+  rescue SQLite3::CantOpenException, SQLite3::ReadOnlyException, Errno::EACCES, Errno::EROFS
+    # Between the check and the write the mount can still change under us.
+    Vault::Store.close!
+    storage_unusable(Vault::Store.storage_problem || [ :directory_not_writable,
+                                                       { directory: Vault::Store.data_dir.to_s, uid: Process.euid } ])
   end
 
+  # Locking on purpose forgets where unlocking would have led: whoever opens the
+  # file next starts at the overview, not on the page somebody else left.
   def destroy
     Vault::Lifecycle.lock!(reason: "manual")
     reset_session
@@ -33,10 +44,12 @@ class UnlockController < ApplicationController
 
   def unlock
     if Vault::Lifecycle.unlock!(params[:passphrase].to_s)
+      resume = session[:resume] || {}
       start_session
-      redirect_to root_path
+      resume_where_interrupted(resume)
     else
       @vault_exists = true
+      @interrupted  = session.dig(:resume, "action").present?
       flash.now[:alert] = t("vault.wrong_passphrase")
       render :show, status: :unprocessable_entity
     end
@@ -69,6 +82,29 @@ class UnlockController < ApplicationController
     seeded = ProductType.fetched.pluck(:label)
     notice = [ t("vault.created"), (t("vault.seeded", labels: seeded.to_sentence) if seeded.any?) ].compact.join(" ")
     redirect_to root_path, notice: notice
+  end
+
+  # Nothing on this page can work, and the message says why and where. 503,
+  # because nothing is wrong with what was sent: the installation cannot store it.
+  def storage_unusable(problem)
+    @vault_exists = Vault::Store.exists?
+    @interrupted  = session.dig(:resume, "action").present?
+    @storage_problem = problem
+    render :show, status: :service_unavailable
+  end
+
+  # Back to the page the lock interrupted. If it interrupted an action, the
+  # page says so — the action was not carried out — and names the form it came
+  # from, so the browser can put back what was typed into it.
+  def resume_where_interrupted(resume)
+    path = resume["path"].to_s
+    path = root_path unless path.start_with?("/") && !path.start_with?("//")
+
+    if resume["action"].present?
+      flash[:alert] = t("vault.action_not_done_after_unlock")
+      flash[:resume_action] = resume["action"]
+    end
+    redirect_to path
   end
 
   def start_session
