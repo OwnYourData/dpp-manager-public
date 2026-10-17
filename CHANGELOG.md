@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.1.7
+
+- **The passphrase no longer reaches the log.** Up to 0.1.6, creating the data
+  file, opening it and changing its passphrase wrote the passphrase in plain
+  text into the container's log, where `docker logs` shows it. The passphrase
+  fields are now filtered, and so are the keys and the prepared revocation of
+  an identity or a passport. Statements that carry the key of the data file
+  bypass the SQL log, and when one of them fails, the error no longer quotes
+  it.
+  - After the update, create the container anew; the old log goes with the
+    old container:
+    `docker compose pull && docker compose up -d --force-recreate`.
+    Started with `docker run` instead: remove the container with
+    `docker rm -f` and run it again with the new image.
+  - If you have passed a log of this container on to anyone, change the
+    passphrase (*Data file* → *Change the passphrase*).
+- **The footer names the funding.** Below the line about the application, in
+  smaller type, the footer says that the DPP Manager is part of PACE-DPP and
+  how it is funded. The README carries the same notice under *Funding*.
+- **The installation starts with `docker compose pull`,** in the README and in
+  the installation guide, so a computer that still holds an older image starts
+  the current one.
+- **The image says what it is.** `docker image inspect` shows the version and
+  the commit it was built from, as `org.opencontainers.image.version` and
+  `org.opencontainers.image.revision`.
+
 ## 0.1.6
 
 - **Not every field of a passport has to be public.** A product type now has a

@@ -25,7 +25,7 @@ module VaultPragmas
     end
 
     literal = Vault::Session.pragma_key_literal
-    @raw_connection.execute("PRAGMA key = \"#{literal}\"")
+    Vault.execute_keyed(@raw_connection, "PRAGMA key = \"#{literal}\"", "PRAGMA key")
     super
   end
 

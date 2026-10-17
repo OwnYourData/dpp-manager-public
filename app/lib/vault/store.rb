@@ -131,8 +131,13 @@ module Vault
         new_key  = Kdf.derive(new_passphrase, new_salt)
         temp     = data_dir.join("#{path.basename}.rekey-#{SecureRandom.hex(4)}")
 
+        # Neither the path nor the key can be bound: SQLCipher reads the key out
+        # of the statement text. The path is generated here and quoted, and the
+        # key is a hex literal derived from the new passphrase.
         connection = ActiveRecord::Base.connection
-        connection.execute("ATTACH DATABASE #{quote(temp.to_s)} AS rekeyed KEY \"#{literal_for(new_key, new_salt)}\"")
+        Vault.execute_keyed(connection.raw_connection,
+                            "ATTACH DATABASE #{quote(temp.to_s)} AS rekeyed KEY \"#{literal_for(new_key, new_salt)}\"",
+                            "ATTACH DATABASE")
         begin
           connection.execute("SELECT sqlcipher_export('rekeyed')")
         ensure
