@@ -1458,6 +1458,24 @@
         }
       },
       "language": "de"
+    },
+    {
+      "@id": "serialNumber",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "dismantlingInstructions",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "OverlayClassification",
+      "@type": "OverlayClassification",
+      "onBase": "DppLedLamp",
+      "name": "DppLedLampAccessClassification"
     }
   ],
   "@context": {

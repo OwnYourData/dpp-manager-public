@@ -14,7 +14,7 @@ class PassportsController < ApplicationController
   before_action :find_passport,
                 only: %i[edit update destroy mint keys secure_keys export_keys
                          submit correct attest retire renew_delegation check_delegation
-                         move_custody finish_move]
+                         move_custody finish_move apply_access_policy access_policy]
   before_action :require_product_type, only: %i[new create]
 
   def index
@@ -171,6 +171,11 @@ class PassportsController < ApplicationController
 
     return if refused_for_problems?(:submit)
 
+    # Before anything is signed: a policy the service does not take is a
+    # passport that must not go out public instead.
+    policy_id = ensure_access_policy(base)
+    return if performed?
+
     mandate = @passport.custodial? ? sign_mandate : nil
     return if performed?
 
@@ -181,7 +186,8 @@ class PassportsController < ApplicationController
                                              token: Did::Token.issue(Identity.current,
                                                                      audience: settings.service_audience),
                                              storage: custody_header(mandate),
-                                             retain_until: retain_until)
+                                             retain_until: retain_until,
+                                             **access_policy_header(policy_id))
 
     unless result.ok?
       Event.record!(:passport_submit_failed, passport: @passport.label, did: @passport.dpp_id,
@@ -192,6 +198,7 @@ class PassportsController < ApplicationController
     end
 
     @passport.record_submission!(result.document, base_url: base, retain_until: retain_until)
+    @passport.record_access_policy!(result.access_policy, policy_id) if policy_id
 
     if mandate
       @passport.record_delegation!(mandate)
@@ -205,6 +212,7 @@ class PassportsController < ApplicationController
     Event.record!(:passport_submitted, passport: @passport.label, did: @passport.dpp_id, service: base,
                                        **sent_despite_problems)
     notice = mandate ? t("passports.custody.submitted", custodian: storage_base) : t("passports.submit.done")
+    notice = [ notice, access_policy_note(result.access_policy, policy_id) ].compact.join(" ")
     notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
     redirect_to edit_passport_path(@passport), notice: notice
   rescue Did::Oyd::Error => e
@@ -231,11 +239,17 @@ class PassportsController < ApplicationController
     return submit_refused(t("passports.submit.no_service")) if base.blank?
     return if refused_for_problems?(:correct)
 
+    # A correction carries the type's current policy along: the passport is
+    # classified by the version in force when it was last written.
+    policy_id = ensure_access_policy(base)
+    return if performed?
+
     patch  = Dpp::Document.correction(@passport)
     result = DppService::Client.update(patch,
                                        base_url: base, dpp_id: @passport.dpp_id,
                                        token: Did::Token.issue(Identity.current,
-                                                               audience: settings.service_audience))
+                                                               audience: settings.service_audience),
+                                       **access_policy_header(policy_id))
 
     unless result.ok?
       Event.record!(:passport_update_failed, passport: @passport.label, did: @passport.dpp_id,
@@ -246,11 +260,12 @@ class PassportsController < ApplicationController
     end
 
     @passport.record_correction!(result.document)
+    @passport.record_access_policy!(result.access_policy, policy_id) if policy_id
     attested = attest_payload(result.commitment)
 
     Event.record!(:passport_updated, passport: @passport.label, did: @passport.dpp_id, service: base,
                                      **sent_despite_problems)
-    notice = t("passports.correct.done")
+    notice = [ t("passports.correct.done"), access_policy_note(result.access_policy, policy_id) ].compact.join(" ")
     notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
     redirect_to edit_passport_path(@passport), notice: notice
   rescue Did::Oyd::Error => e
@@ -259,6 +274,85 @@ class PassportsController < ApplicationController
     submit_refused(t("passports.submit.document_failed", reason: reason_for(e)))
   rescue DppService::Client::Error => e
     submit_refused(t("passports.submit.unreachable", message: reason_for(e)))
+  end
+
+  # --- the access policy ------------------------------------------------------
+
+  # Classifying a passport the service already holds by the type's current
+  # policy: UpdateDPP with an empty merge patch and the policy's id, so nothing
+  # of the document changes but who may read which part of it.
+  #
+  # Not part of a correction, and not a correction itself: the answers here may
+  # be half-edited, and sending a new policy must not send them along. The
+  # public part changes with the classification, so the payload is attested
+  # again as after any write.
+  def apply_access_policy
+    type = @passport.product_type
+    return submit_refused(t("passports.access_policy.not_submitted")) unless @passport.submitted?
+    return submit_refused(t("passports.retired.not_served")) if @passport.retired?
+    return submit_refused(t("passports.access_policy.off")) unless type&.access_policy_enabled?
+    return submit_refused(t("passports.custody.expired_first")) if mandate_stale?
+    return submit_refused(t("passports.submit.no_identity")) if Identity.current.nil?
+
+    base = @passport.submitted_to.presence || settings.service_base_url
+    return submit_refused(t("passports.submit.no_service")) if base.blank?
+
+    policy_id = ensure_access_policy(base)
+    return if performed?
+
+    result = DppService::Client.update({}, base_url: base, dpp_id: @passport.dpp_id,
+                                           token: Did::Token.issue(Identity.current,
+                                                                   audience: settings.service_audience),
+                                           access_policy: policy_id)
+
+    unless result.ok?
+      Event.record!(:passport_access_policy_failed, passport: @passport.label, did: @passport.dpp_id,
+                                                    policy: policy_id, status: result.http_status,
+                                                    problems: result.problems)
+      return redirect_to(edit_passport_path(@passport),
+                         alert: t("passports.submit.refused", status: result.http_status,
+                                                              problems: result.problems.join(" · ")))
+    end
+
+    @passport.record_access_policy!(result.access_policy, policy_id)
+    @passport.update!(service_document: JSON.generate(result.document)) if result.document.present?
+    attested = attest_payload(result.commitment)
+
+    Event.record!(:passport_access_policy_applied, passport: @passport.label, did: @passport.dpp_id,
+                                                   policy: policy_id, service: base)
+    notice = [ t("passports.access_policy.applied"), access_policy_note(result.access_policy, policy_id) ].join(" ")
+    notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
+    redirect_to edit_passport_path(@passport), notice: notice
+  rescue Did::Oyd::Error => e
+    submit_refused(t("passports.submit.token_failed", message: e.message))
+  rescue DppService::Client::Error => e
+    submit_refused(t("passports.submit.unreachable", message: reason_for(e)))
+  end
+
+  # The lists behind the counts: which attributes of the passport no rule
+  # reaches, and which rules reach nothing. Asked of the service, which is the
+  # only one that sees the passport as it stands there.
+  def access_policy
+    unless @passport.submitted? && @passport.access_policy_id.present?
+      return redirect_to(edit_passport_path(@passport), alert: t("passports.access_policy.none"))
+    end
+    return submit_refused(t("passports.submit.no_identity")) if Identity.current.nil?
+
+    base = @passport.submitted_to.presence || settings.service_base_url
+    result = DppService::Client.read_access_policy(base_url: base, dpp_id: @passport.dpp_id,
+                                                   token: Did::Token.issue(Identity.current,
+                                                                           audience: settings.service_audience))
+    unless result.ok?
+      return redirect_to(edit_passport_path(@passport),
+                         alert: t("passports.submit.refused", status: result.http_status,
+                                                              problems: result.problems.join(" · ")))
+    end
+
+    @details = result.document || {}
+  rescue Did::Oyd::Error => e
+    redirect_to edit_passport_path(@passport), alert: t("passports.submit.token_failed", message: e.message)
+  rescue DppService::Client::Error => e
+    redirect_to edit_passport_path(@passport), alert: t("passports.submit.unreachable", message: reason_for(e))
   end
 
   # --- the mandate the custodian holds ----------------------------------------
@@ -714,6 +808,34 @@ class PassportsController < ApplicationController
     else
       t("passports.custody.service_holds_nothing")
     end
+  end
+
+  # The id of the type's policy, registered with +base+, or nil when the type
+  # has none switched on. When the service does not take it, the write is
+  # refused here with the service's own sentence and nil comes back with the
+  # response already rendered.
+  def ensure_access_policy(base)
+    DppService::AccessPolicyRegistration.ensure!(@passport.product_type, base_url: base,
+                                                                        audience: settings.service_audience)
+  rescue DppService::AccessPolicyRegistration::Error => e
+    reason = e.problems.any? ? e.problems.join(" · ") : t("passports.access_policy.reasons.#{e.message}")
+    submit_refused(t("passports.access_policy.not_registered", reason: reason))
+    nil
+  end
+
+  # Only when there is a policy: a passport without one is written exactly as
+  # before, and a client stub that knows nothing about policies still fits.
+  def access_policy_header(policy_id)
+    policy_id ? { access_policy: policy_id } : {}
+  end
+
+  # One sentence about how the policy fits the passport, from the counts the
+  # service reported.
+  def access_policy_note(report, policy_id)
+    return nil if policy_id.nil?
+    return t("passports.access_policy.sent") if report.nil?
+
+    t("passports.access_policy.report", unclassified: report.unclassified.to_i, unused: report.unused_rules.to_i)
   end
 
   def submit_refused(message)

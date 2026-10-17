@@ -45,6 +45,17 @@ module DppService
       Result.new(reachable: false, message: e.message.to_sym)
     end
 
+    # Whom the service takes grants for authorities from, as it publishes it
+    # under /.well-known/dpp-service. Raises Error when the service does not
+    # answer with a discovery document.
+    def authority_issuers(base_url)
+      base = normalize_base(base_url) or raise Error, "invalid_url"
+      discovery = get_json(URI.join(base + "/", ".well-known/dpp-service"))
+      raise Error, "no_discovery" unless discovery.is_a?(Hash)
+
+      Array(discovery["authorityIssuers"]).map(&:to_s).reject(&:empty?)
+    end
+
     def normalize_base(value)
       raw = value.to_s.strip.chomp("/")
       return nil if raw.empty?

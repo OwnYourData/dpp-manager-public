@@ -19,9 +19,23 @@ module DppService
     # ok?      the service accepted it
     # document what it stored, as it returned it
     # problems the sentences from the Result object, ready to show
-    Result = Struct.new(:ok, :http_status, :document, :problems, :commitment, keyword_init: true) do
+    #
+    # list     what the service stored or returned when that is an array rather
+    #          than one document (the access grants of an issuer)
+    Result = Struct.new(:ok, :http_status, :document, :problems, :commitment, :access_policy, :list,
+                        keyword_init: true) do
       def ok? = ok
     end
+
+    # What the service says after a write about the access policy the passport
+    # is classified by (docs/AccessClasses.md of the DPP Service): which policy,
+    # how many attributes no rule reaches, how many rules reach nothing. Counts
+    # only; the lists are read with read_access_policy.
+    AccessPolicyReport = Struct.new(:id, :unclassified, :unused_rules, keyword_init: true) do
+      def to_h = { "policy" => id, "unclassified" => unclassified, "unusedRules" => unused_rules }
+    end
+
+    ACCESS_POLICY_HEADER = "X-DPP-Access-Policy".freeze
 
     # What the service says about the payload commitment (prEN 18246). It arrives
     # in headers and not in the document, because the payload carries the
@@ -57,8 +71,12 @@ module DppService
     # `retain_until` is the last day the passport has to stay available (ESPR
     # Art. 9(2)(i)). A header for the same reason as the custody: it is about
     # how the service keeps the passport, not about what the passport says.
-    def create(document, base_url:, token:, storage: nil, retain_until: nil)
-      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps")
+    #
+    # `access_policy` is the id of an access policy registered beforehand with
+    # register_access_policy. Absent, the passport has none and is public as a
+    # whole, as before.
+    def create(document, base_url:, token:, storage: nil, retain_until: nil, access_policy: nil)
+      uri = full_form(URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps"))
 
       request = Net::HTTP::Post.new(uri.request_uri,
         "Content-Type"  => "application/json",
@@ -66,6 +84,7 @@ module DppService
         "Authorization" => "Bearer #{token}")
       request["X-DPP-Storage"] = storage_header(storage) if storage.present?
       request["X-DPP-Retain-Until"] = retain_until.iso8601 if retain_until.present?
+      request[ACCESS_POLICY_HEADER] = access_policy if access_policy.present?
       request.body = JSON.generate(document)
 
       interpret(perform(request, uri))
@@ -122,7 +141,7 @@ module DppService
     def move_custody(base_url:, dpp_id:, token:, storage:, release_previous: false)
       path = "#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}/custody"
       path += "?release_previous=true" if release_previous
-      uri = URI.parse(path)
+      uri = full_form(URI.parse(path))
 
       request = Net::HTTP::Post.new(uri.request_uri,
         "Accept"        => "application/json",
@@ -152,14 +171,92 @@ module DppService
     # The identifier goes in the path percent-encoded as one segment: it is a
     # DID and contains colons, and the service widened its route constraint for
     # exactly that.
-    def update(patch, base_url:, dpp_id:, token:)
-      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}")
+    #
+    # With `access_policy` the passport is classified by that policy from now
+    # on, in place of the one it had. A passport keeps a policy once it has
+    # one; the service has no way to take it off.
+    def update(patch, base_url:, dpp_id:, token:, access_policy: nil)
+      uri = full_form(URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}"))
 
       request = Net::HTTP::Patch.new(uri.request_uri,
         "Content-Type"  => "application/json",
         "Accept"        => "application/json",
         "Authorization" => "Bearer #{token}")
+      request[ACCESS_POLICY_HEADER] = access_policy if access_policy.present?
       request.body = JSON.generate(patch)
+
+      interpret(perform(request, uri))
+    end
+
+    # Registering an access policy — PUT /dpp/v1/access-policies.
+    #
+    # 201 registered, 200 the same policy was there already; both are success.
+    # 409 says a different policy is registered under this id, which the caller
+    # answers with the next version. A registered policy never changes.
+    def register_access_policy(policy, base_url:, token:)
+      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/access-policies")
+
+      request = Net::HTTP::Put.new(uri.request_uri,
+        "Content-Type"  => "application/json",
+        "Accept"        => "application/json",
+        "Authorization" => "Bearer #{token}")
+      request.body = JSON.generate(policy)
+
+      interpret(perform(request, uri))
+    end
+
+    # Which attributes of a passport its policy leaves to the default and which
+    # rules reach nothing — GET /dpp/v1/dpps/:dpp_id/access-policy, owner only.
+    def read_access_policy(base_url:, dpp_id:, token:)
+      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}/access-policy")
+
+      request = Net::HTTP::Get.new(uri.request_uri,
+        "Accept"        => "application/json",
+        "Authorization" => "Bearer #{token}")
+
+      interpret(perform(request, uri))
+    end
+
+    # Registering an access grant — PUT /dpp/v1/access-grants.
+    #
+    # The body is the signed grant as it is (application/jwt); the bearer token
+    # is the issuer's. 201 registered, 200 registered before. 400 not a valid
+    # grant, 403 the issuer may not grant this, 409 a different grant under the
+    # same jti — each with the service's own sentence.
+    def register_access_grant(grant, base_url:, token:)
+      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/access-grants")
+
+      request = Net::HTTP::Put.new(uri.request_uri,
+        "Content-Type"  => "application/jwt",
+        "Accept"        => "application/json",
+        "Authorization" => "Bearer #{token}")
+      request.body = grant.to_s
+
+      interpret(perform(request, uri))
+    end
+
+    # The grants the presenting DID has issued, with their claims and whether
+    # they are revoked, but not the signed statements — GET
+    # /dpp/v1/access-grants. They come back in `list`.
+    def list_access_grants(base_url:, token:)
+      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/access-grants")
+
+      request = Net::HTTP::Get.new(uri.request_uri,
+        "Accept"        => "application/json",
+        "Authorization" => "Bearer #{token}")
+
+      interpret(perform(request, uri))
+    end
+
+    # Revoking an access grant, with effect from now — DELETE
+    # /dpp/v1/access-grants/:jti. 200 revoked (now or before; the answer says
+    # when and by whom), 404 the presenting DID issued no grant under this jti.
+    def revoke_access_grant(jti, base_url:, token:)
+      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/access-grants/#{CGI.escape(jti.to_s)}")
+
+      request = Net::HTTP::Delete.new(uri.request_uri,
+        "Accept"        => "application/json",
+        "Authorization" => "Bearer #{token}")
 
       interpret(perform(request, uri))
     end
@@ -200,9 +297,24 @@ module DppService
       uri = URI.parse(url.to_s)
       raise Error, "invalid_address" unless uri.is_a?(URI::HTTP) && uri.host.present?
 
+      uri = full_form(uri)
+
       interpret(perform(Net::HTTP::Get.new(uri.request_uri, "Accept" => "application/json"), uri))
     rescue URI::InvalidURIError
       raise Error, "invalid_address"
+    end
+
+    # Every answer that carries a passport is asked for in the full form of
+    # EN 18223:2026 Annex A. The service answers in the compressed form unless
+    # told otherwise (EN 18222:2026 8.1), and this application reads the
+    # element tree in `elements`: the lookup shows it, and the copy kept after
+    # a submission is compared against it. A custodian that knows no such flag
+    # ignores it and answers with the full form it holds anyway.
+    def full_form(uri)
+      query = URI.decode_www_form(uri.query.to_s).reject { |key, _| key == "representation" }
+      uri = uri.dup
+      uri.query = URI.encode_www_form(query + [ [ "representation", "full" ] ])
+      uri
     end
 
     # Over HTTP/2, see Transport.
@@ -218,8 +330,33 @@ module DppService
 
       Result.new(ok: ok, http_status: response.code.to_i,
                  document: (body if ok && body.is_a?(Hash)),
+                 list: (body if ok && body.is_a?(Array)),
                  problems: (ok ? [] : problems_in(body, response)),
-                 commitment: commitment_in(response))
+                 commitment: commitment_in(response),
+                 access_policy: access_policy_in(response))
+    end
+
+    # The answer header, an RFC 8941 item: a string with two integer parameters.
+    #
+    #   "did:oyd:z…/access-policies/DppLedLamp/2";unclassified=1;unused-rules=3
+    #
+    # nil without the header — a passport without a policy, a read, an older
+    # service — and for one that is not an item of that shape.
+    def access_policy_in(response)
+      parse_access_policy_header(response[ACCESS_POLICY_HEADER].to_s)
+    end
+
+    def parse_access_policy_header(raw)
+      match = raw.strip.match(/\A"((?:[^"\\]|\\.)*)"(.*)\z/)
+      return nil if match.nil?
+
+      params = match[2].split(";").map(&:strip).reject(&:empty?).to_h do |pair|
+        key, value = pair.split("=", 2)
+        [ key, value.to_s.match?(/\A-?\d+\z/) ? value.to_i : value ]
+      end
+
+      AccessPolicyReport.new(id: match[1].gsub(/\\(.)/, '\\1'),
+                             unclassified: params["unclassified"], unused_rules: params["unused-rules"])
     end
 
     # nil when the service said nothing about a commitment — which is what a

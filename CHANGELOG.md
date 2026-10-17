@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.1.6
+
+- **Not every field of a passport has to be public.** A product type now has a
+  page *Access classes*: every element its passports carry, with the form
+  fields that end up there, is public, for readers with a legitimate interest,
+  or for authorities only. Which field lands at which element is worked out by
+  running the type's transformation. The classes start from what the SOyA
+  structure suggests in an `OverlayClassification`; the bundled lamp and battery
+  carry one. Switched on, the classes are registered with the DPP Service as
+  the type's access policy, under a versioned identifier, and named in every
+  passport of the type when it is created or corrected (`X-DPP-Access-Policy`).
+  The passport page shows how well the policy fits the passport and moves a
+  passport that is already at the service to a newer version. Switched off,
+  nothing changes.
+- **Readers with a legitimate interest can be let in.** A new page *Access
+  rights* grants a reader, known by its DID, access to some or all of the
+  operator's passports for at most a year. The right is signed with the
+  operator's identity and registered with the DPP Service, which checks it on
+  every read; it is kept here only when the service takes it. Revoking ends it
+  at once. *Compare with the service* takes over rights the operator of the
+  service revoked and shows whom the service trusts to vouch for authorities.
+  Rights for authorities are not offered.
+- **The data file gains the tables for both.** It is brought up to date the
+  next time it is opened; take a backup copy first.
+
+## 0.1.5
+
+- **Passports are read in the full representation.** A DPP service answers in
+  the compressed representation of EN 18223:2026 5.2 unless the request asks
+  for the full one (EN 18222:2026 8.1). Creating, correcting, moving and
+  reading a passport now ask for `representation=full`, so the lookup keeps
+  showing the element tree and the copy kept after a submission stays
+  complete. A custodian that knows no such flag ignores it.
+
 ## 0.1.4
 
 - **DPP services are reached over HTTP/2.** EN 18216:2026 clause 4 makes

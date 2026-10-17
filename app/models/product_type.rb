@@ -7,6 +7,8 @@
 # validate, which is the whole reason the copies are kept rather than fetched
 # each time.
 class ProductType < ApplicationRecord
+  include AccessClassified
+
   LANGUAGES = %w[en de].freeze
 
   # --- what the law says about this kind of product (ESPR Art. 9) -----------

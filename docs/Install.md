@@ -98,13 +98,14 @@ Make a folder for this, put the configuration file in it, and start:
 ```
 mkdir -p ~/Documents/dpp-manager && cd ~/Documents/dpp-manager
 curl -fsSLO https://raw.githubusercontent.com/OwnYourData/dpp-manager-public/main/docker-compose.yml
+docker compose pull
 docker compose up -d
 ```
 
 On Windows, use PowerShell and replace the first line with
 `mkdir $HOME\Documents\dpp-manager; cd $HOME\Documents\dpp-manager`.
 
-With Podman Desktop the last line is `podman compose up -d`.
+With Podman Desktop, write `podman` instead of `docker` in the last two lines.
 
 The file you download is a small configuration that says which image to start,
 which port to use and which folder to keep the data in. You do not have to write
@@ -175,7 +176,34 @@ one to take.
 
 ---
 
-## 6 — If something does not work
+## 6 — Who may read what
+
+Without anything further, every field of a passport is public. Two pages change
+that when you want them to; neither has to be touched.
+
+**Access classes** — under *Passports → Product types*, next to each type. Every
+part of a passport of that type is listed with the form fields that end up there
+and one of three classes: *Public*, *Legitimate interest* (readers you grant it
+to) or *Authorities*. Where the product type suggests a class, it is already
+set. Tick *Switch the access classes on for this type* and save; from then on new passports of
+the type, and corrections of existing ones, carry these classes. A passport that
+is already with the service gets them with *Apply the current access policy* on
+its own page.
+
+**Access rights** — under *Passports → Access rights*. Here you let a reader —
+known by its DID, for example a repair shop — read the parts you classified as
+*Legitimate interest*: for some of your passports or all of them, for at most a
+year. *Revoke* ends it at once. *Compare with the service* shows what the
+service holds, including rights its operator ended, and whom it trusts for
+authorities. Rights for authorities are not given here.
+
+Before updating to a version that changes what the data file holds, take a
+backup copy (*Administration → Data file*). The file is brought up to date the
+next time you open it.
+
+---
+
+## 7 — If something does not work
 
 **The page does not open.** Look in *Containers* — the DPP Manager should be
 there and marked *running* or *healthy*. If it says *exited*, open its log; the

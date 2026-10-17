@@ -36,4 +36,18 @@ class Setting < ApplicationRecord
   end
 
   def setup_complete? = setup_completed_at.present?
+
+  # The service's list of authority issuers as last fetched, or nil when it was
+  # never asked.
+  def authority_issuers
+    return nil if service_authority_issuers.blank?
+
+    Array(JSON.parse(service_authority_issuers))
+  rescue JSON::ParserError
+    nil
+  end
+
+  def record_authority_issuers!(issuers)
+    update!(service_authority_issuers: JSON.generate(Array(issuers)), service_authority_issuers_at: Time.current)
+  end
 end

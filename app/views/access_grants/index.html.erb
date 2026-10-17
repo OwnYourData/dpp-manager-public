@@ -1,0 +1,130 @@
+<h1><%= t("access_grants.title") %></h1>
+<p class="lead"><%= t("access_grants.lead") %></p>
+
+<%= render "shared/help", key: "access_grants.help" %>
+
+<%# What this machine knows. The service may know better — it can revoke a
+    grant on its own — so the comparison is one button away, and only then is
+    anybody asked anything. %>
+<% if @grants.any? %>
+  <table class="grants">
+    <thead>
+      <tr>
+        <th><%= t("access_grants.columns.reader") %></th>
+        <th><%= t("access_grants.columns.scope") %></th>
+        <th><%= t("access_grants.columns.until") %></th>
+        <th><%= t("access_grants.columns.state") %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @grants.each do |grant| %>
+        <% state = grant.state %>
+        <tr>
+          <td>
+            <%= grant.subject_label.presence || t("access_grants.unnamed") %>
+            <p class="hint"><code class="break"><%= grant.subject_did %></code></p>
+            <% if grant.purpose.present? %><p class="hint"><%= grant.purpose %></p><% end %>
+          </td>
+          <td>
+            <%= grant.all_passports? ? t("access_grants.scope.issuer") : t("access_grants.scope.dpps", count: Array(grant.dpp_ids).size) %>
+          </td>
+          <td><%= l(grant.expires_at.in_time_zone, format: :short) %></td>
+          <td>
+            <span class="<%= state == "valid" ? "state-good" : "state-bad" %>"><%= t("access_grants.state.#{state}") %></span>
+            <% if grant.revoked_at %>
+              <p class="hint"><%= l(grant.revoked_at.in_time_zone, format: :short) %></p>
+            <% end %>
+            <% unless grant.known_to_service? %>
+              <p class="warning-inline"><%= t("access_grants.not_known") %></p>
+            <% end %>
+          </td>
+          <td class="actions">
+            <% if grant.revocable? && state == "valid" %>
+              <%= button_to t("access_grants.revoke"), revoke_access_grant_path(grant), method: :post, class: "link danger",
+                    form: { data: { turbo_confirm: t("access_grants.confirm_revoke", reader: grant.subject_label.presence || grant.subject_did) } } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="muted"><%= t("access_grants.empty") %></p>
+<% end %>
+
+<% if settings.service_configured? %>
+  <%= button_to t("access_grants.sync"), sync_access_grants_path, method: :post, class: "link" %>
+  <% synced = @grants.filter_map(&:synced_at).max %>
+  <p class="hint"><%= synced ? t("access_grants.synced_at", when: l(synced.in_time_zone, format: :short)) : t("access_grants.never_synced") %></p>
+<% end %>
+
+<section class="mint">
+  <h2><%= t("access_grants.new_title") %></h2>
+
+  <% if !settings.service_configured? %>
+    <p class="hint"><%= t("access_grants.no_service") %></p>
+  <% elsif Identity.current.nil? %>
+    <p class="hint"><%= t("access_grants.reasons.no_identity") %></p>
+  <% else %>
+    <p class="hint"><%= t("access_grants.new_hint", service: settings.service_base_url) %></p>
+
+    <%= form_with url: access_grants_path, method: :post, local: true do %>
+      <label for="subject_did"><%= t("access_grants.form.reader") %></label>
+      <%= text_field_tag :subject_did, nil, id: "subject_did", placeholder: "did:oyd:…", required: true %>
+      <p class="hint"><%= t("access_grants.form.reader_hint") %></p>
+
+      <label for="subject_label"><%= t("access_grants.form.label") %></label>
+      <%= text_field_tag :subject_label, nil, id: "subject_label", maxlength: 120 %>
+      <p class="hint"><%= t("access_grants.form.label_hint") %></p>
+
+      <label for="purpose"><%= t("access_grants.form.purpose") %></label>
+      <%= text_field_tag :purpose, nil, id: "purpose", maxlength: 200 %>
+      <p class="hint"><%= t("access_grants.form.purpose_hint") %></p>
+
+      <fieldset>
+        <legend><%= t("access_grants.form.scope") %></legend>
+        <label class="confirm">
+          <%= radio_button_tag :scope, "dpps", true %>
+          <span><%= t("access_grants.form.scope_dpps") %></span>
+        </label>
+        <% if @passports.any? %>
+          <% @passports.each do |passport| %>
+            <label class="confirm">
+              <%= check_box_tag "dpp_ids[]", passport.dpp_id, false, id: "dpp_#{passport.id}" %>
+              <span><%= passport.label %> <span class="hint"><code><%= passport.short_dpp_id %></code></span></span>
+            </label>
+          <% end %>
+        <% else %>
+          <p class="hint"><%= t("access_grants.form.no_passports") %></p>
+        <% end %>
+        <label class="confirm">
+          <%= radio_button_tag :scope, "issuer", false %>
+          <span><%= t("access_grants.form.scope_issuer") %></span>
+        </label>
+      </fieldset>
+
+      <label for="days"><%= t("access_grants.form.days") %></label>
+      <%= number_field_tag :days, Did::AccessGrant::MAX_DAYS, id: "days", min: 1, max: Did::AccessGrant::MAX_DAYS %>
+      <p class="hint"><%= t("access_grants.form.days_hint") %></p>
+
+      <p class="hint"><%= t("access_grants.form.class_hint") %></p>
+      <%= submit_tag t("access_grants.form.submit") %>
+    <% end %>
+  <% end %>
+</section>
+
+<%# Authorities are not the operator's to name. What the page can do is say
+    whose word the service takes for it, as the service last said. %>
+<section class="mint">
+  <h2><%= t("access_grants.authority.title") %></h2>
+  <p class="hint"><%= t("access_grants.authority.body") %></p>
+  <% if @issuers.nil? %>
+    <p class="muted"><%= t("access_grants.authority.unknown") %></p>
+  <% elsif @issuers.empty? %>
+    <p class="muted"><%= t("access_grants.authority.none") %></p>
+  <% else %>
+    <ul><% @issuers.each do |issuer| %><li><code class="break"><%= issuer %></code></li><% end %></ul>
+    <p class="hint"><%= t("access_grants.authority.as_of", when: l(settings.service_authority_issuers_at.in_time_zone, format: :short)) %></p>
+  <% end %>
+</section>

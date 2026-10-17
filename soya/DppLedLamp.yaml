@@ -164,6 +164,18 @@ content:
         dismantlingInstructions:
           label: { en: Dismantling instructions (link), de: Demontageanleitung (Link) }
 
+    # The access class of each attribute (https://w3id.org/soya/dpp-access/v1),
+    # as the author of this structure suggests it. An attribute without an entry
+    # is public. The economic operator decides in the end: the DPP Manager shows
+    # these as the starting point when access classes are switched on for a
+    # product type, and every one of them can be changed there.
+    - type: OverlayClassification
+      base: DppLedLamp
+      name: DppLedLampAccessClassification
+      attributes:
+        serialNumber: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+        dismantlingInstructions: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+
     - type: OverlayValidation
       base: DppLedLamp
       name: DppLedLampValidation

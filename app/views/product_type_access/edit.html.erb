@@ -1,0 +1,83 @@
+<h1><%= t("product_type_access.title", label: @product_type.label) %></h1>
+<p class="lead"><%= t("product_type_access.lead") %></p>
+
+<%= render "shared/help", key: "product_type_access.help" %>
+
+<% if @error %>
+  <div class="warning">
+    <strong><%= t("product_type_access.no_paths") %></strong>
+    <p><%= @error %></p>
+  </div>
+<% else %>
+  <%# Where the type stands: off, on and known to the service, or on and not
+      yet registered there. The version is what passports refer to. %>
+  <p class="hint">
+    <% if @product_type.access_policy_enabled? %>
+      <span class="state-good"><%= t("product_type_access.state.on", version: @product_type.access_policy_version) %></span>
+      <% if settings.service_configured? && @product_type.access_policy_registered_at?(settings.service_base_url) %>
+        · <%= t("product_type_access.state.registered", service: @product_type.access_policy_registered_to,
+                                                         when: l(@product_type.access_policy_registered_at.in_time_zone, format: :short)) %>
+      <% else %>
+        · <%= t("product_type_access.state.not_registered") %>
+      <% end %>
+    <% else %>
+      <span class="muted"><%= t("product_type_access.state.off") %></span>
+    <% end %>
+  </p>
+
+  <% if @suggestions.any? %>
+    <p class="hint"><%= t("product_type_access.suggested_by_structure") %></p>
+  <% end %>
+
+  <%= form_with url: product_type_access_path(@product_type), method: :patch, local: true do %>
+    <label class="confirm">
+      <%= hidden_field_tag :enabled, "0", id: nil %>
+      <%= check_box_tag :enabled, "1", @product_type.access_policy_enabled? %>
+      <span><%= t("product_type_access.enable") %></span>
+    </label>
+    <p class="hint"><%= t("product_type_access.enable_hint") %></p>
+
+    <table class="access">
+      <thead>
+        <tr>
+          <th><%= t("product_type_access.columns.field") %></th>
+          <th><%= t("product_type_access.columns.path") %></th>
+          <th><%= t("product_type_access.columns.class") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rows.each do |row| %>
+          <% fields = Array(row["fields"]) %>
+          <tr>
+            <td>
+              <% if fields.any? %>
+                <%= fields.map { |field| @labels[field].presence || field }.join(", ") %>
+                <% suggested = fields.filter_map { |field| @suggestions[field] }.uniq %>
+                <% if suggested.any? %>
+                  <p class="hint"><%= t("product_type_access.suggestion",
+                                        class: suggested.map { |cls| t("product_type_access.classes.#{cls}") }.join(", ")) %></p>
+                <% end %>
+              <% else %>
+                <span class="muted"><%= t("product_type_access.untraced") %></span>
+              <% end %>
+            </td>
+            <td><code class="break"><%= row["path"] %></code></td>
+            <td>
+              <%= select_tag "classes[#{row['path']}]",
+                    options_for_select(Dpp::AccessPolicy::CLASSES.map { |cls| [ t("product_type_access.classes.#{cls}"), cls ] },
+                                       @classes[row["path"]]),
+                    id: "class_#{row['path'].parameterize}" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <p class="hint"><%= t("product_type_access.unreached_hint") %></p>
+    <p class="hint"><%= t("product_type_access.permanent_hint") %></p>
+
+    <%= submit_tag t("product_type_access.save") %>
+  <% end %>
+<% end %>
+
+<p><%= link_to t("product_type_access.back"), product_types_path %></p>

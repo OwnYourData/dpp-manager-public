@@ -12,4 +12,11 @@ module ApplicationHelper
   def nav_section?(*prefixes)
     prefixes.compact.any? { |prefix| request.path == prefix || request.path.start_with?("#{prefix}/") }
   end
+
+  # The funding notice for the footer, in the wording of config/funding.yml.
+  # It stays in English in every language of the application: it is quoted as
+  # agreed with the project, not translated.
+  def funding_notice
+    FundingNotice.html.html_safe
+  end
 end

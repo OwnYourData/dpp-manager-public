@@ -30,7 +30,7 @@
         <nav data-controller="nav-menu">
           <%= link_to t("nav.dashboard"), root_path, class: ("on" if current_page?(root_path)) %>
 
-          <details class="menu <%= "on" if nav_section?(passports_path, lookup_path, product_types_path) %>"
+          <details class="menu <%= "on" if nav_section?(passports_path, lookup_path, product_types_path, access_grants_path) %>"
                    data-nav-menu-target="menu" data-action="toggle->nav-menu#opened">
             <summary><%= t("nav.groups.passports") %></summary>
             <div>
@@ -38,6 +38,7 @@
               <%= link_to t("nav.read_passport"), lookup_path, class: ("on" if current_page?(lookup_path)) %>
               <div class="sep"></div>
               <%= link_to t("nav.product_types"), product_types_path, class: ("on" if current_page?(product_types_path)) %>
+              <%= link_to t("nav.access_grants"), access_grants_path, class: ("on" if current_page?(access_grants_path)) %>
             </div>
           </details>
 
@@ -124,6 +125,7 @@
               link: (vault_open? ? link_to(t("app.footer_link"), vault_path, class: "quiet")
                                  : t("app.footer_link"))) %>
       </span>
+      <p class="funding" lang="en"><%= funding_notice %></p>
     </footer>
   </body>
 </html>

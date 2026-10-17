@@ -41,6 +41,8 @@ Rails.application.routes.draw do
       post "delegation/check", action: :check_delegation, as: :check_delegation
       post "custody/move",     action: :move_custody,     as: :move_custody
       post "custody/finish",   action: :finish_move,      as: :finish_move
+      get  "access-policy",       action: :access_policy
+      post "access-policy/apply", action: :apply_access_policy, as: :apply_access_policy
       get  "keys",        action: :keys
       post "keys/secure", action: :secure_keys, as: :secure_keys
       post "keys/export", action: :export_keys, as: :export_keys
@@ -50,6 +52,18 @@ Rails.application.routes.draw do
   resources :product_types, except: :show, path: "product-types" do
     post :refresh, on: :member
     post :install_bundled, on: :collection, path: "install-bundled"
+  end
+
+  # Who may read which field of the passports of a type. A page of its own: it
+  # asks the transformation, which the type's own form does not need to.
+  get   "product-types/:id/access", to: "product_type_access#edit",   as: :product_type_access
+  patch "product-types/:id/access", to: "product_type_access#update"
+
+  # Who may read the controlled part of these passports. A grant is never
+  # deleted, only revoked: the record of what was granted stays.
+  resources :access_grants, only: %i[index create], path: "access-grants" do
+    post :sync, on: :collection
+    post :revoke, on: :member
   end
 
   resources :events, only: :index

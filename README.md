@@ -52,10 +52,35 @@ and ended.
   passport, one collection and one lifetime, signed here with the operator's
   identity, renewable in a click and revocable without asking anybody. Mandates
   running out are shown on the overview before they expire.
+- The content of a passport is bound to its identifier. After every submission
+  and every correction, the hash the service reports for the bytes the custodian
+  delivers is written into the passport's DID document, signed with the
+  passport's own document key, which never leaves this computer. The passport
+  page shows the attested hash and when it was written, and a handover to
+  another custodian keeps it. Anybody can check it with
+  `bin/verify_dpp <carrier link>` from the DPP Service, needing nothing from
+  either side.
+- Not every field of a passport has to be public. On the page *Access
+  classes* of a product type each element of its passports is public, for
+  readers with a legitimate interest, or for authorities only. The page lists
+  the elements the type's transformation produces, with the form fields that
+  end up in each, and starts from the classes the SOyA structure suggests in
+  an `OverlayClassification` — the bundled lamp and battery carry one. Switched
+  on, the classes become the access policy of the type: it is registered with
+  the DPP Service under a versioned identifier and named in every passport of
+  the type; the service then hands each reader only what its class allows.
+  Switched off, passports stay public as a whole.
+- On the page *Access rights* the operator grants a reader with a legitimate
+  interest — a repair shop, a recycler — access to some or all of their
+  passports for at most a year. The right is signed here with the operator's
+  identity and registered with the service, which checks it on every read.
+  Revoking it ends it at once. Comparing with the service shows rights its
+  operator revoked and whom it trusts to vouch for authorities; rights for
+  authorities are not the operator's to give.
 - Any passport can be read from its identifier alone — the product identifier
   through the service, or the passport's own `did:oyd`, which is resolved and
   then read wherever its document says it lives. No identity and no permission
-  are needed, because that is what a passport is for.
+  are needed for what is public, because that is what a passport is for.
 - Ending a passport is two acts in one order: the service stops serving it and
   keeps the final state as history, then the identifier is revoked with the keys
   kept here. After that it resolves nowhere.
@@ -63,10 +88,9 @@ and ended.
 - German and English throughout, switchable, English by default. Each page
   explains itself; the explanations can be switched off.
 
-Still to come: integrity of the content itself — a signature over the payload
-rather than over the transport — and roles, so that more than one person can act
-for one operator. Moving a passport between two different custodian hosts works
-and is exercised, but has not yet been run end to end against two real hosts.
+Still to come: roles, so that more than one person can act for one operator.
+Moving a passport between two different custodian hosts works and is exercised,
+but has not yet been run end to end against two real hosts.
 
 ### The two identifiers
 
@@ -94,7 +118,7 @@ is who this application is for.
 
 The short version, if you already have Docker:
 
-    docker compose up -d
+    docker compose pull && docker compose up -d
 
 with the `docker-compose.yml` from this repository, then open
 http://localhost:3000 in a browser. On the first start you choose a passphrase;
@@ -219,6 +243,12 @@ Run the application against a directory of your choosing:
 `docs/Decisions.md` is worth reading before changing anything about the database
 layer. Several of the obvious approaches there do not work, and it records which
 and why.
+
+## Funding
+
+<!-- funding:begin -->
+The DPP Manager is part of [PACE-DPP](https://dpp-austria.at/) – Promoting and Accelerating a Digital Product Passport based Data-Service Ecosystem. This Lighthouse Project has been made possible by financial contributions from the Austrian Federal Ministry of Innovation, Mobility and Infrastructure ([BMIMI](https://www.bmimi.gv.at/en.html), formerly BMK), supported by the Austrian Research Promotion Agency (FFG) under grant number [917177](https://projekte.ffg.at/projekt/5128301), as well as from the German Federal Ministry of Research, Technology and Space (BMFTR, formerly BMWK), supported by the German Research Promotion Agency (DLR-PT).
+<!-- funding:end -->
 
 ## Licence
 

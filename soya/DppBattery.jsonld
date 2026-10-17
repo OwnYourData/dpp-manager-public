@@ -4044,6 +4044,96 @@
         }
       },
       "language": "en"
+    },
+    {
+      "@id": "placedInServiceDate",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "batteryStatus",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "cathodeMaterials",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "anodeMaterials",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "electrolyteMaterials",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "dismantlingInformationUrl",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "partNumbersUrl",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "sparePartsUrl",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "safetyMeasuresUrl",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "remainingCapacity",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "capacityFade",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "stateOfCertifiedEnergy",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "stateOfCharge",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "fullCycles",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "OverlayClassification",
+      "@type": "OverlayClassification",
+      "onBase": "Battery",
+      "name": "DppBatteryAccessClassification"
     }
   ],
   "@context": {

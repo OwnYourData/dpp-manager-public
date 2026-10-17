@@ -61,6 +61,9 @@
                   · <%= t("product_types.state.overlays", count: summary[:overlays].values.sum) %>
                 <% end %>
                 · <%= type.forms_by_language.keys.map(&:upcase).join(", ") %>
+                <% if type.access_policy_enabled? %>
+                  · <%= t("product_types.state.access_on", version: type.access_policy_version) %>
+                <% end %>
               </p>
             <% else %>
               <span class="muted"><%= t("product_types.state.pending") %></span>
@@ -69,6 +72,9 @@
           <td class="actions">
             <%= button_to t("product_types.refresh"), refresh_product_type_path(type), class: "link" %>
             <%= link_to t("product_types.edit"), edit_product_type_path(type) %>
+            <% if type.transformation_fetched? %>
+              <%= link_to t("product_types.access"), product_type_access_path(type) %>
+            <% end %>
           </td>
         </tr>
       <% end %>

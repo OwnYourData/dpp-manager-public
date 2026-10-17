@@ -134,6 +134,40 @@
   </section>
 <% end %>
 
+<%# Who may read which part of this passport. Only where there is something to
+    say: a type with its access classes switched on, or a passport the service
+    already classifies. Everything else is public as a whole, as before. %>
+<% access_type = @passport.product_type %>
+<% current_policy = access_type&.access_policy_enabled? ? access_type.access_policy_id : nil %>
+<% if @passport.minted? && (@passport.access_policy_id.present? || current_policy) %>
+  <section class="mint">
+    <h2><%= t("passports.access_policy.title") %></h2>
+
+    <% if @passport.access_policy_id.present? %>
+      <% report = @passport.access_policy_report_hash %>
+      <dl class="given">
+        <dt><%= t("passports.access_policy.policy") %></dt>
+        <dd><code class="break"><%= @passport.access_policy_id %></code></dd>
+        <% if report.key?("unclassified") %>
+          <dt><%= t("passports.access_policy.warnings") %></dt>
+          <dd><%= t("passports.access_policy.counts", unclassified: report["unclassified"].to_i,
+                                                      unused: report["unusedRules"].to_i) %></dd>
+        <% end %>
+      </dl>
+      <p class="hint"><%= t("passports.access_policy.counts_hint") %></p>
+      <p><%= link_to t("passports.access_policy.details"), access_policy_passport_path(@passport) %></p>
+    <% elsif !@passport.submitted? %>
+      <p class="hint"><%= t("passports.access_policy.with_submission", policy: current_policy) %></p>
+    <% end %>
+
+    <% if @passport.access_policy_behind?(current_policy) %>
+      <p class="warning-inline"><%= t("passports.access_policy.behind", policy: current_policy) %></p>
+      <%= button_to t("passports.access_policy.apply"), apply_access_policy_passport_path(@passport), method: :post,
+            form: { data: { turbo_confirm: t("passports.access_policy.confirm_apply", service: @passport.submitted_to) } } %>
+    <% end %>
+  </section>
+<% end %>
+
 <%# Who holds this passport, and on whose authority.
     Only for a passport that was minted against a custodian: for one kept in the
     service's own database there is no mandate, and a section explaining that

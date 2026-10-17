@@ -336,6 +336,7 @@ footer {
 }
 footer .by { display: inline-flex; align-items: center; gap: 6px; }
 footer .by .mark { width: 11px; height: auto; vertical-align: middle; }
+footer .funding { max-width: 720px; margin: 10px auto 0; padding: 0 20px; font-size: 13px; line-height: 1.5; }
 
 a { color: var(--oyd-blue); }
 code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.9em; }
@@ -538,3 +539,7 @@ a.quiet:focus-visible { text-decoration: underline; }
 details.handover { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 14px; }
 details.handover summary { cursor: pointer; color: var(--oyd-blue); }
 details.handover > *:not(summary) { margin-top: 12px; }
+
+/* --- access classes -------------------------------------------------------- */
+table.access select { width: auto; margin: 0; }
+table.access td code { font-size: 0.85rem; }

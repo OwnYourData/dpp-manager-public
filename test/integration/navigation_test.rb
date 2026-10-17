@@ -94,6 +94,21 @@ class NavigationTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # Below that line, in smaller type, the funding of PACE-DPP. Its links leave
+  # the application, so they open in a new tab like the one above.
+  test "the footer names the funding of PACE-DPP" do
+    with_open_vault do
+      create_and_unlock
+
+      get root_path
+
+      assert_select "footer p.funding[lang=?]", "en", text: /\AThe DPP Manager is part of PACE-DPP\./
+      assert_select "footer p.funding a.quiet[href=?][target=?][rel=?]",
+        "https://projekte.ffg.at/projekt/5128301", "_blank", "noopener", text: "917177"
+      assert_select "footer p.funding a", 3
+    end
+  end
+
   test "the identity is offered only once there is one" do
     with_open_vault do
       create_and_unlock

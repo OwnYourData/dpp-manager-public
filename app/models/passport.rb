@@ -273,6 +273,31 @@ class Passport < ApplicationRecord
           .stringify_keys
   end
 
+  # --- access policy --------------------------------------------------------
+
+  # What the service confirmed after a write that named a policy. The report
+  # comes from the answer header; without one (an older service) the id that
+  # was sent is all there is to record.
+  def record_access_policy!(report, sent_id)
+    id = report&.id.presence || sent_id
+    return if id.blank?
+
+    update!(access_policy_id: id,
+            access_policy_report: report ? JSON.generate(report.to_h.merge("at" => Time.current.utc.iso8601)) : nil)
+  end
+
+  def access_policy_report_hash
+    access_policy_report.present? ? JSON.parse(access_policy_report) : {}
+  rescue JSON::ParserError
+    {}
+  end
+
+  # The type's policy has moved on since this passport was classified, or the
+  # type has one and this passport, already with the service, has none yet.
+  def access_policy_behind?(current_id)
+    submitted? && !retired? && current_id.present? && access_policy_id != current_id
+  end
+
   def record_correction!(document)
     update!(corrected_at: Time.current, submitted_digest: input_digest,
             service_document: document.present? ? JSON.generate(document) : nil)

@@ -455,6 +455,74 @@ document from the content each time, and leaving it out drops the section with
 no error and no warning.
 
 
+## Who may read what
+
+### The class lives on the product type; the structure only suggests it
+
+Whether a field is public, for readers with a legitimate interest or for
+authorities is the economic operator's decision, so it is kept per product type
+in the data file and changed on the page *Access classes*. A SOyA structure may
+carry an `OverlayClassification` with classes of the vocabulary
+`https://w3id.org/soya/dpp-access/v1`; those are only the starting point. They
+are written as full IRIs, because a classification overlay can hold other kinds
+of classes as well ("pii"), and a bare `public` would be ambiguous among them.
+Classes of other vocabularies are ignored. A field the overlay does not name is
+public; an element no field can be traced to starts as authorities only.
+
+### Which field ends up where is asked of the transformation
+
+The access policy speaks about element paths (`ProductIdentification/SerialNumber`),
+the operator about form fields (`serialNumber`). The only place that knows how
+one becomes the other is the type's transformation. A table of our own would be
+a second opinion about it, so the transformation is run once over marker
+answers — every field filled with a value that names it — and the markers are
+looked for in the element tree that comes back. Booleans cannot carry a marker
+and get a run each. An element whose identifier is itself an answer counts for
+the collection around it, and the items of a list count for the path they
+share, so that a third item at the service is covered as well. The result is
+kept until the structure or the transformation is fetched again.
+
+### A policy version never changes, and a policy is never taken off
+
+The service keeps a registered policy as it is, so a changed set of classes is
+a new version under a new identifier, `<operator DID>/access-policies/<structure>/<n>`.
+It is registered again before every write that names it, which costs one
+request and catches a service that was reset in the meantime; a conflict moves
+to the next version. The policy has no default: what no rule reaches is for
+authorities. Once a passport is classified by it, the policy of the type cannot
+be switched off, because the service has no way of taking it off the passport;
+making everything public again is a new version.
+
+### Only a legitimate interest is granted here
+
+An access right for authorities rests on issuers the DPP Service trusts, and an
+operator cannot make anybody an authority. The page grants the class
+legitimate interest only, for passports the operator holds at that service, for
+at most a year, and shows whom the service trusts for authorities.
+
+### A right is revoked, never deleted
+
+Revoking ends a right at the service with effect from now. The entry stays
+here, with when and by whom, because what was readable under it has to remain
+traceable to it. The signed right is kept as well, so it can be registered
+again with a service that lost it.
+
+### Comparing with the service happens when asked for
+
+The service can end a right on its own: its operator revokes on order. What is
+here can therefore differ from what counts. Opening the page asks nobody
+anything; *Compare with the service* fetches the rights and the list of
+authority issuers and says what changed. A right the service does not know any
+more is marked rather than removed.
+
+### Local tests use a service DID of their own
+
+A right names the DPP Service it is for, by the service's DID. A test service
+started on a laptop with the DID of the production service would accept rights
+that also count in production. Local runs therefore mint a DID for the test
+service and revoke it afterwards, together with the test identities and test
+passports.
+
 ## Two repositories, and why the public one has no history
 
 The work happens in a private repository. The public one, `dpp-manager-public`,

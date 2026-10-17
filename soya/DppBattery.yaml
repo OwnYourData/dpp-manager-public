@@ -583,6 +583,24 @@ content:
         comment:
           en: Language of the document as a two-letter code, for example de or en.
           de: Sprache des Dokuments als zweibuchstabiger Code, zum Beispiel de oder en.
+  - type: OverlayClassification
+    base: Battery
+    name: DppBatteryAccessClassification
+    attributes:
+      placedInServiceDate: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      batteryStatus: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      cathodeMaterials: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      anodeMaterials: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      electrolyteMaterials: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      dismantlingInformationUrl: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      partNumbersUrl: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      sparePartsUrl: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      safetyMeasuresUrl: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      remainingCapacity: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      capacityFade: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      stateOfCertifiedEnergy: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      stateOfCharge: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+      fullCycles: https://w3id.org/soya/dpp-access/v1#legitimateInterest
   - type: OverlayValidation
     base: Battery
     name: DppBatteryValidationOverlay
