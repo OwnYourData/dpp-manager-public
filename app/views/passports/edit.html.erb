@@ -235,7 +235,7 @@
 
       <%# The exit. Folded shut because it is rare and because an open form
           inviting a handover next to every passport reads as a suggestion. %>
-      <details class="handover">
+      <details class="handover"<%= " open" if flash[:resume_action] == move_custody_passport_path(@passport) %>>
         <summary><%= t("passports.custody.move_title") %></summary>
 
         <p class="hint"><%= t("passports.custody.move_hint") %></p>

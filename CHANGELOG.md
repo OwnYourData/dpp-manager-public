@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.9
+
+- **A custodian without the service's reader is explained.** When the DPP
+  Service refuses a passport because the custodian has not entered its reader
+  for the collection, the passport page says so in your language, names the
+  custodian and the collection, and shows the reader to pass on with a button
+  that copies it. A refused handover keeps what was typed into its form.
+  - The refusal is recognised by the code the DPP Service gives it,
+    `readerNotEntered`, and no longer by its English wording; from a service
+    without the code, the wording still counts. Where the refusal does not
+    name the reader, the page shows the one the service publishes for that
+    custodian.
+- **The German pages say *Collection* throughout.** The section on who holds
+  a passport called it *Sammlung*; it now says *Collection*, as setup and the
+  handover do.
+- **Smaller corrections.**
+  - Saving the settings records only what changed, and the explanations as on
+    or off.
+  - The container name in `docker-compose.yml` can be set in `.env`
+    (`DPP_MANAGER_CONTAINER`) and stays `dpp-manager` by default, so a second
+    DPP Manager can run next to the first.
+  - While the data folder cannot be written to, the passphrase cannot be
+    entered, and the page and the installation guide also say what to check
+    with Docker Desktop on macOS and Windows.
+  - On the passport form, *Your identity* is said of the economic operator only,
+    not of the passport identifier below it.
+  - After submission, an empty *Placed on the market on* names the day of
+    submission the period started on, and claims no period where the product
+    type sets none.
+  - The keys of your identity are shown until you confirm that they are stored,
+    as the setup now says, and not afterwards, also when that step is opened
+    again.
+
 ## 0.1.8
 
 - **The automatic lock no longer throws work away.** When the data file locks

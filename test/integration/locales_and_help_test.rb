@@ -70,6 +70,23 @@ class LocalesAndHelpTest < ActionDispatch::IntegrationTest
     assert_equal "de", change.detail_hash["to"]
   end
 
+  # The form sends every field on every save. Only what changed is logged, and
+  # as the value the setting holds — a checkbox arrives as "1" or "0".
+  test "saving the settings unchanged logs nothing, and a change is logged as the setting holds it" do
+    create_and_unlock
+    current = Setting.current
+    form = { locale: current.locale, help_mode: "1", idle_timeout_minutes: current.idle_timeout_minutes.to_s }
+
+    assert_no_difference -> { Event.where(kind: "setting_changed").count } do
+      patch settings_path, params: { setting: form }
+    end
+
+    patch settings_path, params: { setting: form.merge(help_mode: "0") }
+    changes = Event.where(kind: "setting_changed").map(&:detail_hash)
+    assert_equal [ { "setting" => "help_mode", "from" => true, "to" => false } ], changes
+    assert_not Setting.current.help_mode
+  end
+
   # The language chosen on the unlock screen lives in a session cookie, because
   # there is no vault to keep it in yet. Creating one has to move it across, or
   # the application says "Die Datendatei wurde angelegt" and then answers every

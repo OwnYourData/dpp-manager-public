@@ -216,6 +216,14 @@ the image, or, on route 2b, create a file called `.env` next to
 `docker-compose.yml` containing `DPP_MANAGER_PORT=3100`. Then open
 `http://localhost:3100`.
 
+**"The container name "/dpp-manager" is already in use".** Another DPP
+Manager on this computer already has that name — an older one started with
+`docker run`, or a second installation. Remove the old container if you no
+longer need it (`docker rm -f dpp-manager`; its data folder stays), or give
+this one a name of its own: on route 2b, add `DPP_MANAGER_CONTAINER=dpp-manager-2`
+to the `.env` file next to `docker-compose.yml`, together with its own
+`DPP_MANAGER_PORT`.
+
 **"The data directory is not writable"** in the container's log, or **"The data
 file cannot be stored here"** on the page. The application runs as user id
 1000 inside the container and has to be able to write into the folder you
@@ -228,9 +236,13 @@ to that user, then restart the container (*Containers* → restart, or
 sudo chown -R 1000:1000 data
 ```
 
-`ls -ln data` shows the owner as a number; it should say `1000 1000`. macOS and
-Windows handle this themselves with Docker Desktop. Nothing is written while the
-message is showing, so no data is lost by it.
+`ls -ln data` shows the owner as a number; it should say `1000 1000`. Docker
+Desktop on macOS and Windows maps the user id itself; there the folder has to
+belong to you and must not be read-only. On macOS, Docker also needs access to
+it: under *System Settings → Privacy & Security → Files and Folders*, allow
+Docker the folder it is in, such as *Documents*, then restart the container.
+Nothing is written while the message is showing, and the passphrase cannot be
+entered until it is gone, so no data is lost by it.
 
 **You forgot the passphrase.** There is nothing anybody can do. If the file
 holds nothing you need yet, delete `dpp.db` and start again; the application

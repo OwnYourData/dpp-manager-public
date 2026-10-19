@@ -106,6 +106,120 @@ class PassportCustodyTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # The DPP Service refuses controlled data for a collection at which the
+  # custodian has not entered its reader. Only the custodian can change that,
+  # so the page says it in the operator's language and hands them the reader
+  # to pass on, instead of the service's English sentence.
+  READER = "did:oyd:zQmQcGAi1ms87cXJVEAV4BHsYXbS2R86FomWktXgBpVL13z".freeze
+
+  def reader_refusal(collection = COLLECTION)
+    DppService::Client::Result.new(
+      ok: false, http_status: 400,
+      problems: [ "Refused: the custodian at #{POD} has no reader entered for collection #{collection}, so the 2 " \
+                  "attribute(s) of this passport that are not public could not be read there with access rights. " \
+                  "Nothing was written. Please ask the custodian to enter this service's reader #{READER} for the " \
+                  "collection" ]
+    )
+  end
+
+  test "a submission refused for a missing reader says what to ask the custodian for, with the reader to copy" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+
+      submitting(create: ->(*, **) { reader_refusal }) { post submit_passport_path(passport) }
+      follow_redirect!
+
+      assert_select ".flash.alert p", text: I18n.t("passports.reader_missing.alert", custodian: POD, collection: COLLECTION)
+      assert_select ".flash.alert .reader-missing[data-controller=copy]" do
+        assert_select "code[data-copy-target=source]", text: READER
+        assert_select "button[type=button][data-action='copy#copy']", text: I18n.t("passports.reader_missing.copy")
+      end
+      assert_no_match(/HTTP 400/, response.body)
+
+      passport.reload
+      assert_not passport.submitted?
+      assert_not passport.delegated?
+      failed = Event.where(kind: "passport_submit_failed").last
+      assert_includes failed.detail_hash["problems"].join, READER, "the log keeps what the service said"
+    end
+  end
+
+  test "the hint about a missing reader is given in German too" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+      Setting.current.update!(locale: "de")
+
+      submitting(create: ->(*, **) { reader_refusal }) { post submit_passport_path(passport) }
+      follow_redirect!
+
+      assert_select ".flash.alert p", text: I18n.t("passports.reader_missing.alert", custodian: POD,
+                                                                                    collection: COLLECTION, locale: :de)
+      assert_select ".flash.alert .reader-missing code", text: READER
+      assert_select ".flash.alert .reader-missing button", text: I18n.t("passports.reader_missing.copy", locale: :de)
+    ensure
+      Setting.current.update!(locale: "en")
+    end
+  end
+
+  # The service gives that refusal the code readerNotEntered. Recognised by the
+  # code, it does not depend on the wording: the custodian and collection are
+  # where the passport was to go, and the reader is the one the service
+  # publishes for that custodian.
+  def coded_refusal
+    DppService::Client::Result.new(ok: false, http_status: 400, problems: [ "Refused: put differently now" ],
+                                   codes: [ "readerNotEntered" ])
+  end
+
+  test "a refusal recognised by its code names the reader the service publishes for the custodian" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+
+      asked = nil
+      stubbing(DppService::Directory, :reader_for, ->(base, pod) { asked = [ base, pod ]; READER }) do
+        submitting(create: ->(*, **) { coded_refusal }) { post submit_passport_path(passport) }
+      end
+      follow_redirect!
+
+      assert_equal [ SERVICE, POD ], asked
+      assert_select ".flash.alert p", text: I18n.t("passports.reader_missing.alert", custodian: POD, collection: COLLECTION)
+      assert_select ".flash.alert .reader-missing code", text: READER
+      assert_no_match(/put differently/, response.body)
+    end
+  end
+
+  test "without a reader to show, the hint says where the service names it" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+
+      stubbing(DppService::Directory, :reader_for, ->(*) { nil }) do
+        submitting(create: ->(*, **) { coded_refusal }) { post submit_passport_path(passport) }
+      end
+      follow_redirect!
+
+      assert_select ".flash.alert p", text: I18n.t("passports.reader_missing.alert_without_reader", custodian: POD,
+                                                                                                   collection: COLLECTION)
+      assert_select ".reader-missing", count: 0
+    end
+  end
+
+  test "any other refusal is still shown as the service put it" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport
+
+      refusal = DppService::Client::Result.new(ok: false, http_status: 400, problems: [ "no such collection" ])
+      submitting(create: ->(*, **) { refusal }) { post submit_passport_path(passport) }
+      follow_redirect!
+
+      assert_select ".flash.alert p", text: I18n.t("passports.submit.refused", status: 400, problems: "no such collection")
+      assert_select ".reader-missing", count: 0
+    end
+  end
+
   test "a passport kept in the service's own database is submitted without a mandate" do
     with_open_vault do
       create_and_unlock
@@ -379,6 +493,63 @@ class PassportCustodyTest < ActionDispatch::IntegrationTest
       assert_equal COLLECTION, passport.custodian_collection_id
       assert_equal before, passport.delegation_jti
       assert Event.where(kind: "passport_custody_move_failed").exists?
+    end
+  end
+
+  # A refused handover keeps what was typed into its form: the page names the
+  # form for the browser to fill in again (ResumeController) and opens it.
+  test "a handover refused for a missing reader keeps the form and names the reader" do
+    with_open_vault do
+      create_and_unlock
+      passport = submitted_passport
+
+      moving(move: ->(**) { reader_refusal("9") }) do
+        post move_custody_passport_path(passport),
+             params: { custodian_base_url: POD, custodian_collection_id: "9" }
+      end
+      follow_redirect!
+
+      assert_select "body[data-resume-restore-value=?]", move_custody_passport_path(passport)
+      assert_select "details.handover[open]"
+      assert_select ".flash.alert p", text: I18n.t("passports.reader_missing.alert", custodian: POD, collection: "9")
+      assert_select ".flash.alert .reader-missing code", text: READER
+      assert_equal COLLECTION, passport.reload.custodian_collection_id
+    end
+  end
+
+  test "a handover refused by code names the custodian and collection it was meant for" do
+    with_open_vault do
+      create_and_unlock
+      passport = submitted_passport
+
+      asked = nil
+      stubbing(DppService::Directory, :reader_for, ->(base, pod) { asked = [ base, pod ]; READER }) do
+        moving(move: ->(**) { coded_refusal }) do
+          post move_custody_passport_path(passport),
+               params: { custodian_base_url: OTHER_POD, custodian_collection_id: "9" }
+        end
+      end
+      follow_redirect!
+
+      assert_equal [ SERVICE, OTHER_POD ], asked
+      assert_select ".flash.alert p", text: I18n.t("passports.reader_missing.alert", custodian: OTHER_POD, collection: "9")
+      assert_select "details.handover[open]"
+    end
+  end
+
+  # The section on custody names the collection as setup and the handover do.
+  test "the custody section says Collection in German as well" do
+    with_open_vault do
+      create_and_unlock
+      passport = submitted_passport
+      Setting.current.update!(locale: "de")
+
+      get edit_passport_path(passport)
+
+      assert_select "dt", text: "Collection"
+      assert_no_match(/Sammlung/, response.body)
+    ensure
+      Setting.current.update!(locale: "en")
     end
   end
 

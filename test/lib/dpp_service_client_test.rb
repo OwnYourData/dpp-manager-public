@@ -20,6 +20,71 @@ class DppServiceClientTest < ActiveSupport::TestCase
     assert_empty result.problems
   end
 
+  # The DPP Service's refusal for a collection whose custodian has not entered
+  # its reader, word for word as it sends it.
+  READER_REFUSAL = "Refused: the custodian at https://dpp.go-data.at has no reader entered for collection 36, " \
+                   "so the 2 attribute(s) of this passport that are not public could not be read there with " \
+                   "access rights. Nothing was written. Please ask the custodian to enter this service's reader " \
+                   "did:oyd:zQmQcGAi1ms87cXJVEAV4BHsYXbS2R86FomWktXgBpVL13z for the collection".freeze
+
+  test "the refusal for a collection without the service's reader names custodian, collection and reader" do
+    body = { "statusCode" => "ClientErrorBadRequest", "message" => [ { "messageType" => "Error", "text" => READER_REFUSAL } ] }
+
+    missing = DppService::Client.reader_missing(DppService::Client.interpret(response("400", JSON.generate(body))))
+
+    assert_equal "https://dpp.go-data.at", missing.custodian
+    assert_equal "36", missing.collection
+    assert_equal "did:oyd:zQmQcGAi1ms87cXJVEAV4BHsYXbS2R86FomWktXgBpVL13z", missing.reader_did
+  end
+
+  # The service gives the refusal the code readerNotEntered; the text still
+  # carries the details.
+  test "the refusal is recognised by its code, and its text gives custodian, collection and reader" do
+    body = { "statusCode" => "ClientErrorBadRequest",
+             "message" => [ { "messageType" => "Error", "text" => READER_REFUSAL, "code" => "readerNotEntered" } ] }
+
+    result = DppService::Client.interpret(response("400", JSON.generate(body)))
+    missing = DppService::Client.reader_missing(result, custodian: "https://elsewhere.example", collection: "99")
+
+    assert_equal [ "readerNotEntered" ], result.codes
+    assert_equal "https://dpp.go-data.at", missing.custodian
+    assert_equal "36", missing.collection
+    assert_equal "did:oyd:zQmQcGAi1ms87cXJVEAV4BHsYXbS2R86FomWktXgBpVL13z", missing.reader_did
+  end
+
+  test "a coded refusal in other words still counts, for the custodian and collection the write was meant for" do
+    body = { "message" => [ { "messageType" => "Error", "text" => "Refused: put differently now",
+                              "code" => "readerNotEntered" } ] }
+
+    missing = DppService::Client.reader_missing(DppService::Client.interpret(response("400", JSON.generate(body))),
+                                                custodian: "https://pod.example", collection: "7")
+
+    assert_equal "https://pod.example", missing.custodian
+    assert_equal "7", missing.collection
+    assert_nil missing.reader_did, "the reader is left to the caller"
+  end
+
+  test "the wording alone counts only when the answer carries no code" do
+    older = DppService::Client::Result.new(ok: false, http_status: 400, problems: [ READER_REFUSAL ], codes: [])
+    other_code = DppService::Client::Result.new(ok: false, http_status: 400, problems: [ READER_REFUSAL ],
+                                                codes: [ "somethingElse" ])
+
+    assert_equal "36", DppService::Client.reader_missing(older).collection
+    assert_nil DppService::Client.reader_missing(other_code)
+  end
+
+  test "no other answer is taken for that refusal" do
+    other = DppService::Client::Result.new(ok: false, http_status: 400, problems: [ "serviceEndpoint host does not match" ])
+    wrong_status = DppService::Client::Result.new(ok: false, http_status: 502, problems: [ READER_REFUSAL ],
+                                                  codes: [ "readerNotEntered" ])
+    accepted = DppService::Client::Result.new(ok: true, http_status: 201, problems: [])
+
+    assert_nil DppService::Client.reader_missing(other)
+    assert_nil DppService::Client.reader_missing(wrong_status)
+    assert_nil DppService::Client.reader_missing(accepted)
+    assert_nil DppService::Client.reader_missing(nil)
+  end
+
   test "a refusal keeps the service's own sentence, which is the only useful part" do
     body = {
       "statusCode" => "ClientErrorBadRequest",
@@ -39,6 +104,14 @@ class DppServiceClientTest < ActiveSupport::TestCase
     body = { "message" => [ { "text" => "first" }, { "text" => "second" }, { "messageType" => "Info" } ] }
 
     assert_equal %w[first second], DppService::Client.interpret(response("400", JSON.generate(body))).problems
+  end
+
+  test "the codes of the messages are kept, where there are any" do
+    body = { "message" => [ { "text" => "first", "code" => "readerNotEntered" }, { "text" => "second" },
+                            { "text" => "third", "code" => "" } ] }
+
+    assert_equal [ "readerNotEntered" ], DppService::Client.interpret(response("400", JSON.generate(body))).codes
+    assert_empty DppService::Client.interpret(response("502", "<html>Bad Gateway</html>")).codes
   end
 
   # A proxy in front of the service answers HTML, and "unexpected token <" is

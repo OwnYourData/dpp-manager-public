@@ -48,7 +48,8 @@ de:
       missing: "Das Datenverzeichnis %{directory} gibt es im Container nicht."
       directory_not_writable: "Das Datenverzeichnis %{directory} ist da, aber diese Anwendung (Benutzerkennung %{uid}) kann nicht hineinschreiben."
       file_not_writable: "Die Datendatei %{file} ist da, aber diese Anwendung (Benutzerkennung %{uid}) kann sie nicht lesen und schreiben."
-      fix: "Es wurde nichts geschrieben. Binden Sie einen Ordner Ihres Rechners als Datenverzeichnis ein, in den dieser Benutzer schreiben darf — unter Linux gehört er der Benutzerkennung 1000 (sudo chown -R 1000:1000 auf den Ordner) — und starten Sie den Container neu. Die Installationsanleitung beschreibt das in Abschnitt 7."
+      fix: "Es wurde nichts geschrieben. Binden Sie einen Ordner Ihres Rechners als Datenverzeichnis ein, in den dieser Benutzer schreiben darf, und starten Sie den Container neu. Unter Linux geben Sie den Ordner der Benutzerkennung 1000 (sudo chown -R 1000:1000 auf den Ordner). Mit Docker Desktop unter macOS oder Windows muss der Ordner Ihnen gehören und darf nicht schreibgeschützt sein; unter macOS braucht Docker außerdem Zugriff darauf unter Systemeinstellungen → Datenschutz & Sicherheit → Dateien und Ordner. Die Installationsanleitung beschreibt das in Abschnitt 7."
+      disabled: "Das Passwort lässt sich eingeben, sobald die Datendatei gespeichert werden kann."
     passphrase: "Passwort"
     open: "Öffnen"
     existing:
@@ -265,6 +266,8 @@ de:
       placed_on_market: "In Verkehr gebracht am (optional)"
       placed_on_market_hint: "Hier beginnt der Zeitraum, für den der Pass verfügbar bleiben muss. Leer beginnt er am Tag der Übermittlung."
       placed_on_market_fixed: "Bei der Übermittlung festgelegt: daraus wurde berechnet, wie lange der Dienst den Pass hält."
+      placed_on_market_from_submission: "Leer gelassen, also begann der Zeitraum, für den der Dienst den Pass hält, am Tag der Übermittlung, %{date}."
+      placed_on_market_no_period: "Nach der Übermittlung nicht mehr änderbar."
       facility: "Betriebsstätte (optional)"
       facility_hint: "Der Bezeichner des Herstellungsorts, falls Sie einen führen."
       operator: "Wirtschaftsteilnehmer"
@@ -372,7 +375,7 @@ de:
     custody:
       title: "Wer diesen Pass verwahrt"
       custodian: "Verwahrer"
-      collection: "Sammlung"
+      collection: "Collection"
       signed_at: "Mandat unterschrieben"
       expires_at: "Mandat gültig bis"
       act: "Umfasst"
@@ -410,7 +413,7 @@ de:
       no_service_did: "%{service} veröffentlicht die Kennung nicht, die ein Mandat nennen muss. Richten Sie den Service unter Einrichtung erneut ein, damit sie gelesen werden kann."
       sign_failed: "Das Mandat konnte nicht unterschrieben werden: %{message}"
       help:
-        purpose: "Ein Verwahrer speichert diesen Pass, und die Berechtigung dafür ist eine Aussage, die Sie unterschrieben haben: dieser Service darf diesen einen Pass in dieser einen Sammlung ablegen, für diese Dauer. Es wird kein Passwort übergeben, und nichts daran lässt sich für einen anderen Pass verwenden."
+        purpose: "Ein Verwahrer speichert diesen Pass, und die Berechtigung dafür ist eine Aussage, die Sie unterschrieben haben: dieser Service darf diesen einen Pass in dieser einen Collection ablegen, für diese Dauer. Es wird kein Passwort übergeben, und nichts daran lässt sich für einen anderen Pass verwenden."
         steps:
           - "Das Mandat wird hier mit Ihrem Identitätsschlüssel unterschrieben und nennt immer genau einen Pass."
           - "Es läuft nach neunzig Tagen ab. Ein neues ist eine Unterschrift; am Pass ändert sich dabei nichts."
@@ -441,6 +444,12 @@ de:
       not_served: "Der Service stellt diesen Pass nicht mehr bereit, es gibt also nichts mehr zu korrigieren."
       custody_over: "Der Pass ist beim Verwahrer nicht mehr vorhanden. Oben steht das Mandat, das galt, solange er dort lag."
       badge: "beendet"
+    reader_missing:
+      alert: "Der Service hat nichts übernommen: Der Verwahrer %{custodian} hat für die Collection %{collection} noch keinen Leser des DPP Service eingetragen. Ohne diesen Leser könnten Berechtigte die nicht öffentlichen Angaben dort nicht lesen. Bitten Sie Ihren Verwahrer, den Leser unten für diese Collection einzutragen, und versuchen Sie es dann erneut."
+      alert_without_reader: "Der Service hat nichts übernommen: Der Verwahrer %{custodian} hat für die Collection %{collection} noch keinen Leser des DPP Service eingetragen. Ohne diesen Leser könnten Berechtigte die nicht öffentlichen Angaben dort nicht lesen. Bitten Sie Ihren Verwahrer, den Leser des DPP Service für diese Collection einzutragen, und versuchen Sie es dann erneut. Der Service nennt diesen Leser unter /.well-known/dpp-service."
+      reader: "Leser, den Sie Ihrem Verwahrer nennen"
+      copy: "Kopieren"
+      copied: "Kopiert"
     submit:
       title: "Übermitteln"
       action: "An den DPP Service übermitteln"
@@ -867,10 +876,10 @@ de:
         purpose: "Eine Identität ist hier ein Schlüsselpaar. Die private Hälfte bleibt auf diesem Rechner und unterschreibt, was Sie senden; die öffentliche wird veröffentlicht, damit der Dienst die Unterschrift prüfen kann. Es gibt nichts zu registrieren und niemanden zu fragen."
         steps:
           - "Das Anlegen dauert einen Moment und braucht eine Netzverbindung."
-          - "Der nächste Schritt zeigt Ihnen die Schlüssel einmal. Das ist die einzige Gelegenheit."
+          - "Der nächste Schritt zeigt Ihnen die Schlüssel. Sie bleiben sichtbar, bis Sie bestätigen, dass sie abgelegt sind; danach werden sie nicht mehr angezeigt."
     keys:
       heading: "Schreiben Sie das auf, bevor Sie weitergehen"
-      warning_title: "Sie sehen die Schlüssel kein zweites Mal."
+      warning_title: "Sobald Sie unten bestätigen, werden diese Schlüssel nicht mehr angezeigt."
       warning_body: "Diese zwei Schlüssel gibt es hier und sonst nirgends. Niemand kann sie Ihnen noch einmal schicken — weder das Verzeichnis noch wir. Legen Sie sie irgendwo ab, wo Sie sie in fünf Jahren noch finden."
       your_identity: "Ihre Identität"
       what_they_are: "Der Dokumentenschlüssel unterschreibt. Der Widerrufsschlüssel beendet diese Identität, und nur er kann das. Bewahren Sie beide getrennt auf, wenn es geht."
@@ -880,6 +889,7 @@ de:
       confirm_label: "Ich habe diese Schlüssel sicher abgelegt."
       action: "Weiter"
       must_confirm: "Bitte bestätigen Sie, dass Sie die Schlüssel abgelegt haben."
+      already_secured: "Am %{when} als abgelegt bestätigt. Die Schlüssel werden nicht wieder angezeigt."
       help:
         purpose: "Der einzige Bildschirm dieser Anwendung, der Geheimnisse zeigt. Es gibt ihn, weil ein Schlüssel, der nur in der Datendatei liegt, ein vergessenes Passwort von der Vernichtung entfernt ist."
         steps:

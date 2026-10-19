@@ -1,0 +1,9 @@
+<%# The reader the custodian has to enter for the collection, as the DPP Service
+    named it. It is what the operator passes on, so it stands on a line of its
+    own, whole, and can be copied with one click rather than selected by hand. %>
+<div class="reader-missing" data-controller="copy">
+  <p class="reader-missing-label"><%= t("passports.reader_missing.reader") %></p>
+  <code class="secret break" data-copy-target="source"><%= missing["reader_did"] %></code>
+  <button type="button" class="link" data-copy-target="button" data-action="copy#copy"
+          data-copied-label="<%= t("passports.reader_missing.copied") %>"><%= t("passports.reader_missing.copy") %></button>
+</div>

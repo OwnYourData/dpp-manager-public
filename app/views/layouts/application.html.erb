@@ -98,6 +98,7 @@
       <% if alert %>
         <div class="flash alert">
           <p><%= alert %></p>
+          <%= render "shared/reader_missing", missing: flash[:reader_missing] if flash[:reader_missing].present? %>
           <% if flash[:problems].present? %>
             <details class="problems" open>
               <summary><%= t("passports.problem.show", count: flash[:problem_count] || Array(flash[:problems]).size) %></summary>

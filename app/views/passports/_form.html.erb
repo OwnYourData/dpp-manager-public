@@ -85,17 +85,20 @@
 
     <label for="passport_placed_on_market_on"><%= t("passports.envelope.placed_on_market") %></label>
     <%= f.date_field :placed_on_market_on, disabled: passport.submitted? %>
-    <p class="hint">
-      <%= passport.submitted? ? t("passports.envelope.placed_on_market_fixed") : t("passports.envelope.placed_on_market_hint") %>
-    </p>
+    <p class="hint"><%= placed_on_market_note(passport) %></p>
 
     <label for="passport_facility_id"><%= t("passports.envelope.facility") %></label>
     <%= f.text_field :facility_id %>
     <p class="hint"><%= t("passports.envelope.facility_hint") %></p>
 
+    <%# The hint belongs to the operator alone: the passport identifier below
+        is the product's, not the operator's identity. %>
     <dl class="given">
       <dt><%= t("passports.envelope.operator") %></dt>
-      <dd><code class="break"><%= Identity.current&.did %></code></dd>
+      <dd>
+        <code class="break"><%= Identity.current&.did %></code>
+        <p class="hint"><%= t("passports.envelope.operator_hint") %></p>
+      </dd>
       <dt><%= t("passports.envelope.schema") %></dt>
       <dd><code><%= Passport::SCHEMA_VERSION %></code></dd>
       <% if passport.minted? %>
@@ -103,7 +106,6 @@
         <dd><code class="break"><%= passport.dpp_id %></code></dd>
       <% end %>
     </dl>
-    <p class="hint"><%= t("passports.envelope.operator_hint") %></p>
   </fieldset>
 
   <h2><%= product_type.label %></h2>

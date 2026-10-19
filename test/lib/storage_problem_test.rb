@@ -37,10 +37,34 @@ class StorageProblemTest < ActionDispatch::IntegrationTest
 
       post unlock_path, params: { passphrase: TEST_PASSPHRASE, passphrase_confirmation: TEST_PASSPHRASE }
       assert_response :service_unavailable
-      assert_match I18n.t("unlock.storage.fix"), response.body
+      assert_includes CGI.unescapeHTML(response.body), I18n.t("unlock.storage.fix")
     end
 
     refute Vault::Store.exists?, "nothing was written"
+  end
+
+  # Typing a passphrase into a page that cannot store anything would only be
+  # lost. The form stays visible, so the page still says what it is for.
+  test "while the data file cannot be stored, the passphrase cannot be entered" do
+    problem = [ :directory_not_writable, { directory: "/data", uid: 1000 } ]
+    stubbing(Vault::Store, :storage_problem, ->(*) { problem }) do
+      get unlock_path
+      assert_select "input#passphrase[disabled]"
+      assert_select "input#passphrase_confirmation[disabled]"
+      assert_select "input[type=submit][disabled]"
+      assert_select "p.hint", text: I18n.t("unlock.storage.disabled")
+      assert_match "Docker Desktop on macOS or Windows", response.body
+
+      stubbing(Vault::Store, :exists?, ->(*) { true }) do
+        get unlock_path
+        assert_select "input#passphrase[disabled]"
+        assert_select "input[type=submit][disabled]"
+      end
+    end
+
+    get unlock_path
+    assert_select "input#passphrase:not([disabled])"
+    assert_select "input[type=submit][disabled]", count: 0
   end
 
   test "a write refused by SQLite after the check is shown the same way" do

@@ -81,6 +81,38 @@ class SetupTest < ActionDispatch::IntegrationTest
     assert_equal "identity_keys_secured", Event.last.kind
   end
 
+  # As on the key page of a passport: shown until their storage is confirmed,
+  # also on a reload, and not afterwards — not even when the step is opened
+  # again from further on.
+  test "the keys of the identity stay visible until confirmed, and not after" do
+    configure_service!
+    with_mint { post setup_mint_identity_path }
+
+    2.times do
+      get setup_path(step: "keys")
+      assert_match "z1S5DocumentKey", response.body
+      assert_match "z1S5RevocationKey", response.body
+    end
+
+    post setup_keys_path, params: { confirmed: "1" }
+    get setup_path(step: "keys")
+
+    assert_response :success
+    assert_no_match "z1S5DocumentKey", response.body
+    assert_no_match "z1S5RevocationKey", response.body
+    secured = I18n.l(Identity.current.keys_secured_at.in_time_zone, format: :short)
+    assert_select "p.muted", text: I18n.t("setup.keys.already_secured", when: secured)
+    assert_match Identity.current.did, response.body
+  end
+
+  test "the identity step says the keys are shown until they are confirmed" do
+    configure_service!
+    get setup_path
+
+    assert_includes response.body, I18n.t("setup.identity.help.steps").last
+    assert_no_match(/keys once/, response.body)
+  end
+
   test "an imported identity is checked against the registry before it is stored" do
     configure_service!
     stubbing(Did::Oyd, :key_matches?, ->(_did, _key) { false }) do

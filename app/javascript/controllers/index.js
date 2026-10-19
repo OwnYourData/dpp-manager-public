@@ -6,6 +6,7 @@ import NavMenuController from "controllers/nav_menu_controller"
 import DismissableController from "controllers/dismissable_controller"
 import ResumeController from "controllers/resume_controller"
 import ConfirmController from "controllers/confirm_controller"
+import CopyController from "controllers/copy_controller"
 
 application.register("passphrase", PassphraseController)
 application.register("soya-form", SoyaFormController)
@@ -14,3 +15,4 @@ application.register("nav-menu", NavMenuController)
 application.register("dismissable", DismissableController)
 application.register("resume", ResumeController)
 application.register("confirm", ConfirmController)
+application.register("copy", CopyController)

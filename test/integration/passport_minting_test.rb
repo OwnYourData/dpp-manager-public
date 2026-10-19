@@ -188,6 +188,26 @@ class PassportMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # The hint about the operator belongs to the operator: the passport
+  # identifier listed with it is the product's, not the operator's identity.
+  test "the envelope says your identity only of the economic operator, not of the passport identifier" do
+    with_open_vault do
+      create_and_unlock
+      Identity.create!(did: "did:oyd:zQmWxYzabcdefgh", origin: "minted", document_key: "k")
+      passport = minted_passport
+
+      get edit_passport_path(passport)
+
+      terms = css_select("dl.given dt")
+      operator = terms.find { |dt| dt.text.strip == I18n.t("passports.envelope.operator") }
+      identifier = terms.find { |dt| dt.text.strip == I18n.t("passports.envelope.dpp_id") }
+      assert_includes operator.next_element.text, I18n.t("passports.envelope.operator_hint")
+      assert_not_includes identifier.next_element.text, I18n.t("passports.envelope.operator_hint")
+      assert_select "dl.given + p.hint", count: 0
+      assert_equal 1, response.body.scan(I18n.t("passports.envelope.operator_hint")).size
+    end
+  end
+
   test "the keys are not confirmed by opening the page, only by saying so" do
     with_open_vault do
       create_and_unlock

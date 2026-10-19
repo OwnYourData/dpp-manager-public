@@ -1,7 +1,11 @@
 <%= image_tag "oyd-logo.svg", class: "logo", alt: "OwnYourData" %>
 <h1><%= t("app.name") %></h1>
 
-<% if @storage_problem %>
+<%# While the data file cannot be stored, a passphrase typed here would go
+    nowhere: the form stays visible, so the page still says what it is for,
+    but it cannot be sent. %>
+<% blocked = @storage_problem.present? %>
+<% if blocked %>
   <% kind, facts = @storage_problem %>
   <div class="warning" role="alert">
     <strong><%= t("unlock.storage.title") %></strong>
@@ -19,8 +23,10 @@
 
   <%= form_with url: unlock_path, method: :post, local: true do |f| %>
     <label for="passphrase"><%= t("unlock.passphrase") %></label>
-    <%= password_field_tag :passphrase, nil, id: "passphrase", autofocus: true, autocomplete: "current-password" %>
-    <%= submit_tag t("unlock.open") %>
+    <%= password_field_tag :passphrase, nil, id: "passphrase", autofocus: !blocked, autocomplete: "current-password",
+                                              disabled: blocked %>
+    <%= submit_tag t("unlock.open"), disabled: blocked %>
+    <% if blocked %><p class="hint"><%= t("unlock.storage.disabled") %></p><% end %>
   <% end %>
 
   <details class="help-inline">
@@ -38,7 +44,7 @@
 
   <%= form_with url: unlock_path, method: :post, local: true, data: { controller: "passphrase" } do |f| %>
     <label for="passphrase"><%= t("unlock.new.passphrase") %></label>
-    <%= password_field_tag :passphrase, nil, id: "passphrase", autofocus: true,
+    <%= password_field_tag :passphrase, nil, id: "passphrase", autofocus: !blocked, disabled: blocked,
           autocomplete: "new-password", data: { passphrase_target: "input", action: "input->passphrase#assess" } %>
 
     <div class="meter" data-passphrase-target="meter" hidden>
@@ -47,9 +53,11 @@
     </div>
 
     <label for="passphrase_confirmation"><%= t("unlock.new.passphrase_confirmation") %></label>
-    <%= password_field_tag :passphrase_confirmation, nil, id: "passphrase_confirmation", autocomplete: "new-password" %>
+    <%= password_field_tag :passphrase_confirmation, nil, id: "passphrase_confirmation", autocomplete: "new-password",
+                                                        disabled: blocked %>
 
-    <%= submit_tag t("unlock.new.create") %>
+    <%= submit_tag t("unlock.new.create"), disabled: blocked %>
+    <% if blocked %><p class="hint"><%= t("unlock.storage.disabled") %></p><% end %>
   <% end %>
 
   <div class="meter-strings"

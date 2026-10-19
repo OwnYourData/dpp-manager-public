@@ -19,10 +19,12 @@ module DppService
     # ok?      the service accepted it
     # document what it stored, as it returned it
     # problems the sentences from the Result object, ready to show
+    # codes    the codes of its messages, where the service gives one; a refusal
+    #          is recognised by these rather than by the wording of a sentence
     #
     # list     what the service stored or returned when that is an array rather
     #          than one document (the access grants of an issuer)
-    Result = Struct.new(:ok, :http_status, :document, :problems, :commitment, :access_policy, :list,
+    Result = Struct.new(:ok, :http_status, :document, :problems, :codes, :commitment, :access_policy, :list,
                         keyword_init: true) do
       def ok? = ok
     end
@@ -36,6 +38,20 @@ module DppService
     end
 
     ACCESS_POLICY_HEADER = "X-DPP-Access-Policy".freeze
+
+    # The one refusal only the custodian can resolve: the passport has
+    # attributes that are not public, and the custodian has not entered the
+    # service's reader for the collection they would be written to, so nobody
+    # entitled could read them there. The service says so with 400 and the code
+    # readerNotEntered, and names custodian, collection and reader in the text;
+    # this is what the operator passes on.
+    ReaderMissing = Struct.new(:custodian, :collection, :reader_did, keyword_init: true)
+
+    READER_NOT_ENTERED = "readerNotEntered".freeze
+
+    # The wording of that text. It gives the details, and it is how the refusal
+    # is recognised from a service that does not give the code yet.
+    READER_MISSING = /the custodian at (\S+) has no reader entered for collection (\S+?),.*this service's reader (did:\S+) for the collection/m
 
     # What the service says about the payload commitment (prEN 18246). It arrives
     # in headers and not in the document, because the payload carries the
@@ -317,6 +333,26 @@ module DppService
       uri
     end
 
+    # The custodian, collection and reader a refusal names, or nil when the
+    # result is not that refusal.
+    # The refusal for a collection without the service's reader, or nil.
+    #
+    # Recognised by its code. By the wording of its text only when the answer
+    # carries no code at all, as from a service before the code. Custodian,
+    # collection and reader come from the text where it has the known wording;
+    # otherwise custodian and collection are where the write was to go
+    # (+custodian+, +collection+), and the reader is left to the caller.
+    def reader_missing(result, custodian: nil, collection: nil)
+      return nil if result.nil? || result.ok? || result.http_status != 400
+
+      codes = Array(result.codes)
+      named = Array(result.problems).lazy.filter_map { |text| text.to_s.match(READER_MISSING) }.first
+      return nil unless codes.include?(READER_NOT_ENTERED) || (codes.empty? && named)
+      return ReaderMissing.new(custodian: named[1], collection: named[2], reader_did: named[3]) if named
+
+      ReaderMissing.new(custodian: custodian, collection: collection, reader_did: nil)
+    end
+
     # Over HTTP/2, see Transport.
     def perform(request, uri)
       Transport.call(request, uri, timeout: TIMEOUT)
@@ -332,6 +368,7 @@ module DppService
                  document: (body if ok && body.is_a?(Hash)),
                  list: (body if ok && body.is_a?(Array)),
                  problems: (ok ? [] : problems_in(body, response)),
+                 codes: (ok ? [] : codes_in(body)),
                  commitment: commitment_in(response),
                  access_policy: access_policy_in(response))
     end
@@ -379,6 +416,11 @@ module DppService
       return messages if messages.any?
 
       [ "HTTP #{response.code}" ]
+    end
+
+    def codes_in(body)
+      Array(body.is_a?(Hash) ? body["message"] : nil)
+        .filter_map { |entry| entry["code"].to_s.presence if entry.is_a?(Hash) }
     end
 
     def parse(response)

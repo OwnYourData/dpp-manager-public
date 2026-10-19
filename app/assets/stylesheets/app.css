@@ -67,6 +67,10 @@ body.centered {
 
 .panel .lead { text-align: center; }
 
+/* While the data file cannot be stored, the form is there but cannot be used,
+   and it has to look that way. */
+.panel input:disabled { opacity: 0.55; cursor: not-allowed; }
+
 /* --- the bar -------------------------------------------------------------- */
 
 /* The bar spans the window so the page keeps a lid, but its contents sit in a
@@ -174,6 +178,13 @@ h2 { font-size: 1.05rem; margin: 26px 0 8px; }
 .flash .problems { margin-top: 6px; }
 .flash .problems summary { cursor: pointer; font-size: 0.92rem; }
 .flash.alert  { background: var(--bad-tint);  border: 1px solid #DDA9A9; }
+
+/* The reader a custodian has to enter (shared/reader_missing): the DID on a
+   line of its own, whole, with the copy button beside it where there is room
+   and below it where there is not. */
+.flash .reader-missing { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 10px; }
+.flash .reader-missing-label { flex-basis: 100%; font-size: 0.92rem; }
+.flash .reader-missing code.secret { flex: 1 1 18rem; min-width: 0; margin: 0; background: var(--panel); }
 
 /* The flame colour, used where it means something: this cannot be undone. */
 .warning {

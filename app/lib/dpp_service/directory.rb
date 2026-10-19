@@ -56,6 +56,27 @@ module DppService
       Array(discovery["authorityIssuers"]).map(&:to_s).reject(&:empty?)
     end
 
+    # The reader the service has for a custodian, as it publishes it under
+    # /.well-known/dpp-service: the DID the custodian enters for a collection,
+    # so that the service can read the part of a passport that is not public
+    # there. nil when the service names none for that custodian or cannot be
+    # asked.
+    def reader_for(base_url, custodian)
+      base = normalize_base(base_url)
+      pod  = normalize_base(custodian)&.downcase
+      return nil if base.nil? || pod.nil?
+
+      discovery = get_json(URI.join(base + "/", ".well-known/dpp-service"))
+      return nil unless discovery.is_a?(Hash)
+
+      entry = Array(discovery["readers"]).find do |reader|
+        reader.is_a?(Hash) && normalize_base(reader["pod"])&.downcase == pod
+      end
+      entry && entry["did"].to_s.presence
+    rescue Error
+      nil
+    end
+
     def normalize_base(value)
       raw = value.to_s.strip.chomp("/")
       return nil if raw.empty?

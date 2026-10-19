@@ -52,7 +52,8 @@ en:
       missing: "The data directory %{directory} does not exist inside the container."
       directory_not_writable: "The data directory %{directory} is there, but this application (user id %{uid}) cannot write to it."
       file_not_writable: "The data file %{file} is there, but this application (user id %{uid}) cannot read and write it."
-      fix: "Nothing has been written. Mount a folder of your computer onto the data directory that this user may write to — on Linux, give it to user id 1000 (sudo chown -R 1000:1000 on the folder) — and restart the container. The installation guide, section 7, has the details."
+      fix: "Nothing has been written. Mount a folder of your computer onto the data directory that this user may write to, and restart the container. On Linux, give the folder to user id 1000 (sudo chown -R 1000:1000 on the folder). With Docker Desktop on macOS or Windows, the folder has to belong to you and must not be read-only, and on macOS Docker needs access to it under System Settings → Privacy & Security → Files and Folders. The installation guide, section 7, has the details."
+      disabled: "The passphrase can be entered once the data file can be stored."
     passphrase: "Passphrase"
     open: "Open"
     existing:
@@ -269,6 +270,8 @@ en:
       placed_on_market: "Placed on the market on (optional)"
       placed_on_market_hint: "The period the passport has to stay available starts here. Left empty, it starts on the day the passport is submitted."
       placed_on_market_fixed: "Fixed at submission: the period the service keeps the passport for was worked out from it."
+      placed_on_market_from_submission: "Left empty, so the period the service keeps the passport for started on the day of submission, %{date}."
+      placed_on_market_no_period: "Can no longer be changed after submission."
       facility: "Facility (optional)"
       facility_hint: "The identifier of the place of manufacture, if you carry one."
       operator: "Economic operator"
@@ -445,6 +448,12 @@ en:
       not_served: "The service no longer serves this passport, so there is nothing left to correct."
       custody_over: "The passport is gone from the custodian. What stands above is the mandate that applied while it was there."
       badge: "ended"
+    reader_missing:
+      alert: "The service took nothing: the custodian %{custodian} has not yet entered the DPP Service's reader for collection %{collection}. Without that reader, the information that is not public could not be read there by those entitled to it. Ask your custodian to enter the reader below for this collection, then try again."
+      alert_without_reader: "The service took nothing: the custodian %{custodian} has not yet entered the DPP Service's reader for collection %{collection}. Without that reader, the information that is not public could not be read there by those entitled to it. Ask your custodian to enter the DPP Service's reader for this collection, then try again. The service names that reader under /.well-known/dpp-service."
+      reader: "Reader to pass on to your custodian"
+      copy: "Copy"
+      copied: "Copied"
     submit:
       title: "Submitting"
       action: "Submit to the DPP Service"
@@ -871,10 +880,10 @@ en:
         purpose: "An identity in this system is a key pair. The private half stays on this machine and signs what you send; the public half is published so that the service can check the signature. There is nothing to register and nobody to ask."
         steps:
           - "Creating one takes a moment and needs a network connection."
-          - "The next step shows you the keys once. That is the only time."
+          - "The next step shows you the keys. They stay visible until you confirm that they are stored; after that they are not shown again."
     keys:
       heading: "Write these down before you continue"
-      warning_title: "You will not see them again."
+      warning_title: "Once you confirm below, these keys are not shown again."
       warning_body: "These two keys exist here and nowhere else. Nobody can send them to you again — not the registry, not us. Store them somewhere you will still find them in five years."
       your_identity: "Your identity"
       what_they_are: "The document key signs. The revocation key ends this identity, and only it can. Keep them apart from each other if you can."
@@ -884,6 +893,7 @@ en:
       confirm_label: "I have stored these keys somewhere safe."
       action: "Continue"
       must_confirm: "Please confirm that you have stored the keys."
+      already_secured: "Confirmed as stored on %{when}. The keys are not shown again."
       help:
         purpose: "The one screen in this application that shows secrets. It exists because a key that is only in the data file is one lost passphrase away from gone."
         steps:

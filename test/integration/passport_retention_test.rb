@@ -55,6 +55,44 @@ class PassportRetentionTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # After submission the hint under the date says what the date did, and
+  # nothing about a period where none applies.
+  test "after submission a given date is named as where the period was worked out from" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport(years: 10, placed_on_market_on: Date.new(2027, 3, 1))
+      submitting { post submit_passport_path(passport) }
+
+      get edit_passport_path(passport)
+      assert_select "p.hint", text: I18n.t("passports.envelope.placed_on_market_fixed")
+    end
+  end
+
+  test "after submission an empty date says the period started on the day of submission, and which" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport(years: 15)
+      submitting { post submit_passport_path(passport) }
+
+      get edit_passport_path(passport)
+      day = I18n.l(passport.reload.submitted_at.utc.to_date)
+      assert_select "p.hint", text: I18n.t("passports.envelope.placed_on_market_from_submission", date: day)
+      assert_select "p.hint", text: I18n.t("passports.envelope.placed_on_market_fixed"), count: 0
+    end
+  end
+
+  test "after submission without a period the hint does not claim one" do
+    with_open_vault do
+      create_and_unlock
+      passport = minted_passport(years: nil)
+      submitting { post submit_passport_path(passport) }
+
+      get edit_passport_path(passport)
+      assert_select "p.hint", text: I18n.t("passports.envelope.placed_on_market_no_period")
+      assert_select "p.hint", text: I18n.t("passports.envelope.placed_on_market_fixed"), count: 0
+    end
+  end
+
   test "the passport keeps the configuration it was issued under, even when the type changes later" do
     with_open_vault do
       create_and_unlock

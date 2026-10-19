@@ -192,9 +192,7 @@ class PassportsController < ApplicationController
     unless result.ok?
       Event.record!(:passport_submit_failed, passport: @passport.label, did: @passport.dpp_id,
                                              status: result.http_status, problems: result.problems)
-      return redirect_to(edit_passport_path(@passport),
-                         alert: t("passports.submit.refused", status: result.http_status,
-                                                              problems: result.problems.join(" · ")))
+      return service_refused(result)
     end
 
     @passport.record_submission!(result.document, base_url: base, retain_until: retain_until)
@@ -254,9 +252,7 @@ class PassportsController < ApplicationController
     unless result.ok?
       Event.record!(:passport_update_failed, passport: @passport.label, did: @passport.dpp_id,
                                              status: result.http_status, problems: result.problems)
-      return redirect_to(edit_passport_path(@passport),
-                         alert: t("passports.submit.refused", status: result.http_status,
-                                                              problems: result.problems.join(" · ")))
+      return service_refused(result)
     end
 
     @passport.record_correction!(result.document)
@@ -309,9 +305,7 @@ class PassportsController < ApplicationController
       Event.record!(:passport_access_policy_failed, passport: @passport.label, did: @passport.dpp_id,
                                                     policy: policy_id, status: result.http_status,
                                                     problems: result.problems)
-      return redirect_to(edit_passport_path(@passport),
-                         alert: t("passports.submit.refused", status: result.http_status,
-                                                              problems: result.problems.join(" · ")))
+      return service_refused(result)
     end
 
     @passport.record_access_policy!(result.access_policy, policy_id)
@@ -435,9 +429,8 @@ class PassportsController < ApplicationController
     unless result.ok?
       Event.record!(:passport_custody_move_failed, passport: @passport.label, did: @passport.dpp_id,
                                                    status: result.http_status, problems: result.problems)
-      return redirect_to(edit_passport_path(@passport),
-                         alert: t("passports.submit.refused", status: result.http_status,
-                                                              problems: result.problems.join(" · ")))
+      return service_refused(result, resume: move_custody_passport_path(@passport),
+                                     custodian: destination[:base_url], collection: destination[:collection_id])
     end
 
     @passport.record_custody_move!(base_url: destination[:base_url],
@@ -836,6 +829,32 @@ class PassportsController < ApplicationController
     return t("passports.access_policy.sent") if report.nil?
 
     t("passports.access_policy.report", unclassified: report.unclassified.to_i, unused: report.unused_rules.to_i)
+  end
+
+  # A refusal of the service, back on the passport's page. The one only the
+  # custodian can resolve -- no reader of the service entered for the
+  # collection -- is said in the operator's language, with the reader to pass
+  # on (shared/reader_missing); every other one as the service put it. The
+  # reader is the one the refusal names, or else the one the service publishes
+  # for that custodian. +custodian+ and +collection+ are where the write was to
+  # go. +resume+ names the form whose values the browser puts back
+  # (ResumeController), so a refused handover does not cost the operator what
+  # they typed.
+  def service_refused(result, resume: nil, custodian: storage_base, collection: custody_collection)
+    flash[:resume_action] = resume if resume
+    missing = DppService::Client.reader_missing(result, custodian: custodian, collection: collection)
+    if missing
+      missing.reader_did ||= DppService::Directory.reader_for(@passport.submitted_to.presence ||
+                                                                settings.service_base_url, missing.custodian)
+      flash[:reader_missing] = missing.to_h.transform_keys(&:to_s) if missing.reader_did
+      alert = missing.reader_did ? "passports.reader_missing.alert" : "passports.reader_missing.alert_without_reader"
+      return redirect_to(edit_passport_path(@passport),
+                         alert: t(alert, custodian: missing.custodian, collection: missing.collection))
+    end
+
+    redirect_to(edit_passport_path(@passport),
+                alert: t("passports.submit.refused", status: result.http_status,
+                                                     problems: result.problems.join(" · ")))
   end
 
   def submit_refused(message)

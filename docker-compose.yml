@@ -11,7 +11,11 @@
 services:
   dpp-manager:
     image: oydeu/dpp-manager:latest
-    container_name: dpp-manager
+
+    # The name `docker logs` and `docker ps` show. A second DPP Manager on the
+    # same computer needs a name of its own, set like port and folder in a file
+    # called .env next to this one: DPP_MANAGER_CONTAINER=dpp-manager-2.
+    container_name: ${DPP_MANAGER_CONTAINER:-dpp-manager}
 
     # A folder next to this file rather than a named volume. A named volume is
     # the tidier default and the wrong one here: the operator has to be able to
