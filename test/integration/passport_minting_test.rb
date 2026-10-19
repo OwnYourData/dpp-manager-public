@@ -40,6 +40,27 @@ class PassportMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # The keys stay on the page until their storage is confirmed, so the page
+  # says that rather than that they are shown once.
+  test "the key page says the keys stay until they are confirmed as stored" do
+    with_open_vault do
+      create_and_unlock
+      passport = ready_passport
+
+      minting do
+        post mint_passport_path(passport)
+      end
+      follow_redirect!
+
+      assert_response :success
+      assert_includes response.body, "Its two keys are below until you confirm that they are stored."
+      assert_no_match(/below, once/, response.body)
+      german = I18n.t("passports.keys.lead", label: "Lampe", locale: :de)
+      assert_includes german, "bis Sie bestätigen, dass sie abgelegt sind"
+      assert_not_includes german, "einmal"
+    end
+  end
+
   # The identifier goes inside the DID's serviceEndpoint. What that endpoint says
   # has to be byte for byte what the DPP Service would have built itself, escaping
   # included — the service compares the host, but a passport read by anyone else

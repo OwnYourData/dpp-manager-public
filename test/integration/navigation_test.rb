@@ -78,19 +78,67 @@ class NavigationTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # The name of the house leads out to the web. In a new tab, and only this one:
+  # Who made it, and the name of the house leads out to the web. In a new tab:
   # an application holding an open vault must not navigate away from itself
   # because somebody read the footer.
-  test "the footer names OwnYourData.eu and links to it in a new tab" do
+  test "the footer says OwnYourData developed it and links to it in a new tab" do
     with_open_vault do
       create_and_unlock
 
       get root_path
 
-      assert_select "footer a.quiet[href=?]", "https://www.ownyourdata.eu",
-        text: "OwnYourData.eu"
-      assert_select "footer a[href=?][target=?][rel=?]",
-        "https://www.ownyourdata.eu", "_blank", "noopener"
+      assert_select "footer p.by", text: /\ADeveloped by OwnYourData — everything is kept in one encrypted file on this machine\.\z/
+      assert_select "footer p.by a.quiet[href=?][target=?][rel=?]",
+        "https://www.ownyourdata.eu/en/", "_blank", "noopener", text: "OwnYourData"
+    end
+  end
+
+  # As in the footers of the DPP Service and the DPP Linter: where the other
+  # DPP tools are, the source and the version. The tools are always those of
+  # OwnYourData, whichever service this installation submits to.
+  test "the footer leads to the DPP tools and the source, and names the version" do
+    with_open_vault do
+      create_and_unlock
+      Setting.current.update!(service_base_url: "https://dpp.example.org", service_audience: "https://dpp.example.org")
+
+      get root_path
+
+      assert_select "footer p.links a.quiet[href=?][target=?][rel=?]", "https://dpp-service.ownyourdata.eu",
+        "_blank", "noopener", text: "DPP Service, Knowledge Base, Linter and Validator"
+      assert_select "footer p.links a.quiet[href=?][target=?][rel=?]", "https://github.com/OwnYourData/dpp-manager-public",
+        "_blank", "noopener", text: "Source code"
+      assert_select "footer p.links", text: /·\s+Version #{Regexp.escape(DppManager::VERSION)}\z/
+    end
+  end
+
+  test "the footer speaks German in German" do
+    with_open_vault do
+      create_and_unlock
+      Setting.current.update!(locale: "de")
+
+      get root_path
+
+      assert_select "footer p.by", text: /\AEntwickelt von OwnYourData — alles liegt in einer verschlüsselten Datei auf diesem Rechner\.\z/
+      assert_select "footer p.by a[href=?]", "https://www.ownyourdata.eu/"
+      assert_select "footer p.links a", text: "DPP Service, Knowledge Base, Linter und Validator"
+      assert_select "footer p.links a", text: "Quelltext"
+    end
+  end
+
+  # On the right of the bar, as in the bars of the DPP Linter and the Validator:
+  # the DPP Service this installation submits to, in a tab of its own.
+  test "the bar links to the DPP Service that is set up, and before setup to the one setup suggests" do
+    with_open_vault do
+      create_and_unlock
+
+      get root_path
+      assert_select "header nav > a.service:last-child[href=?][target=?][rel=?]", "https://dpp-service.ownyourdata.eu",
+        "_blank", "noopener", text: "DPP Service"
+
+      Setting.current.update!(service_base_url: "https://dpp.example.org", service_audience: "https://dpp.example.org")
+      get events_path
+      assert_select "header nav > a.service[href=?]", "https://dpp.example.org", text: "DPP Service"
+      assert_select "header a.service", 1
     end
   end
 

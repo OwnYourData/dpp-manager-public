@@ -6,9 +6,13 @@ de:
   app:
     name: "DPP Manager"
     tagline: "Digitale Produktpässe auf dem eigenen Rechner anlegen und verwalten."
-    footer_html: "%{home} · Version %{version} — alles liegt in einer %{link} auf diesem Rechner."
-    footer_home: "OwnYourData.eu"
+    footer_html: "Entwickelt von %{home} — alles liegt in einer %{link} auf diesem Rechner."
+    footer_home: "OwnYourData"
+    footer_home_url: "https://www.ownyourdata.eu/"
     footer_link: "verschlüsselten Datei"
+    footer_tools: "DPP Service, Knowledge Base, Linter und Validator"
+    footer_source: "Quelltext"
+    footer_version: "Version %{version}"
 
   locales:
     en: "English"
@@ -32,6 +36,7 @@ de:
     identity: "Meine Identität"
     settings: "Einstellungen"
     lock: "Sperren"
+    dpp_service: "DPP Service"
 
   help:
     title: "Wozu diese Seite da ist"
@@ -299,7 +304,7 @@ de:
           - "Die Adresse, auf die sie zeigt, prüft der DPP Service beim Übermitteln — eine Kennung für den einen Ort lässt sich nicht an einem anderen einreichen."
     keys:
       title: "Die Schlüssel dieses Passes"
-      lead: "Die Kennung von „%{label}“ ist angelegt. Ihre beiden Schlüssel stehen unten — einmal."
+      lead: "Die Kennung von „%{label}“ ist angelegt. Ihre beiden Schlüssel stehen unten, bis Sie bestätigen, dass sie abgelegt sind."
       did: "Passkennung"
       endpoint: "Zeigt auf"
       endpoint_hint: "Wo der Pass zu lesen sein wird. Der DPP Service vergleicht diese Adresse mit dem Ort, an dem Sie einreichen — sie gehört zur Kennung und ist keine Anmerkung dazu."

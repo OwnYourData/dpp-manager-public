@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.10
+
+- The bar links on the right to the DPP Service your passports are submitted
+  to, and the footer leads to the DPP Service with its Knowledge Base, Linter
+  and Validator and to the source code, and names the version.
+- The key page of a new passport identifier says that its keys stay visible
+  until you confirm that they are stored, as the setup does for the keys of
+  your identity.
+- When the container cannot write to its data folder, its log gives the same
+  remedy as the page and the installation guide, Docker Desktop on macOS and
+  Windows included.
+- Setup names the handover of a passport by the title the passport page gives
+  it, *Hand this passport to another custodian*.
+- Rails is updated to 8.1.4.
+
 ## 0.1.9
 
 - **A custodian without the service's reader is explained.** When the DPP

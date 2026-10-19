@@ -10,9 +10,13 @@ en:
   app:
     name: "DPP Manager"
     tagline: "Create and manage digital product passports on your own machine."
-    footer_html: "%{home} · Version %{version} — everything is kept in one %{link} on this machine."
-    footer_home: "OwnYourData.eu"
+    footer_html: "Developed by %{home} — everything is kept in one %{link} on this machine."
+    footer_home: "OwnYourData"
+    footer_home_url: "https://www.ownyourdata.eu/en/"
     footer_link: "encrypted file"
+    footer_tools: "DPP Service, Knowledge Base, Linter and Validator"
+    footer_source: "Source code"
+    footer_version: "Version %{version}"
 
   locales:
     en: "English"
@@ -36,6 +40,7 @@ en:
     identity: "My identity"
     settings: "Settings"
     lock: "Lock"
+    dpp_service: "DPP Service"
 
   help:
     title: "What this page is for"
@@ -303,7 +308,7 @@ en:
           - "The address it points at is compared by the DPP Service when you submit — an identifier created for one place cannot be submitted to another."
     keys:
       title: "The keys of this passport"
-      lead: "The identifier of “%{label}” has been created. Its two keys are below, once."
+      lead: "The identifier of “%{label}” has been created. Its two keys are below until you confirm that they are stored."
       did: "Passport identifier"
       endpoint: "Points at"
       endpoint_hint: "Where the passport will be readable. The DPP Service checks this address against where you submit, so it is part of the identifier rather than a note about it."
@@ -906,7 +911,7 @@ en:
       known_hint: "A data intermediary registered under the Data Governance Act, which holds passports as custodian. It does not run this application — you do. You get your collection when you sign a hosting agreement with it."
       other: "A different custodian"
       collection_hint: "The number of your collection at the custodian. It is in the confirmation they sent you."
-      affects_new_only: "A change here applies to passports you create from now on. Passports already minted carry their address in their identifier and stay where they are — you move one of those on its own page, under “Hand this passport to a different custodian”."
+      affects_new_only: "A change here applies to passports you create from now on. Passports already minted carry their address in their identifier and stay where they are — you move one of those on its own page, under “Hand this passport to another custodian”."
       save: "Save"
       clear_action: "Remove the custodian"
       changed: "The custodian is changed. It applies to passports you create from now on."

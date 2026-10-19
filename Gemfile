@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 ruby "~> 3.3"
 
-gem "rails", "~> 8.1.3", ">= 8.1.3.1"
+gem "rails", "~> 8.1.4"
 gem "propshaft"
 
 # Built from source against libsqlcipher: the whole database file is encrypted,

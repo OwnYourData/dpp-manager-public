@@ -8,7 +8,7 @@
 
 <%= form_with url: setup_service_path, method: :post, local: true do %>
   <label for="service_base_url"><%= t("setup.service.label") %></label>
-  <%= text_field_tag :service_base_url, settings.service_base_url.presence || "https://dpp-service.ownyourdata.eu",
+  <%= text_field_tag :service_base_url, settings.service_base_url.presence || Setting::DEFAULT_SERVICE_BASE_URL,
         id: "service_base_url", autofocus: true, autocomplete: "off", spellcheck: false %>
   <p class="hint"><%= t("setup.service.hint") %></p>
 

@@ -17,6 +17,11 @@ class Setting < ApplicationRecord
 
   def self.known_custodian?(base_url) = base_url.to_s == KNOWN_CUSTODIAN[:base_url]
 
+  # The DPP Service of OwnYourData. Setup suggests it, the bar links to it until
+  # another one is set up, and the footer always does: next to the service it
+  # carries the Knowledge Base, the DPP Linter and the Validator.
+  DEFAULT_SERVICE_BASE_URL = "https://dpp-service.ownyourdata.eu".freeze
+
   validates :locale, inclusion: { in: LOCALES }
   validates :idle_timeout_minutes, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 480 }
 

@@ -7,7 +7,9 @@ fi
 
 if [ ! -w "${DPP_DATA_DIR}" ]; then
   echo "The data directory ${DPP_DATA_DIR} is not writable by this container (uid $(id -u))." >&2
-  echo "On Linux, chown the directory to uid 1000. On macOS and Windows, Docker Desktop handles this for you." >&2
+  echo "On Linux, chown the directory to uid 1000 (sudo chown -R 1000:1000 on it)." >&2
+  echo "With Docker Desktop on macOS or Windows, the directory has to belong to you and must not be read-only; on macOS, Docker also needs access to it under System Settings → Privacy & Security → Files and Folders." >&2
+  echo "The installation guide, section 7, has the details." >&2
   exit 1
 fi
 

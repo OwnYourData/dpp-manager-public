@@ -13,6 +13,13 @@ module ApplicationHelper
     prefixes.compact.any? { |prefix| request.path == prefix || request.path.start_with?("#{prefix}/") }
   end
 
+  # The DPP Service this installation submits to, for the link in the bar: the
+  # one set up, and until there is one the one setup suggests. While the vault
+  # is closed nothing set up can be read, so it is the suggestion then too.
+  def dpp_service_url
+    (settings.service_base_url.presence if vault_open?) || Setting::DEFAULT_SERVICE_BASE_URL
+  end
+
   # The funding notice for the footer, in the wording of config/funding.yml.
   # It stays in English in every language of the application: it is quoted as
   # agreed with the project, not translated.

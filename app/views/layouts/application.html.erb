@@ -64,6 +64,14 @@
               <%= link_to t("nav.settings"), settings_path, class: ("on" if current_page?(settings_path)) %>
             </div>
           </details>
+
+          <%# On the right, as in the bars of the DPP Linter and the Validator: the
+              DPP Service this installation submits to. It is the one link in
+              the bar that leaves the application, so it opens in a tab of its
+              own — an open vault should not navigate away from itself. On a
+              narrow window it ends the row of the navigation. %>
+          <%= link_to t("nav.dpp_service"), dpp_service_url, class: "service", title: dpp_service_url,
+                      target: "_blank", rel: "noopener" %>
         </nav>
 
         <%= button_to lock_path, method: :delete, class: "link" do %>
@@ -114,21 +122,32 @@
     </main>
 
     <footer>
-      <%# Two links, both quiet on purpose: in the same grey as the sentence
-          around them, underlined only under the cursor. A blue link in the
-          footer would pull the eye away from whatever the page is actually for.
-          The words that name the file lead to the page about it; the name of
-          the house leads out to the web, and only that one opens a new tab —
-          an application holding an open vault should not navigate away from
-          itself because somebody read the footer. %>
-      <span class="by">
+      <%# Like the footers of the DPP Service and the DPP Linter: who made it,
+          where the rest of the DPP tools are, the source and the version. The
+          links are quiet on purpose: in the same grey as the sentence around
+          them, underlined only under the cursor. A blue link in the footer
+          would pull the eye away from whatever the page is actually for.
+          The words that name the file lead to the page about it; every other
+          link leads out to the web and opens a new tab — an application holding
+          an open vault should not navigate away from itself because somebody
+          read the footer. %>
+      <p class="by">
         <%= image_tag "oyd-mark.svg", class: "mark", alt: "" %>
-        <%= t("app.footer_html", version: DppManager::VERSION,
-              home: link_to(t("app.footer_home"), "https://www.ownyourdata.eu",
-                            class: "quiet", target: "_blank", rel: "noopener"),
-              link: (vault_open? ? link_to(t("app.footer_link"), vault_path, class: "quiet")
-                                 : t("app.footer_link"))) %>
-      </span>
+        <span><%= t("app.footer_html",
+                    home: link_to(t("app.footer_home"), t("app.footer_home_url"),
+                                  class: "quiet", target: "_blank", rel: "noopener"),
+                    link: (vault_open? ? link_to(t("app.footer_link"), vault_path, class: "quiet")
+                                       : t("app.footer_link"))) %></span>
+      </p>
+      <%# The separator stays with the item before it, so that a narrow window
+          breaks the line after a dot and never starts one with it. %>
+      <p class="links">
+        <%= link_to t("app.footer_tools"), Setting::DEFAULT_SERVICE_BASE_URL,
+                    class: "quiet", target: "_blank", rel: "noopener" %>&nbsp;·
+        <%= link_to t("app.footer_source"), "https://github.com/OwnYourData/dpp-manager-public",
+                    class: "quiet", target: "_blank", rel: "noopener" %>&nbsp;·
+        <%= t("app.footer_version", version: DppManager::VERSION) %>
+      </p>
       <p class="funding" lang="en"><%= funding_notice %></p>
     </footer>
 

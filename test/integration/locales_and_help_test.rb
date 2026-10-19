@@ -15,6 +15,15 @@ class LocalesAndHelpTest < ActionDispatch::IntegrationTest
     assert_empty (de - en), "missing in en.yml: #{(de - en).join(', ')}"
   end
 
+  # Setup sends the operator to the handover on the passport page by its title,
+  # so it has to quote that title as the page shows it.
+  test "setup quotes the title of the handover as the passport page shows it" do
+    %i[en de].each do |locale|
+      title = I18n.t("passports.custody.move_title", locale: locale)
+      assert_includes I18n.t("setup.custodian.affects_new_only", locale: locale), title, "in #{locale}"
+    end
+  end
+
   test "no locale value is left empty" do
     %w[en de].each do |locale|
       values = flatten_values(YAML.load_file(Rails.root.join("config/locales/#{locale}.yml"))[locale])

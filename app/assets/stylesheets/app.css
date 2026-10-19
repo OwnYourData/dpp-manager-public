@@ -114,6 +114,10 @@ body.centered {
    would stop answering the question on nearly every page. */
 .bar nav > a.on, .bar nav .menu.on > summary { color: var(--oyd-blue); font-weight: 600; }
 
+/* The DPP Service: an entry like the others, pushed to the right end of the
+   navigation, next to the lock — and to the end of its row on a narrow window. */
+.bar nav > a.service { margin-left: auto; }
+
 .menu { position: relative; }
 .menu summary { list-style: none; }
 .menu summary::-webkit-details-marker { display: none; }
@@ -345,8 +349,9 @@ footer {
   font-size: 0.85rem;
   padding: 0 0 30px;
 }
-footer .by { display: inline-flex; align-items: center; gap: 6px; }
-footer .by .mark { width: 11px; height: auto; vertical-align: middle; }
+footer .by { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 0; padding: 0 20px; }
+footer .by .mark { width: 11px; height: auto; flex: none; }
+footer .links { margin: 6px 0 0; padding: 0 20px; }
 footer .funding { max-width: 720px; margin: 10px auto 0; padding: 0 20px; font-size: 13px; line-height: 1.5; }
 
 a { color: var(--oyd-blue); }
