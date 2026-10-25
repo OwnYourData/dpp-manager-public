@@ -43,6 +43,23 @@ class DidOydTest < ActiveSupport::TestCase
       "an identifier whose whole purpose is authenticating to a service has to say so"
   end
 
+  # The identity signs the passports the DPP Service keeps, as their economic
+  # operator, so its document says that the document key asserts too. Like
+  # authentication, it sits inside the hashed payload: right at minting, or not
+  # at all.
+  test "the identity DID declares its document key for assertions" do
+    seen = nil
+    stubbing(::Oydid, :create, ->(content, _options) { seen = content; [ RESULT, nil ] }) { Did::Oyd.mint }
+
+    assert_equal [ "#key-doc" ], seen["assertionMethod"]
+  end
+
+  test "a passport DID declares no assertion method" do
+    content = capture_passport_content("https://id.example.com/01/09520123456788", endpoint_base: "https://pod.example")
+
+    assert_not content.key?("assertionMethod"), "a passport names a thing; the identity signs on its behalf"
+  end
+
   # --- attesting the payload (variant B) --------------------------------------
   #
   # The service computes the hash and reports it; it cannot sign the entry,

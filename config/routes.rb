@@ -46,7 +46,9 @@ Rails.application.routes.draw do
       get  "keys",        action: :keys
       post "keys/secure", action: :secure_keys, as: :secure_keys
       post "keys/export", action: :export_keys, as: :export_keys
+      post "sign"
     end
+    post "sign-all", action: :sign_all, on: :collection, as: :sign_all
   end
 
   resources :product_types, except: :show, path: "product-types" do

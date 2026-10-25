@@ -130,12 +130,102 @@ class DppServiceClientTest < ActiveSupport::TestCase
     assert_nil result.document
   end
 
+  # --- the token names its request ------------------------------------------
+
+  # Stands in for Did::Token::Bearer: records what it was asked to mint for.
+  RecordingBearer = Struct.new(:asked) do
+    def token_for(method, target, body)
+      asked << [ method, target, body ]
+      "minted-#{asked.size}"
+    end
+  end
+
+  test "the token of a write is minted for exactly the method, target and body that go out" do
+    sent = []
+    bearer = RecordingBearer.new([])
+    stubbing(DppService::Client, :perform, ->(request, uri) { sent << [ request, uri ]; response("200", "{}") }) do
+      DppService::Client.update({ "facilityId" => "x" }, base_url: "https://dpp-service.example",
+                                                         dpp_id: "did:oyd:zQmP", token: bearer)
+      DppService::Client.delete(base_url: "https://dpp-service.example", dpp_id: "did:oyd:zQmP", token: bearer)
+    end
+
+    (patch, patch_uri), (delete, _) = sent
+    assert_equal [ "PATCH", "/dpp/v1/dpps/did%3Aoyd%3AzQmP?representation=full", patch.body ], bearer.asked[0],
+      "the query is part of the request-target, the body the bytes sent"
+    assert_equal patch_uri.request_uri, bearer.asked[0][1]
+    assert_equal "Bearer minted-1", patch["Authorization"]
+    assert_equal [ "DELETE", "/dpp/v1/dpps/did%3Aoyd%3AzQmP", "" ], bearer.asked[1], "no body is the empty one"
+    assert_equal "Bearer minted-2", delete["Authorization"]
+  end
+
+  test "a token handed in as a string is sent as it is" do
+    sent = []
+    stubbing(DppService::Client, :perform, ->(request, _uri) { sent << request; response("200", "[]") }) do
+      DppService::Client.list_access_grants(base_url: "https://dpp-service.example", token: "t")
+    end
+
+    assert_equal "Bearer t", sent.first["Authorization"]
+  end
+
+  # --- the signature of the economic operator --------------------------------
+
+  test "what is signed is read without a token, in the full representation, as the bytes that came" do
+    sent = []
+    body = %({"digitalProductPassportId":"did:oyd:zQmP","elements":[]})
+    result = stubbing(DppService::Client, :perform, ->(request, uri) { sent << [ request, uri ]; response("200", body) }) do
+      DppService::Client.read_for_signing(base_url: "https://dpp-service.example/", dpp_id: "did:oyd:zQmP")
+    end
+
+    request, uri = sent.first
+    assert_equal "GET", request.method
+    assert_equal "/dpp/v1/dpps/did%3Aoyd%3AzQmP?representation=full", uri.request_uri
+    assert_nil request["Authorization"], "a reader without access rights gets what is signed"
+    assert_equal body, result.raw
+  end
+
+  test "the signature is handed in as the body of a PUT, under a token minted for it" do
+    sent = []
+    bearer = RecordingBearer.new([])
+    answer = response("200", JSON.generate("statusCode" => "Success",
+                                           "message" => [ { "messageType" => "Info", "text" => "signature accepted" } ]),
+                      "X-DPP-Signature-State" => "signed")
+    result = stubbing(DppService::Client, :perform, ->(request, uri) { sent << [ request, uri ]; answer }) do
+      DppService::Client.submit_signature("h.p.s", base_url: "https://dpp-service.example", dpp_id: "did:oyd:zQmP",
+                                                   token: bearer)
+    end
+
+    request, uri = sent.first
+    assert_equal "PUT", request.method
+    assert_equal "/dpp/v1/dpps/did%3Aoyd%3AzQmP/signature", uri.request_uri
+    assert_equal "application/jose", request["Content-Type"]
+    assert_equal "h.p.s", request.body
+    assert_equal [ "PUT", "/dpp/v1/dpps/did%3Aoyd%3AzQmP/signature", "h.p.s" ], bearer.asked.first
+    assert result.ok?
+    assert_equal "signed", result.signature_state
+    assert_empty result.warnings, "an Info message is no warning"
+  end
+
+  test "the warning on a representative's signature is kept, and the state read from every answer" do
+    warning = "signed by did:oyd:zQmRep, which is not the economicOperatorId did:oyd:zQmOp: accepted"
+    result = DppService::Client.interpret(
+      response("200", JSON.generate("statusCode" => "Success",
+                                    "message" => [ { "messageType" => "Warning", "text" => warning } ]),
+               "X-DPP-Signature-State" => "signed")
+    )
+
+    assert_equal [ warning ], result.warnings
+    assert_equal "pending", DppService::Client.interpret(response("200", "{}", "X-DPP-Signature-State" => "pending"))
+                                              .signature_state
+    assert_nil DppService::Client.interpret(response("200", "{}")).signature_state,
+      "a service that says nothing knows no signature of the economic operator"
+  end
+
   private
 
   # A real Net::HTTPResponse rather than a double: body_as_text asks it for its
   # type_params, and a stand-in that answered differently would hide exactly the
   # encoding bug that made body_as_text necessary.
-  # The payload commitment (prEN 18246) arrives in headers, because the document
+  # The payload commitment (EN 18246:2026) arrives in headers, because the document
   # carries the attributes of EN 18223:2026 Table 1 and nothing else. `pending`
   # is the state that asks something of this application: the service has the
   # hash but not the key to sign the entry with.

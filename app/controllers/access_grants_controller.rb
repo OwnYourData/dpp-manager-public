@@ -109,7 +109,7 @@ class AccessGrantsController < ApplicationController
   end
 
   def bearer
-    Did::Token.issue(Identity.current, audience: settings.service_audience)
+    Did::Token.bearer(Identity.current, audience: settings.service_audience)
   end
 
   # The passports a grant of this operator can name at the configured service:

@@ -292,6 +292,53 @@
   </section>
 <% end %>
 
+<%# The signature of the economic operator. A passport the DPP Service keeps
+    in its own database is signed here after every write: the service fetches
+    nothing from this machine, it only checks what is handed in against what it
+    delivers. A custodian serves its passports itself, and for those the page
+    says why there is no signature instead of offering one. %>
+<% if @passport.submitted? && !@passport.retired? %>
+  <section class="mint" id="signature">
+    <h2><%= t("passports.signature.title") %></h2>
+
+    <% if @passport.custodial? %>
+      <p class="hint"><%= t("passports.signature.custodial") %></p>
+    <% else %>
+      <% if @passport.signature_state.present? %>
+        <dl class="given">
+          <dt><%= t("passports.signature.state") %></dt>
+          <dd><%= t("passports.signature.states.#{@passport.signature_state}", default: @passport.signature_state) %></dd>
+
+          <% if @passport.signature_recorded_at %>
+            <dt><%= t("passports.signature.recorded_at") %></dt>
+            <dd><%= l(@passport.signature_recorded_at.in_time_zone, format: :short) %></dd>
+          <% end %>
+
+          <% if @passport.signed? && @passport.signature_warning.present? %>
+            <dt><%= t("passports.signature.warning") %></dt>
+            <dd>
+              <%= t("passports.signature.representative") %>
+              <br><span class="muted"><%= @passport.signature_warning %></span>
+            </dd>
+          <% end %>
+
+          <% if !@passport.signed? && @passport.signature_problem.present? %>
+            <dt><%= t("passports.signature.problem") %></dt>
+            <dd><%= @passport.signature_problem %></dd>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="hint"><%= t("passports.signature.unknown") %></p>
+      <% end %>
+
+      <p class="hint"><%= t("passports.signature.hint") %></p>
+      <% unless @passport.signed? %>
+        <%= button_to t("passports.signature.action"), sign_passport_path(@passport), method: :post %>
+      <% end %>
+    <% end %>
+  </section>
+<% end %>
+
 <div class="danger-zone">
   <%# Three states, three different things to offer. A passport that never left
       this machine is simply deleted; one that is out in the world is ended,

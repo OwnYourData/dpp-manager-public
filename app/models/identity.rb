@@ -2,7 +2,8 @@
 #
 # Not a passport identifier and not the service's: this is who the operator *is*
 # towards the DPP Service and towards a custodian. It signs the bearer tokens,
-# it signs the delegations, and a custodian records it as the controller of the
+# it signs the delegations, it signs the passports the DPP Service keeps as
+# their economic operator, and a custodian records it as the controller of the
 # collection the passports go into.
 #
 # Exactly one for now. The table is not built around that assumption, because a

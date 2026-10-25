@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # What this machine attested about the payload the custodian delivers
-# (prEN 18246; dpp-service/docs/Integrity.md).
+# (EN 18246:2026; dpp-service/docs/Integrity.md).
 #
 # Two fields rather than a copy of the service's own state. What matters here is
 # what *this* operator signed: the service reports the hash of the payload it

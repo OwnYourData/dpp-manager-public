@@ -298,6 +298,42 @@ class Passport < ApplicationRecord
     submitted? && !retired? && current_id.present? && access_policy_id != current_id
   end
 
+  # --- signature of the economic operator -----------------------------------
+
+  # The passports that should carry the signature and, as far as is known
+  # here, do not: with the DPP Service in its own database, not ended.
+  scope :awaiting_signature, lambda {
+    where.not(submitted_at: nil).where(retired_at: nil, custodian_collection_id: [ nil, "" ])
+         .where("signature_state IS NULL OR signature_state <> ?", "signed")
+  }
+
+  # Only a passport the DPP Service keeps in its own database can carry it. A
+  # custodian serves its passports itself, and the service takes no signature
+  # for them.
+  def signable? = submitted? && !retired? && !custodial?
+
+  def signed? = signature_state == "signed"
+
+  # What the service said after a write: the signature it held is gone, and
+  # with it the warning that came with it.
+  def record_signature_state!(state)
+    return if state.blank?
+
+    update!(signature_state: state, signature_warning: (signature_warning if state == "signed"),
+            signature_recorded_at: Time.current)
+  end
+
+  # The outcome of handing in a signature (DppService::OperatorSigning).
+  def record_signature!(outcome)
+    if outcome.ok?
+      update!(signature_state: outcome.state, signature_warning: outcome.warnings.join(" ").presence,
+              signature_problem: nil, signature_recorded_at: Time.current)
+    else
+      update!(signature_state: outcome.state.presence || signature_state,
+              signature_problem: outcome.problems.join(" · ").presence, signature_recorded_at: Time.current)
+    end
+  end
+
   def record_correction!(document)
     update!(corrected_at: Time.current, submitted_digest: input_digest,
             service_document: document.present? ? JSON.generate(document) : nil)

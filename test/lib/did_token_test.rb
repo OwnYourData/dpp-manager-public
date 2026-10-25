@@ -60,6 +60,38 @@ class DidTokenTest < ActiveSupport::TestCase
     end
   end
 
+  # The vectors of the DPP Service (its spec/lib/request_binding_spec.rb): one
+  # implementation each side, and the same hash from both or no write at all.
+  test "the request hash is the one the service computes" do
+    assert_equal "WGgNu_mKYsHBy5viG29BhN08q9qznsS6mH22QZ2P7-8",
+                 Did::Token.request_hash("PATCH", "/dpp/v1/dpps/did%3Aoyd%3AzQmExample?representation=full",
+                                         '{"elements":[]}')
+    assert_equal "ULdlZ_iK5tIAER3kxGjUyaxwuG_1knNw0KlTUAMexaQ",
+                 Did::Token.request_hash("delete", "/dpp/v1/dpps/x", ""),
+                 "the method in capitals, an empty body as the empty octet string"
+  end
+
+  test "the token of a write names its request, and a token without one names none" do
+    bound = Did::Token.issue(@identity, audience: "https://x.example",
+                                        request: [ "POST", "/dpp/v1/dpps", '{"a":1}' ])
+    payload, = JWT.decode(bound, nil, false)
+    plain, = JWT.decode(Did::Token.issue(@identity, audience: "https://x.example"), nil, false)
+
+    assert_equal Did::Token.request_hash("POST", "/dpp/v1/dpps", '{"a":1}'), payload["rqh"]
+    assert_not plain.key?("rqh")
+  end
+
+  test "a bearer mints a new token for every request it is asked about" do
+    bearer = Did::Token.bearer(@identity, audience: "https://x.example")
+    first, = JWT.decode(bearer.token_for("PUT", "/dpp/v1/dpps/x/signature", "a.b.c"), nil, false)
+    second, = JWT.decode(bearer.token_for("PUT", "/dpp/v1/dpps/x/signature", "a.b.d"), nil, false)
+
+    assert_not_equal first["jti"], second["jti"], "the service accepts each token once"
+    assert_not_equal first["rqh"], second["rqh"]
+    assert_equal "https://x.example", first["aud"]
+    assert_raises(ArgumentError) { Did::Token.bearer(@identity, audience: "") }
+  end
+
   test "an audience is required — a token without one is refused everywhere" do
     assert_raises(ArgumentError) { Did::Token.issue(@identity, audience: nil) }
   end

@@ -27,8 +27,9 @@ module Did
     SERVICE_TYPE = "DigitalProductPassport".freeze
 
     # The attribute of that service entry which commits to the payload the
-    # custodian delivers (prEN 18246). The DPP Service fixes the same name in one
-    # place; a different spelling on either side is a commitment nobody can check.
+    # custodian delivers (EN 18246:2026). The DPP Service fixes the same name in
+    # one place; a different spelling on either side is a commitment nobody can
+    # check.
     PAYLOAD_HASH = "payloadHash".freeze
 
     module_function
@@ -53,11 +54,18 @@ module Did
     # Mint the operator's identity DID. It carries no service entry: it names an
     # actor, not a passport, and an actor has nothing to point at.
     #
+    # Its document key does two things: it authenticates the operator to the
+    # DPP Service, and it signs the passports the operator stands behind. The
+    # document says both, `authentication` and `assertionMethod` naming
+    # #key-doc. Like `authentication`, the section is part of the hashed
+    # payload and cannot be added later without a new identifier, so an
+    # identity minted before keeps what it has.
+    #
     # Returns { did:, document_key:, revocation_key:, revocation_log: }. The two
     # keys exist in this return value and nowhere else — the registrar does not
     # keep them and cannot hand them out again.
     def mint(content = {})
-      create(content, authentication: true)
+      create({ "assertionMethod" => [ "#key-doc" ] }.merge(content), authentication: true)
     end
 
     # The passport's DID.
@@ -144,8 +152,8 @@ module Did
     end
 
     # Attest the payload the custodian delivers, by adding the hash the service
-    # reported to the passport's own DID document (prEN 18246; the procedure is
-    # dpp-service/docs/Integrity.md section 4).
+    # reported to the passport's own DID document (EN 18246:2026; the procedure
+    # is dpp-service/docs/Integrity.md section 4).
     #
     # This is the half of variant B that cannot be delegated: the service holds no
     # document key and therefore cannot sign this entry. It computes the hash,

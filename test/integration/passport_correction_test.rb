@@ -60,13 +60,13 @@ class PassportCorrectionTest < ActionDispatch::IntegrationTest
 
       seen = nil
       correcting(update: ->(_patch, base_url:, dpp_id:, token:) {
-        seen = { base_url: base_url, dpp_id: dpp_id, token: token }
+        seen = { base_url: base_url, dpp_id: dpp_id, token: token.token_for("PATCH", "/dpp/v1/dpps/x", "{}") }
         accepted
       }) { post correct_passport_path(passport) }
 
       assert_equal SERVICE, seen[:base_url]
       assert_equal passport.dpp_id, seen[:dpp_id]
-      assert_equal "token", seen[:token]
+      assert_equal "token", seen[:token], "the token is minted for the request once the client has built it"
     end
   end
 

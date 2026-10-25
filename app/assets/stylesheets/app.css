@@ -314,25 +314,41 @@ button.as-link:focus-visible { text-decoration: underline; }
   border-radius: 8px;
   padding: 14px 18px;
   flex: 1 1 20rem;
+  min-width: 0;
 }
 .card h2 { margin-top: 4px; }
 
-dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; }
+/* A long value, such as the path of the data file, breaks where it has to
+   instead of making its column, and with it the page, wider than the window. */
+dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; }
 dt { color: var(--muted); }
-dd { margin: 0; }
+dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
 
 table { width: 100%; border-collapse: collapse; margin: 10px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 th, td { text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--line); vertical-align: top; }
 tr:last-child td { border-bottom: 0; }
 th { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; background: var(--bg); }
 td.when { white-space: nowrap; color: var(--muted); }
-td.detail .pair { display: inline-block; margin-right: 12px; font-size: 0.9rem; }
+td.detail .pair { display: inline-block; max-width: 100%; margin-right: 12px; font-size: 0.9rem; overflow-wrap: anywhere; }
 
 .chain-ok { color: var(--good); }
-.filters { display: flex; gap: 10px; align-items: end; margin: 10px 0; }
+/* The filter of the event log goes onto more lines on a narrow window; the
+   list of kinds is as wide as the window at most, not as its longest name. */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin: 10px 0; }
 .filters label { margin: 0; }
-.filters select { width: auto; }
+.filters select { width: auto; max-width: 100%; min-width: 0; }
 .filters input[type="submit"] { margin: 0; }
+
+/* The event log on a narrow window: one event under the other, its time above
+   what happened and the details below, instead of three columns that run out
+   of the page. The column heads are still read out. */
+@media (max-width: 44rem) {
+  table.events, table.events tbody, table.events tr, table.events td { display: block; }
+  table.events thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  table.events tr { border-bottom: 1px solid var(--line); padding: 6px 0; }
+  table.events tbody tr:last-child { border-bottom: 0; }
+  table.events td { border-bottom: 0; padding: 2px 11px; }
+}
 
 /* The overview's two cards: what the operator has, and the file it is in. The
    first is the reason they opened the page, so it gets the room. */

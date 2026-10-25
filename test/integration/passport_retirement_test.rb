@@ -79,13 +79,13 @@ class PassportRetirementTest < ActionDispatch::IntegrationTest
 
       seen = nil
       retiring(delete: ->(base_url:, dpp_id:, token:) {
-        seen = { base_url: base_url, dpp_id: dpp_id, token: token }
+        seen = { base_url: base_url, dpp_id: dpp_id, token: token.token_for("DELETE", "/dpp/v1/dpps/x", "") }
         accepted
       }) { post retire_passport_path(passport) }
 
       assert_equal SERVICE, seen[:base_url]
       assert_equal passport.dpp_id, seen[:dpp_id]
-      assert_equal "token", seen[:token]
+      assert_equal "token", seen[:token], "the token is minted for the request once the client has built it"
     end
   end
 

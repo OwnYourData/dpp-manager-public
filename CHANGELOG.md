@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.11
+
+- **Passports are signed by their economic operator.** After every
+  submission, correction and change of access policy of a passport the DPP
+  Service keeps in its own database, the DPP Manager reads the passport as any
+  reader receives it, signs it with the key of your identity and hands the
+  signature to the service. The passport page shows the state the service
+  reports, says so when the service accepted the signature as that of an
+  authorised representative, and names the reason when a signature did not go
+  through, with a button to sign again. *Sign all passports that wait for it*
+  on the list of passports signs those that carry no signature yet. A passport
+  held by a custodian is not signed, and its page says why.
+- **Every write names its request.** The token signed for a write carries the
+  hash of its method, address and body. The DPP Service keeps it as your
+  statement of exactly which change you asked for, and from 1 December 2026
+  it accepts no write without it.
+- New identities declare their key for signing (`assertionMethod`) as well as
+  for authenticating; existing identities stay as they are.
+- The event log and the card *Your data file* no longer run over the edge on
+  narrow screens.
+- References to the integrity standard name EN 18246:2026.
+
 ## 0.1.10
 
 - The bar links on the right to the DPP Service your passports are submitted

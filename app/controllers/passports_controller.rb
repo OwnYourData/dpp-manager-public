@@ -14,12 +14,13 @@ class PassportsController < ApplicationController
   before_action :find_passport,
                 only: %i[edit update destroy mint keys secure_keys export_keys
                          submit correct attest retire renew_delegation check_delegation
-                         move_custody finish_move apply_access_policy access_policy]
+                         move_custody finish_move apply_access_policy access_policy sign]
   before_action :require_product_type, only: %i[new create]
 
   def index
     @passports = Passport.includes(:product_type).all
     @product_types = ProductType.fetched
+    @awaiting_signature = Identity.current ? Passport.awaiting_signature.count : 0
   end
 
   def new
@@ -183,8 +184,8 @@ class PassportsController < ApplicationController
     retain_until = @passport.retention_deadline
     result       = DppService::Client.create(document,
                                              base_url: base,
-                                             token: Did::Token.issue(Identity.current,
-                                                                     audience: settings.service_audience),
+                                             token: Did::Token.bearer(Identity.current,
+                                                                      audience: settings.service_audience),
                                              storage: custody_header(mandate),
                                              retain_until: retain_until,
                                              **access_policy_header(policy_id))
@@ -209,9 +210,11 @@ class PassportsController < ApplicationController
 
     Event.record!(:passport_submitted, passport: @passport.label, did: @passport.dpp_id, service: base,
                                        **sent_despite_problems)
+    signed = sign_after_write(result, base)
     notice = mandate ? t("passports.custody.submitted", custodian: storage_base) : t("passports.submit.done")
     notice = [ notice, access_policy_note(result.access_policy, policy_id) ].compact.join(" ")
     notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
+    notice = [ notice, signature_note(signed) ].compact.join(" ")
     redirect_to edit_passport_path(@passport), notice: notice
   rescue Did::Oyd::Error => e
     submit_refused(t("passports.submit.token_failed", message: e.message))
@@ -245,8 +248,8 @@ class PassportsController < ApplicationController
     patch  = Dpp::Document.correction(@passport)
     result = DppService::Client.update(patch,
                                        base_url: base, dpp_id: @passport.dpp_id,
-                                       token: Did::Token.issue(Identity.current,
-                                                               audience: settings.service_audience),
+                                       token: Did::Token.bearer(Identity.current,
+                                                                audience: settings.service_audience),
                                        **access_policy_header(policy_id))
 
     unless result.ok?
@@ -261,8 +264,10 @@ class PassportsController < ApplicationController
 
     Event.record!(:passport_updated, passport: @passport.label, did: @passport.dpp_id, service: base,
                                      **sent_despite_problems)
+    signed = sign_after_write(result, base)
     notice = [ t("passports.correct.done"), access_policy_note(result.access_policy, policy_id) ].compact.join(" ")
     notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
+    notice = [ notice, signature_note(signed) ].compact.join(" ")
     redirect_to edit_passport_path(@passport), notice: notice
   rescue Did::Oyd::Error => e
     submit_refused(t("passports.submit.token_failed", message: e.message))
@@ -297,8 +302,8 @@ class PassportsController < ApplicationController
     return if performed?
 
     result = DppService::Client.update({}, base_url: base, dpp_id: @passport.dpp_id,
-                                           token: Did::Token.issue(Identity.current,
-                                                                   audience: settings.service_audience),
+                                           token: Did::Token.bearer(Identity.current,
+                                                                    audience: settings.service_audience),
                                            access_policy: policy_id)
 
     unless result.ok?
@@ -314,8 +319,10 @@ class PassportsController < ApplicationController
 
     Event.record!(:passport_access_policy_applied, passport: @passport.label, did: @passport.dpp_id,
                                                    policy: policy_id, service: base)
+    signed = sign_after_write(result, base)
     notice = [ t("passports.access_policy.applied"), access_policy_note(result.access_policy, policy_id) ].join(" ")
     notice = "#{notice} #{t('passports.attest.waiting')}" if attested == false
+    notice = [ notice, signature_note(signed) ].compact.join(" ")
     redirect_to edit_passport_path(@passport), notice: notice
   rescue Did::Oyd::Error => e
     submit_refused(t("passports.submit.token_failed", message: e.message))
@@ -334,8 +341,8 @@ class PassportsController < ApplicationController
 
     base = @passport.submitted_to.presence || settings.service_base_url
     result = DppService::Client.read_access_policy(base_url: base, dpp_id: @passport.dpp_id,
-                                                   token: Did::Token.issue(Identity.current,
-                                                                           audience: settings.service_audience))
+                                                   token: Did::Token.bearer(Identity.current,
+                                                                            audience: settings.service_audience))
     unless result.ok?
       return redirect_to(edit_passport_path(@passport),
                          alert: t("passports.submit.refused", status: result.http_status,
@@ -373,7 +380,7 @@ class PassportsController < ApplicationController
     base   = @passport.submitted_to.presence || settings.service_base_url
     result = DppService::Client.renew_delegation(
       base_url: base, dpp_id: @passport.dpp_id, storage: custody_header(mandate),
-      token: Did::Token.issue(Identity.current, audience: settings.service_audience)
+      token: Did::Token.bearer(Identity.current, audience: settings.service_audience)
     )
 
     unless result.ok?
@@ -423,7 +430,7 @@ class PassportsController < ApplicationController
         delegation: mandate.token
       },
       release_previous: params[:release_previous] == "1",
-      token: Did::Token.issue(Identity.current, audience: settings.service_audience)
+      token: Did::Token.bearer(Identity.current, audience: settings.service_audience)
     )
 
     unless result.ok?
@@ -468,7 +475,7 @@ class PassportsController < ApplicationController
     base   = @passport.submitted_to.presence || settings.service_base_url
     result = DppService::Client.read_delegation(
       base_url: base, dpp_id: @passport.dpp_id,
-      token: Did::Token.issue(Identity.current, audience: settings.service_audience)
+      token: Did::Token.bearer(Identity.current, audience: settings.service_audience)
     )
 
     unless result.ok?
@@ -545,6 +552,54 @@ class PassportsController < ApplicationController
     end
   end
 
+  # --- the signature of the economic operator -------------------------------
+  #
+  # A passport the DPP Service keeps in its own database is signed by the
+  # economic operator after every write: the service delivers it, and the
+  # signature says who stands behind what it delivers (dpp-service
+  # docs/Integrity.md section 10). This application does it on its own after
+  # submitting, correcting and classifying; the action here is for a passport
+  # whose signature did not go through then, or that was never signed.
+  #
+  # A custodian serves its passports itself, and the DPP Service takes no
+  # signature for them; the page says so instead of offering one.
+  def sign
+    return submit_refused(t("passports.signature.not_submitted")) unless @passport.submitted?
+    return submit_refused(t("passports.retired.not_served")) if @passport.retired?
+    return submit_refused(t("passports.signature.custodial")) if @passport.custodial?
+    return submit_refused(t("passports.submit.no_identity")) if Identity.current.nil?
+
+    base = @passport.submitted_to.presence || settings.service_base_url
+    return submit_refused(t("passports.submit.no_service")) if base.blank?
+
+    outcome = sign_passport(@passport, base)
+    if outcome.ok?
+      redirect_to edit_passport_path(@passport), notice: signature_note(outcome)
+    else
+      redirect_to edit_passport_path(@passport), alert: signature_note(outcome)
+    end
+  end
+
+  # Every passport that should carry the signature and does not, signed in one
+  # go: passports that were never signed, and those whose signature failed.
+  # One after the other, each with its own answer.
+  def sign_all
+    return redirect_to(passports_path, alert: t("passports.submit.no_identity")) if Identity.current.nil?
+
+    candidates = Passport.awaiting_signature.to_a
+    return redirect_to(passports_path, notice: t("passports.signature.all_none")) if candidates.empty?
+
+    failed = candidates.reject do |passport|
+      sign_passport(passport, passport.submitted_to.presence || settings.service_base_url).ok?
+    end
+
+    notice = t("passports.signature.all_done", signed: candidates.size - failed.size, count: candidates.size)
+    return redirect_to(passports_path, notice: notice) if failed.empty?
+
+    redirect_to passports_path, notice: notice,
+                                alert: t("passports.signature.all_failed", labels: failed.map(&:label).join(", "))
+  end
+
   private
 
   # Returns true when the passport is no longer at the service — including the
@@ -563,8 +618,8 @@ class PassportsController < ApplicationController
 
     base = @passport.submitted_to.presence || settings.service_base_url
     result = DppService::Client.delete(base_url: base, dpp_id: @passport.dpp_id,
-                                       token: Did::Token.issue(Identity.current,
-                                                               audience: settings.service_audience))
+                                       token: Did::Token.bearer(Identity.current,
+                                                                audience: settings.service_audience))
 
     unless result.ok?
       Event.record!(:passport_retire_failed, passport: @passport.label, did: @passport.dpp_id,
@@ -612,7 +667,7 @@ class PassportsController < ApplicationController
   # failure here leaves the document at the new custodian under an identifier
   # that still names the old one, which is the only state in this sequence a
   # reader would notice.
-  # --- attesting the payload (prEN 18246, variant B) --------------------------
+  # --- attesting the payload (EN 18246:2026, variant B) ------------------------
   #
   # The service computes the hash of the payload the custodian delivers and
   # reports it in a header, but it holds no document key and cannot sign the log
@@ -860,6 +915,55 @@ class PassportsController < ApplicationController
   def submit_refused(message)
     Event.record!(:passport_submit_failed, passport: @passport.label, did: @passport.dpp_id, problems: [ message ])
     redirect_to edit_passport_path(@passport), alert: message
+  end
+
+  # After a write: what the service now says about the signature, and the
+  # signature itself where the service keeps the passport. A service that
+  # reports no state knows no signature of the economic operator, and is not
+  # asked for one.
+  #
+  # Best effort, like the attestation: the write is done, and a signature that
+  # cannot be handed in must not turn it into a failure. The passport then
+  # says that it waits, and offers to sign again.
+  def sign_after_write(result, base)
+    return nil if @passport.custodial? || result.signature_state.blank?
+
+    @passport.record_signature_state!(result.signature_state)
+    sign_passport(@passport, base)
+  end
+
+  def sign_passport(passport, base)
+    outcome = DppService::OperatorSigning.call(base_url: base, dpp_id: passport.dpp_id,
+                                               identity: Identity.current,
+                                               audience: settings.service_audience)
+    record_signature(passport, outcome)
+  rescue DppService::Client::Error => e
+    record_signature(passport, DppService::OperatorSigning::Outcome.new(ok: false, warnings: [],
+                                                                        problems: [ reason_for(e) ]))
+  rescue Did::Oyd::Error => e
+    record_signature(passport, DppService::OperatorSigning::Outcome.new(ok: false, warnings: [],
+                                                                        problems: [ e.message ]))
+  end
+
+  def record_signature(passport, outcome)
+    passport.record_signature!(outcome)
+    if outcome.ok?
+      Event.record!(:passport_signed, passport: passport.label, did: passport.dpp_id, state: outcome.state,
+                                      warnings: outcome.warnings)
+    else
+      Event.record!(:passport_signature_failed, passport: passport.label, did: passport.dpp_id,
+                                                problems: outcome.problems)
+    end
+    outcome
+  end
+
+  # The sentence for the flash; nil when nothing was signed or tried.
+  def signature_note(outcome)
+    return nil if outcome.nil?
+    return t("passports.signature.failed", problems: outcome.problems.join(" · ")) unless outcome.ok?
+    return t("passports.signature.done_representative") if outcome.warnings.any?
+
+    t("passports.signature.done")
   end
 
   # Both libraries raise with a symbol naming the cause, so each one has a

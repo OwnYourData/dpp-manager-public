@@ -24,10 +24,18 @@ module DppService
     #
     # list     what the service stored or returned when that is an array rather
     #          than one document (the access grants of an issuer)
+    #
+    # signature_state  what the service says about the signature of the
+    #          economic operator on this passport (X-DPP-Signature-State: none,
+    #          pending, signed, stale); nil from a service that knows none
+    # warnings the sentences of an accepted request's messages of type Warning
+    # raw      the body as it arrived, for the one caller that signs it
     Result = Struct.new(:ok, :http_status, :document, :problems, :codes, :commitment, :access_policy, :list,
-                        keyword_init: true) do
+                        :signature_state, :warnings, :raw, keyword_init: true) do
       def ok? = ok
     end
+
+    SIGNATURE_STATE_HEADER = "X-DPP-Signature-State".freeze
 
     # What the service says after a write about the access policy the passport
     # is classified by (docs/AccessClasses.md of the DPP Service): which policy,
@@ -53,9 +61,9 @@ module DppService
     # is recognised from a service that does not give the code yet.
     READER_MISSING = /the custodian at (\S+) has no reader entered for collection (\S+?),.*this service's reader (did:\S+) for the collection/m
 
-    # What the service says about the payload commitment (prEN 18246). It arrives
-    # in headers and not in the document, because the payload carries the
-    # attributes of EN 18223:2026 Table 1 and nothing else.
+    # What the service says about the payload commitment (EN 18246:2026). It
+    # arrives in headers and not in the document, because the payload carries
+    # the attributes of EN 18223:2026 Table 1 and nothing else.
     #
     # `pending?` is the state that asks something of this application: the service
     # has computed the hash but cannot sign the log entry, because the document
@@ -96,13 +104,13 @@ module DppService
 
       request = Net::HTTP::Post.new(uri.request_uri,
         "Content-Type"  => "application/json",
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
       request["X-DPP-Storage"] = storage_header(storage) if storage.present?
       request["X-DPP-Retain-Until"] = retain_until.iso8601 if retain_until.present?
       request[ACCESS_POLICY_HEADER] = access_policy if access_policy.present?
       request.body = JSON.generate(document)
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -119,9 +127,9 @@ module DppService
       uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}/delegation")
 
       request = Net::HTTP::Get.new(uri.request_uri,
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -135,10 +143,10 @@ module DppService
       uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}/delegation")
 
       request = Net::HTTP::Post.new(uri.request_uri,
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
       request["X-DPP-Storage"] = storage_header(storage)
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -160,10 +168,10 @@ module DppService
       uri = full_form(URI.parse(path))
 
       request = Net::HTTP::Post.new(uri.request_uri,
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
       request["X-DPP-Storage"] = storage_header(storage)
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -196,11 +204,11 @@ module DppService
 
       request = Net::HTTP::Patch.new(uri.request_uri,
         "Content-Type"  => "application/json",
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
       request[ACCESS_POLICY_HEADER] = access_policy if access_policy.present?
       request.body = JSON.generate(patch)
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -214,10 +222,10 @@ module DppService
 
       request = Net::HTTP::Put.new(uri.request_uri,
         "Content-Type"  => "application/json",
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
       request.body = JSON.generate(policy)
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -227,9 +235,9 @@ module DppService
       uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}/access-policy")
 
       request = Net::HTTP::Get.new(uri.request_uri,
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -244,10 +252,10 @@ module DppService
 
       request = Net::HTTP::Put.new(uri.request_uri,
         "Content-Type"  => "application/jwt",
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
       request.body = grant.to_s
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -258,9 +266,9 @@ module DppService
       uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/access-grants")
 
       request = Net::HTTP::Get.new(uri.request_uri,
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -271,9 +279,9 @@ module DppService
       uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/access-grants/#{CGI.escape(jti.to_s)}")
 
       request = Net::HTTP::Delete.new(uri.request_uri,
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -286,9 +294,9 @@ module DppService
       uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}")
 
       request = Net::HTTP::Delete.new(uri.request_uri,
-        "Accept"        => "application/json",
-        "Authorization" => "Bearer #{token}")
+        "Accept"        => "application/json")
 
+      authorize!(request, uri, token)
       interpret(perform(request, uri))
     end
 
@@ -303,6 +311,34 @@ module DppService
     # ended is 404 here, and its history is reached by date instead.
     def read_by_product_id(base_url:, product_id:)
       read("#{base_url.to_s.chomp('/')}/dpp/v1/dppsByProductId/#{CGI.escape(product_id.to_s)}")
+    end
+
+    # The passport as a reader without access rights receives it, in the full
+    # representation, from the service that holds it: GET
+    # /dpp/v1/dpps/:dpp_id?representation=full, without a token. That is
+    # exactly what the signature of the economic operator has to cover
+    # (dpp-service docs/Integrity.md section 10), so the bytes come back in
+    # `raw` as they arrived, to be signed unchanged.
+    def read_for_signing(base_url:, dpp_id:)
+      read("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}")
+    end
+
+    # Handing in the signature of the economic operator — PUT
+    # /dpp/v1/dpps/:dpp_id/signature, the JWS in the compact serialization as
+    # the body. 200 accepted, with X-DPP-Signature-State: signed and, where the
+    # signer is not the economicOperatorId of the passport, a message of type
+    # Warning; 400 among other things when the passport changed since it was
+    # read.
+    def submit_signature(compact, base_url:, dpp_id:, token:)
+      uri = URI.parse("#{base_url.to_s.chomp('/')}/dpp/v1/dpps/#{CGI.escape(dpp_id.to_s)}/signature")
+
+      request = Net::HTTP::Put.new(uri.request_uri,
+        "Content-Type" => "application/jose",
+        "Accept"       => "application/json")
+      request.body = compact.to_s
+
+      authorize!(request, uri, token)
+      interpret(perform(request, uri))
     end
 
     # The same read against an address that was worked out elsewhere — a
@@ -360,6 +396,15 @@ module DppService
       raise Error, e.message
     end
 
+    # The bearer token goes on last, once method, target and body are what goes
+    # out: a Did::Token::Bearer mints it for exactly this request (the claim
+    # rqh), and a token minted for anything else would be refused. A plain
+    # string is taken as it is.
+    def authorize!(request, uri, token)
+      value = token.respond_to?(:token_for) ? token.token_for(request.method, uri.request_uri, request.body.to_s) : token
+      request["Authorization"] = "Bearer #{value}"
+    end
+
     def interpret(response)
       body = parse(response)
       ok   = response.is_a?(Net::HTTPSuccess)
@@ -370,7 +415,18 @@ module DppService
                  problems: (ok ? [] : problems_in(body, response)),
                  codes: (ok ? [] : codes_in(body)),
                  commitment: commitment_in(response),
-                 access_policy: access_policy_in(response))
+                 access_policy: access_policy_in(response),
+                 signature_state: response[SIGNATURE_STATE_HEADER].to_s.strip.presence,
+                 warnings: (ok ? warnings_in(body) : []),
+                 raw: response.body.to_s)
+    end
+
+    # The Warning messages of an accepted request: the DPP Service accepts a
+    # signature by someone other than the passport's economicOperatorId, as
+    # that of an authorised representative, and says so this way.
+    def warnings_in(body)
+      Array(body.is_a?(Hash) ? body["message"] : nil)
+        .filter_map { |entry| entry["text"].presence if entry.is_a?(Hash) && entry["messageType"] == "Warning" }
     end
 
     # The answer header, an RFC 8941 item: a string with two integer parameters.

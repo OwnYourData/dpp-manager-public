@@ -25,7 +25,8 @@ and ended.
 - A passphrase creates that file on first run and opens it afterwards. There is
   no way in without it. The application locks itself after a period without use.
 - The operator's identity is a `did:oyd` minted on this machine. Its two keys
-  are shown once and never leave the file.
+  are shown once and never leave the file. Its document key authenticates the
+  operator to the DPP Service and signs what the operator stands behind.
 - Product types are SOyA structures. They are fetched once and cached, and from
   then on the form, the validation and the transformation work without a
   network — soya-web-cli runs beside Rails and pulls every structure back out of
@@ -60,6 +61,18 @@ and ended.
   another custodian keeps it. Anybody can check it with
   `bin/verify_dpp <carrier link>` from the DPP Service, needing nothing from
   either side.
+- A passport the DPP Service keeps in its own database carries the signature
+  of its economic operator. After every submission, correction and change of
+  access policy the application reads the passport as any reader receives it,
+  signs it with the operator's identity and hands the signature to the
+  service, which delivers it with the passport on request. The passport page
+  shows the state the service reports, and says so when the service accepted
+  the signature as that of an authorised representative. Passports without a
+  signature yet are signed in one go from the list of passports. A passport held by a
+  custodian carries no such signature yet, and its page says why.
+- Every write names its request: the token signed for it carries the hash of
+  the method, the address and the body, so the service keeps it as the
+  operator's statement of exactly which change they asked for.
 - Not every field of a passport has to be public. On the page *Access
   classes* of a product type each element of its passports is public, for
   readers with a legitimate interest, or for authorities only. The page lists

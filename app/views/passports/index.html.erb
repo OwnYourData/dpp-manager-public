@@ -18,6 +18,15 @@
   </div>
 <% end %>
 
+<%# Passports that should carry the signature of the economic operator and
+    do not: those never signed, and those whose signature did not go through. %>
+<% if @awaiting_signature.positive? %>
+  <section class="mint">
+    <p class="hint"><%= t("passports.signature.all_hint") %></p>
+    <%= button_to t("passports.signature.all_action"), sign_all_passports_path, method: :post %>
+  </section>
+<% end %>
+
 <% if @passports.any? %>
   <table>
     <thead>

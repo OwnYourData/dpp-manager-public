@@ -44,7 +44,8 @@ class PassportSubmissionTest < ActionDispatch::IntegrationTest
       stubbing(Soya::WebCli, :transform, ->(*) { [] }) do
         stubbing(Did::Token, :issue, ->(_identity, audience:, **) { "token-for-#{audience}" }) do
           stubbing(DppService::Client, :create, ->(document, base_url:, token:, storage: nil, retain_until: nil) {
-            sent = { document: document, base_url: base_url, token: token, storage: storage }
+            sent = { document: document, base_url: base_url, storage: storage,
+                     token: token.token_for("POST", "/dpp/v1/dpps", "{}") }
             accepted
           }) do
             post submit_passport_path(passport)
@@ -183,7 +184,7 @@ class PassportSubmissionTest < ActionDispatch::IntegrationTest
 
   private
 
-  # --- attesting the payload (prEN 18246, variant B) ---------------------------
+  # --- attesting the payload (EN 18246:2026, variant B) ------------------------
   #
   # The service computes the hash of what the custodian delivers and reports it,
   # but it cannot sign the entry that commits to it: the document key is here.

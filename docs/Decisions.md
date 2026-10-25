@@ -441,19 +441,77 @@ identifier and the log hash. It is not a rendering option, and it cannot be
 added afterwards: a DID minted without it can only gain it through an update,
 which mints a new identifier.
 
-The operator's DID exists for exactly one purpose, authenticating to the DPP
-Service, so it should assert the key it authenticates with. Nothing here depends
-on it today — this application reads the public key out of the DID's `key`
-field, slot 0, past `authentication` entirely, and that field is byte-identical
-with and without the flag. What it buys is a document a conformant verifier can
-use, which is the difference between an identifier that works with our service
-and one that works with anybody's.
+The operator's DID authenticates the operator to the DPP Service, so it should
+assert the key it authenticates with. Nothing here depends on it — this
+application reads the public key out of the DID's `key` field, slot 0, past
+`authentication` entirely, and that field is byte-identical with and without
+the flag. What it buys is a document a conformant verifier can use, which is
+the difference between an identifier that works with our service and one that
+works with anybody's.
+
+The same key also signs the passports the DPP Service keeps, as their economic
+operator. A new identity therefore says that too: `assertionMethod:
+["#key-doc"]` goes into the content it is minted with. The section is part of
+the hashed payload like `authentication`, so an identity minted before keeps
+the document it has; changing it would mean a new identifier. Nothing checks
+for the section today, neither the service nor dpplint, and an existing
+identity signs as before.
 
 The trap it comes with is recorded in the code and repeated here because it is
 silent: the option has to be passed again on every update. oydid rebuilds the
 document from the content each time, and leaving it out drops the section with
 no error and no warning.
 
+
+## Every write names its request
+
+The DPP Service keeps the token of every write as the operator's statement of
+what they asked for, and for that the token carries `rqh`, a hash over the
+method, the request-target and the body bytes. Only the client knows those
+three once the request is built — the body is serialised there, the query
+added there — so the controllers no longer mint the token. They hand the client
+a `Did::Token::Bearer`, which says who signs and for which service, and the
+client asks it for a token once method, target and body are final, right
+before the request goes out. A token minted any earlier would be for a request
+that is not the one sent.
+
+A plain string is still taken as a token, unchanged. The tests use that, and so
+could a caller that has a token from elsewhere; the service then decides
+whether a token without `rqh` is still accepted.
+
+## The economic operator signs what the service delivers
+
+After every write to a passport the DPP Service keeps in its own database —
+submission, correction, a new access policy — the application signs it as its
+economic operator. What is signed is read from the service, not built here:
+the passport as a reader without access rights receives it, in the full
+representation. The service compares the signature with exactly that, and
+only the service knows how it delivers the passport after the write it has just
+made, its own attributes included. The bytes that arrive are signed as they
+are, without parsing and serialising them again.
+
+Between the read and the hand-in another write can come in, and the service
+then refuses with a sentence that says the passport is no longer the one
+delivered. The application reads and signs again, three times at most, and
+reports the refusal after that.
+
+Signing is best effort, as attesting the payload is: the write is done when the
+service accepted it, and a signature that cannot be handed in must not turn it
+into a failure. The passport page shows the state the service reports
+(`X-DPP-Signature-State`), the reason a signature did not go through, and a
+button to sign again; the list of passports offers to sign every passport that
+waits, which covers passports that were never signed.
+
+The service accepts a signature by an identity that is not the passport's
+`economicOperatorId`, as that of an authorised representative, and says so in
+a warning. The page shows that warning, because a verifier reports such a
+signature as not issued by the economic operator.
+
+A passport held by a custodian is not signed: the custodian serves it, and the
+service takes no signature for it until the custodian can keep and deliver
+one. Its page says so rather than offering a button that cannot work. A
+service that reports no signature state at all knows no signature of the
+economic operator, and is not asked for one.
 
 ## Who may read what
 

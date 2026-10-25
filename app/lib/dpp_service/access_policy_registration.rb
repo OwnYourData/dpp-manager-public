@@ -37,7 +37,7 @@ module DppService
         raise Error, "no_policy" if document.nil?
 
         result = Client.register_access_policy(document, base_url: base_url,
-                                                         token: Did::Token.issue(identity, audience: audience))
+                                                         token: Did::Token.bearer(identity, audience: audience))
         if result.ok?
           newly = !product_type.access_policy_registered_at?(base_url, identity.did)
           product_type.record_access_policy_registered!(document["id"], base_url)
