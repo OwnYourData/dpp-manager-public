@@ -56,9 +56,14 @@ content:
         def collection($id; $children):
           ($children | if length == 0 then empty else { elementId: $id, objectType: "DataElementCollection", elements: . } end);
 
-        def resource($id; $url):
+        # EN 18223 asks a related resource for the media type of what its
+        # address serves. It is the one the operator chose, and it is only
+        # left out when they chose none -- never guessed from the address.
+        def resource($id; $url; $type):
           if $url == null or $url == "" then empty
-          else { objectType: "RelatedResource", elementId: $id, url: $url }
+          else { objectType: "RelatedResource", elementId: $id }
+               + (if $type == null or $type == "" then {} else { contentType: $type } end)
+               + { url: $url }
           end;
 
         # --- the elements -------------------------------------------------
@@ -125,9 +130,9 @@ content:
               sv("CarbonFootprint"; $in.carbonFootprint; "xsd:decimal"; "kg CO2e")
             ]),
 
-            # Documents are referenced, never carried. contentType is left out
-            # rather than guessed from the address: a URL ending in .pdf is not
-            # a promise about what is served.
-            resource("DeclarationOfConformity"; $in.declarationOfConformity),
-            resource("DismantlingInstructions"; $in.dismantlingInstructions)
+            # Documents are referenced, never carried. The media type comes
+            # from the answer beside the address: a URL ending in .pdf is not a
+            # promise about what is served.
+            resource("DeclarationOfConformity"; $in.declarationOfConformity; $in.declarationOfConformityContentType),
+            resource("DismantlingInstructions"; $in.dismantlingInstructions; $in.dismantlingInstructionsContentType)
           ]

@@ -55,9 +55,13 @@ content:
         carbonFootprint: Decimal
 
         # Documents are referenced, never held: version 1 of the application
-        # takes a URL and does not host anything.
+        # takes a URL and does not host anything. Each address comes with the
+        # media type of what it serves, which EN 18223 asks of a related
+        # resource and which is chosen rather than guessed from the address.
         declarationOfConformity: AnyURI
+        declarationOfConformityContentType: String
         dismantlingInstructions: AnyURI
+        dismantlingInstructionsContentType: String
 
   overlays:
     - type: OverlayAnnotation
@@ -161,8 +165,18 @@ content:
           comment:
             en: A web address. This application does not host the document.
             de: Eine Webadresse. Diese Anwendung hostet das Dokument nicht.
+        declarationOfConformityContentType:
+          label: { en: Declaration of conformity (file type), de: Konformitätserklärung (Dateityp) }
+          comment:
+            en: The media type of the file behind the address. Needed as soon as an address is given.
+            de: Der Medientyp der Datei hinter der Adresse. Nötig, sobald eine Adresse angegeben ist.
         dismantlingInstructions:
           label: { en: Dismantling instructions (link), de: Demontageanleitung (Link) }
+        dismantlingInstructionsContentType:
+          label: { en: Dismantling instructions (file type), de: Demontageanleitung (Dateityp) }
+          comment:
+            en: The media type of the file behind the address. Needed as soon as an address is given.
+            de: Der Medientyp der Datei hinter der Adresse. Nötig, sobald eine Adresse angegeben ist.
 
     # The access class of each attribute (https://w3id.org/soya/dpp-access/v1),
     # as the author of this structure suggests it. An attribute without an entry
@@ -175,6 +189,8 @@ content:
       attributes:
         serialNumber: https://w3id.org/soya/dpp-access/v1#legitimateInterest
         dismantlingInstructions: https://w3id.org/soya/dpp-access/v1#legitimateInterest
+        # Same element in the passport as the address, so the same class.
+        dismantlingInstructionsContentType: https://w3id.org/soya/dpp-access/v1#legitimateInterest
 
     - type: OverlayValidation
       base: DppLedLamp
@@ -282,6 +298,18 @@ content:
           cardinality: "0..1"
           pattern: "^https://"
 
+        # A closed list of literals, for the reason given at energyEfficiencyClass,
+        # and no default: the operator says what the address serves. That it is
+        # needed as soon as the address is given cannot be said in this overlay,
+        # which knows no condition. The form schema says it (`dependencies`), and
+        # the application checks the same rule on the server.
+        declarationOfConformityContentType:
+          cardinality: "0..1"
+          valueOption: [ application/pdf, text/html, text/plain, image/png, image/jpeg, video/mp4 ]
+        dismantlingInstructionsContentType:
+          cardinality: "0..1"
+          valueOption: [ application/pdf, text/html, text/plain, image/png, image/jpeg, video/mp4 ]
+
     # The generated form would put twenty-six controls in one column in the
     # order the base happens to list them. That is the only thing wrong with it,
     # and it is exactly what a form overlay is for: grouping and order.
@@ -326,7 +354,15 @@ content:
           energyEfficiencyClass: { type: string, enum: [ A, B, C, D, E, F, G ] }
           carbonFootprint: { type: number, minimum: 0 }
           declarationOfConformity: { type: string, pattern: "^https://" }
+          declarationOfConformityContentType: { type: string, enum: [ application/pdf, text/html, text/plain, image/png, image/jpeg, video/mp4 ] }
           dismantlingInstructions: { type: string, pattern: "^https://" }
+          dismantlingInstructionsContentType: { type: string, enum: [ application/pdf, text/html, text/plain, image/png, image/jpeg, video/mp4 ] }
+        # A document's address makes its file type required (JSON Schema
+        # draft 7). The validation overlay cannot say this; the application
+        # checks it on the server as well.
+        dependencies:
+          declarationOfConformity: [ declarationOfConformityContentType ]
+          dismantlingInstructions: [ dismantlingInstructionsContentType ]
         required:
           - manufacturerName
           - productDesignation
@@ -404,7 +440,10 @@ content:
                   condition:
                     scope: "#/properties/containsSvhc"
                     schema: { const: true }
-              - { type: Control, scope: "#/properties/declarationOfConformity", label: "Declaration of conformity (link)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/declarationOfConformity", label: "Declaration of conformity (link)" }
+                  - { type: Control, scope: "#/properties/declarationOfConformityContentType", label: "Declaration of conformity (file type)" }
           - type: Category
             label: Environment
             elements:
@@ -412,7 +451,10 @@ content:
                 elements:
                   - { type: Control, scope: "#/properties/energyEfficiencyClass", label: "Energy efficiency class" }
                   - { type: Control, scope: "#/properties/carbonFootprint", label: "Carbon footprint (kg CO2e)" }
-              - { type: Control, scope: "#/properties/dismantlingInstructions", label: "Dismantling instructions (link)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/dismantlingInstructions", label: "Dismantling instructions (link)" }
+                  - { type: Control, scope: "#/properties/dismantlingInstructionsContentType", label: "Dismantling instructions (file type)" }
 
     - type: OverlayForm
       base: DppLedLamp
@@ -445,7 +487,15 @@ content:
           energyEfficiencyClass: { type: string, enum: [ A, B, C, D, E, F, G ] }
           carbonFootprint: { type: number, minimum: 0 }
           declarationOfConformity: { type: string, pattern: "^https://" }
+          declarationOfConformityContentType: { type: string, enum: [ application/pdf, text/html, text/plain, image/png, image/jpeg, video/mp4 ] }
           dismantlingInstructions: { type: string, pattern: "^https://" }
+          dismantlingInstructionsContentType: { type: string, enum: [ application/pdf, text/html, text/plain, image/png, image/jpeg, video/mp4 ] }
+        # A document's address makes its file type required (JSON Schema
+        # draft 7). The validation overlay cannot say this; the application
+        # checks it on the server as well.
+        dependencies:
+          declarationOfConformity: [ declarationOfConformityContentType ]
+          dismantlingInstructions: [ dismantlingInstructionsContentType ]
         required:
           - manufacturerName
           - productDesignation
@@ -520,7 +570,10 @@ content:
                   condition:
                     scope: "#/properties/containsSvhc"
                     schema: { const: true }
-              - { type: Control, scope: "#/properties/declarationOfConformity", label: "Konformitätserklärung (Link)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/declarationOfConformity", label: "Konformitätserklärung (Link)" }
+                  - { type: Control, scope: "#/properties/declarationOfConformityContentType", label: "Konformitätserklärung (Dateityp)" }
           - type: Category
             label: Umwelt
             elements:
@@ -528,4 +581,7 @@ content:
                 elements:
                   - { type: Control, scope: "#/properties/energyEfficiencyClass", label: "Energieeffizienzklasse" }
                   - { type: Control, scope: "#/properties/carbonFootprint", label: "CO2-Fußabdruck (kg CO2e)" }
-              - { type: Control, scope: "#/properties/dismantlingInstructions", label: "Demontageanleitung (Link)" }
+              - type: HorizontalLayout
+                elements:
+                  - { type: Control, scope: "#/properties/dismantlingInstructions", label: "Demontageanleitung (Link)" }
+                  - { type: Control, scope: "#/properties/dismantlingInstructionsContentType", label: "Demontageanleitung (Dateityp)" }

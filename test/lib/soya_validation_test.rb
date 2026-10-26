@@ -179,6 +179,57 @@ class SoyaValidationTest < ActiveSupport::TestCase
     assert_equal [ "Value is not a date" ], Soya::Validation.problems_in(report)
   end
 
+  # What the form's schema makes conditional, checked again on the server: the
+  # validation overlay knows no condition, so SHACL never reports it.
+  DOCUMENT_FORM = {
+    "schema" => {
+      "properties" => {
+        "declarationOfConformity" => { "type" => "string" },
+        "declarationOfConformityContentType" => { "type" => "string", "enum" => %w[application/pdf text/html] }
+      },
+      "dependencies" => { "declarationOfConformity" => [ "declarationOfConformityContentType" ] }
+    },
+    "ui" => {
+      "type" => "HorizontalLayout",
+      "elements" => [
+        { "type" => "Control", "scope" => "#/properties/declarationOfConformity",
+          "label" => "Declaration of conformity (link)" },
+        { "type" => "Control", "scope" => "#/properties/declarationOfConformityContentType",
+          "label" => "Declaration of conformity (file type)" }
+      ]
+    }
+  }.freeze
+
+  test "an address without the file type it makes required is a problem, in the form's words" do
+    problems = Soya::Validation.dependency_problems(Type.new(DOCUMENT_FORM),
+                                                    { "declarationOfConformity" => "https://example.org/doc.pdf" })
+
+    assert_equal [ "Declaration of conformity (file type): is required as soon as " \
+                   "Declaration of conformity (link) is given" ], problems
+  end
+
+  test "an address with its file type, a file type alone and nothing at all are no problem" do
+    [
+      { "declarationOfConformity" => "https://example.org/doc.pdf",
+        "declarationOfConformityContentType" => "application/pdf" },
+      { "declarationOfConformityContentType" => "application/pdf" },
+      { "declarationOfConformity" => "" },
+      {}
+    ].each do |answers|
+      assert_empty Soya::Validation.dependency_problems(Type.new(DOCUMENT_FORM), answers), answers.inspect
+    end
+  end
+
+  test "an empty file type does not count as chosen" do
+    answers = { "declarationOfConformity" => "https://example.org/doc.pdf", "declarationOfConformityContentType" => "" }
+
+    assert_equal 1, Soya::Validation.dependency_problems(Type.new(DOCUMENT_FORM), answers).size
+  end
+
+  test "a form without dependencies asks for nothing more" do
+    assert_empty Soya::Validation.dependency_problems(type, { "colourTemperature" => 2700 })
+  end
+
   private
 
   # Only the form is needed here, and a real ProductType would need a vault to be

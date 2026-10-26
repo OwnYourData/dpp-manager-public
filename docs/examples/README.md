@@ -6,7 +6,7 @@ the browser and the form is drawn again from it — nothing is uploaded, and
 nothing is saved until you press Save.
 
 That is meant for two situations: showing somebody what the application does
-without typing twenty-four fields at them, and the case where the data already
+without typing twenty-six fields at them, and the case where the data already
 exists in another system and only has to get in here.
 
 ## The format

@@ -250,6 +250,7 @@ en:
         other: "Show the %{count} points that are open"
       one_of: "must be one of: %{values}"
       required: "is required"
+      required_with: "is required as soon as %{field} is given"
       granularity_config: "the product type prescribes %{expected}"
       at_least: "needs at least %{count} values"
       at_most:

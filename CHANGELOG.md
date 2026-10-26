@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.12
+
+- **The documents of an LED lamp name their file type.** Beside the address of
+  the declaration of conformity and of the dismantling instructions, the form
+  asks what the address serves — PDF, HTML, plain text, PNG, JPEG or MP4 — and
+  requires it as soon as the address is given. The passport carries it as the
+  media type EN 18223 asks of a related resource; nothing is guessed from the
+  address. An LED lamp type created before this release gets the new fields
+  with *Fetch again*, and a passport submitted before keeps its documents
+  without a file type until it is corrected.
+- What a form makes required once another field is filled in is checked again
+  when a passport is saved or submitted, not only while typing.
+
 ## 0.1.11
 
 - **Passports are signed by their economic operator.** After every

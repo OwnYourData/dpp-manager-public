@@ -69,7 +69,41 @@ class LampStructureTest < ActiveSupport::TestCase
     end
   end
 
+  # A document is an address and the media type of what it serves; EN 18223
+  # wants both of a related resource. The type is offered as a choice with no
+  # default, and once the address is given it is required. The validation
+  # overlay cannot say "once", so the form's schema does (`dependencies`), and
+  # Soya::Validation repeats it on the server.
+  test "every document address comes with a file type it makes required" do
+    addresses = base_attributes.select { |_name, type| type == "AnyURI" }.keys
+    assert_equal %w[declarationOfConformity dismantlingInstructions], addresses.sort
+
+    dependencies = form_overlay("en").dig("schema", "dependencies")
+    addresses.each do |address|
+      file_type = "#{address}ContentType"
+
+      assert_equal "String", base_attributes[file_type], "#{address} has no file type beside it"
+      assert_equal [ file_type ], dependencies[address], "#{address} does not make #{file_type} required"
+      assert properties.dig(file_type, "enum").present?, "#{file_type} is not a choice"
+      assert_nil properties.dig(file_type, "default"), "#{file_type} has a default, so nobody chose it"
+      assert_equal "0..1", validation.dig(file_type, "cardinality")
+    end
+  end
+
+  # The file type is part of the same element in the passport as the address,
+  # so a reader who may not see the one may not see the other either.
+  test "a document's file type is classified like its address" do
+    classification = document.dig("content", "overlays")
+                             .find { |overlay| overlay["type"] == "OverlayClassification" }["attributes"]
+
+    %w[declarationOfConformity dismantlingInstructions].each do |address|
+      assert_equal classification[address].to_s, classification["#{address}ContentType"].to_s, address
+    end
+  end
+
   private
+
+  def base_attributes = document.dig("content", "bases", 0, "attributes")
 
   def expected(name, rules)
     out = {}

@@ -34,10 +34,42 @@ module Soya
 
       # The product type's own configuration is checked with it, so that a
       # passport that contradicts it is held back by the same second click.
+      # So is what the form makes conditional, which SHACL never sees.
       configured = passport.configuration_problems
-      Result.new(valid: report["isValid"] == true && configured.empty?,
-                 problems: problems_in(report, type) + configured)
+      depending  = dependency_problems(type, passport.values)
+      Result.new(valid: report["isValid"] == true && configured.empty? && depending.empty?,
+                 problems: problems_in(report, type) + depending + configured)
     end
+
+    # The answers one answer makes required, checked again on the server.
+    #
+    # A form schema can say that one field needs others once it is filled in:
+    # `dependencies`, JSON Schema draft 7 -- a document's address its file type.
+    # JSON Forms checks that while the operator types. The validation overlay
+    # knows no condition, so the SHACL shapes cannot say it, and answers that
+    # arrive another way (a file loaded into the form, a form that was not
+    # finished) would otherwise go out without the field the form insists on.
+    def dependency_problems(type, values)
+      form = type.form_for(I18n.locale) || {}
+      dependencies = form.dig("schema", "dependencies")
+      return [] unless dependencies.is_a?(Hash)
+
+      answers = values.is_a?(Hash) ? values : {}
+      fields  = form_fields(type)
+      label   = ->(name) { fields.dig(name, :label).presence || name }
+
+      dependencies.flat_map do |trigger, required|
+        next [] unless required.is_a?(Array) && answered?(answers[trigger])
+
+        required.reject { |name| answered?(answers[name]) }.map do |name|
+          "#{label.call(name)}: #{I18n.t('passports.problem.required_with', field: label.call(trigger))}"
+        end
+      end
+    end
+
+    # The same reading of "answered" the transformations use: nothing, an empty
+    # string and an empty list are not answers; false and 0 are.
+    def answered?(value) = !(value.nil? || value == "" || value == [])
 
     # SHACL results and the class check are two different failures with the same
     # consequence, so they are counted together. A structure whose target class

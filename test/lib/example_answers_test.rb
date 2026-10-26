@@ -65,6 +65,21 @@ class ExampleAnswersTest < ActiveSupport::TestCase
       end
     end
 
+    # What one answer makes required (`dependencies` in the form's schema): a
+    # document's address its file type. The form refuses to save without it,
+    # so a demo file without it would open with an error.
+    test "#{label}: what one answer makes required is answered too" do
+      dependencies = form_overlay(type).dig("schema", "dependencies") || {}
+      assert_kind_of Hash, dependencies
+
+      dependencies.each do |trigger, needed|
+        next unless answers(type).key?(trigger)
+
+        assert_empty Array(needed) - answers(type).keys,
+          "#{trigger} is answered, so #{Array(needed).join(', ')} has to be as well"
+      end
+    end
+
     # Every element of a set is checked the same way the set's items say,
     # because a list is where a wrong type hides best. Two shapes occur: a list
     # of plain values, and a list of objects — and for the latter the item's own

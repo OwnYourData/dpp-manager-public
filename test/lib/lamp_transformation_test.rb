@@ -40,7 +40,9 @@ class LampTransformationTest < ActiveSupport::TestCase
     "energyEfficiencyClass" => "E",
     "carbonFootprint" => 1.8,
     "declarationOfConformity" => "https://docs.lumina.example/doc/LUM-A60.pdf",
-    "dismantlingInstructions" => ""
+    "declarationOfConformityContentType" => "application/pdf",
+    "dismantlingInstructions" => "",
+    "dismantlingInstructionsContentType" => ""
   }.freeze
 
   # The three things soya-js looks at, and every one of them fails silently.
@@ -120,13 +122,34 @@ class LampTransformationTest < ActiveSupport::TestCase
       "the children are repetitions of one value, so they share an elementId"
   end
 
-  test "documents are referenced and their type is not guessed from the address" do
-    resource = transform(FULL).find { |e| e["objectType"] == "RelatedResource" }
+  test "documents are referenced, with the file type the operator chose" do
+    resources = transform(FULL).select { |e| e["objectType"] == "RelatedResource" }
 
+    assert_equal 1, resources.size, "a document without an address became an element"
+    resource = resources.first
     assert_equal "DeclarationOfConformity", resource["elementId"]
     assert_equal "https://docs.lumina.example/doc/LUM-A60.pdf", resource["url"]
-    assert_not resource.key?("contentType"),
-      "a URL ending in .pdf is not a promise about what is served"
+    assert_equal "application/pdf", resource["contentType"]
+    assert_equal %w[objectType elementId contentType url], resource.keys
+  end
+
+  # The form will not save an address without its type, but answers can come
+  # from elsewhere. What is missing then stays missing: a URL ending in .pdf is
+  # not a promise about what is served.
+  test "a file type that was not chosen is not guessed from the address" do
+    resource = transform(FULL.merge("declarationOfConformityContentType" => ""))
+               .find { |e| e["objectType"] == "RelatedResource" }
+
+    assert_equal "https://docs.lumina.example/doc/LUM-A60.pdf", resource["url"]
+    assert_not resource.key?("contentType")
+  end
+
+  test "a file type without an address leaves no element behind" do
+    resources = transform(FULL.merge("declarationOfConformity" => "",
+                                     "dismantlingInstructionsContentType" => "text/html"))
+                .select { |e| e["objectType"] == "RelatedResource" }
+
+    assert_empty resources
   end
 
   test "units and datatypes are the ones the standard's example uses" do

@@ -148,9 +148,21 @@
       "domain": "DppLedLamp"
     },
     {
+      "@id": "declarationOfConformityContentType",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
+      "domain": "DppLedLamp"
+    },
+    {
       "@id": "dismantlingInstructions",
       "@type": "owl:DatatypeProperty",
       "range": "xsd:anyURI",
+      "domain": "DppLedLamp"
+    },
+    {
+      "@id": "dismantlingInstructionsContentType",
+      "@type": "owl:DatatypeProperty",
+      "range": "xsd:string",
       "domain": "DppLedLamp"
     },
     {
@@ -530,6 +542,25 @@
       }
     },
     {
+      "@id": "declarationOfConformityContentType",
+      "label": {
+        "de": [
+          "Konformitätserklärung (Dateityp)"
+        ],
+        "en": [
+          "Declaration of conformity (file type)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Der Medientyp der Datei hinter der Adresse. Nötig, sobald eine Adresse angegeben ist."
+        ],
+        "en": [
+          "The media type of the file behind the address. Needed as soon as an address is given."
+        ]
+      }
+    },
+    {
       "@id": "dismantlingInstructions",
       "label": {
         "de": [
@@ -537,6 +568,25 @@
         ],
         "en": [
           "Dismantling instructions (link)"
+        ]
+      }
+    },
+    {
+      "@id": "dismantlingInstructionsContentType",
+      "label": {
+        "de": [
+          "Demontageanleitung (Dateityp)"
+        ],
+        "en": [
+          "Dismantling instructions (file type)"
+        ]
+      },
+      "comment": {
+        "de": [
+          "Der Medientyp der Datei hinter der Adresse. Nötig, sobald eine Adresse angegeben ist."
+        ],
+        "en": [
+          "The media type of the file behind the address. Needed as soon as an address is given."
         ]
       }
     },
@@ -739,6 +789,36 @@
           "sh:pattern": "^https://",
           "sh:maxCount": 1,
           "sh:minCount": 0
+        },
+        {
+          "sh:path": "declarationOfConformityContentType",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:in": {
+            "@list": [
+              "application/pdf",
+              "text/html",
+              "text/plain",
+              "image/png",
+              "image/jpeg",
+              "video/mp4"
+            ]
+          }
+        },
+        {
+          "sh:path": "dismantlingInstructionsContentType",
+          "sh:maxCount": 1,
+          "sh:minCount": 0,
+          "sh:in": {
+            "@list": [
+              "application/pdf",
+              "text/html",
+              "text/plain",
+              "image/png",
+              "image/jpeg",
+              "video/mp4"
+            ]
+          }
         }
       ],
       "sh:targetClass": "DppLedLamp"
@@ -923,9 +1003,19 @@
                 "scope": "#/properties/svhcSubstances"
               },
               {
-                "type": "Control",
-                "label": "Declaration of conformity (link)",
-                "scope": "#/properties/declarationOfConformity"
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/declarationOfConformity",
+                    "label": "Declaration of conformity (link)"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/declarationOfConformityContentType",
+                    "label": "Declaration of conformity (file type)"
+                  }
+                ]
               }
             ]
           },
@@ -949,9 +1039,19 @@
                 ]
               },
               {
-                "type": "Control",
-                "label": "Dismantling instructions (link)",
-                "scope": "#/properties/dismantlingInstructions"
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/dismantlingInstructions",
+                    "label": "Dismantling instructions (link)"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/dismantlingInstructionsContentType",
+                    "label": "Dismantling instructions (file type)"
+                  }
+                ]
               }
             ]
           }
@@ -1096,7 +1196,37 @@
           "guaranteedSwitchingCycles": {
             "type": "integer",
             "minimum": 0
+          },
+          "declarationOfConformityContentType": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "text/html",
+              "text/plain",
+              "image/png",
+              "image/jpeg",
+              "video/mp4"
+            ]
+          },
+          "dismantlingInstructionsContentType": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "text/html",
+              "text/plain",
+              "image/png",
+              "image/jpeg",
+              "video/mp4"
+            ]
           }
+        },
+        "dependencies": {
+          "declarationOfConformity": [
+            "declarationOfConformityContentType"
+          ],
+          "dismantlingInstructions": [
+            "dismantlingInstructionsContentType"
+          ]
         }
       },
       "language": "en"
@@ -1281,9 +1411,19 @@
                 "scope": "#/properties/svhcSubstances"
               },
               {
-                "type": "Control",
-                "label": "Konformitätserklärung (Link)",
-                "scope": "#/properties/declarationOfConformity"
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/declarationOfConformity",
+                    "label": "Konformitätserklärung (Link)"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/declarationOfConformityContentType",
+                    "label": "Konformitätserklärung (Dateityp)"
+                  }
+                ]
               }
             ]
           },
@@ -1307,9 +1447,19 @@
                 ]
               },
               {
-                "type": "Control",
-                "label": "Demontageanleitung (Link)",
-                "scope": "#/properties/dismantlingInstructions"
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/dismantlingInstructions",
+                    "label": "Demontageanleitung (Link)"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/dismantlingInstructionsContentType",
+                    "label": "Demontageanleitung (Dateityp)"
+                  }
+                ]
               }
             ]
           }
@@ -1454,7 +1604,37 @@
           "guaranteedSwitchingCycles": {
             "type": "integer",
             "minimum": 0
+          },
+          "declarationOfConformityContentType": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "text/html",
+              "text/plain",
+              "image/png",
+              "image/jpeg",
+              "video/mp4"
+            ]
+          },
+          "dismantlingInstructionsContentType": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "text/html",
+              "text/plain",
+              "image/png",
+              "image/jpeg",
+              "video/mp4"
+            ]
           }
+        },
+        "dependencies": {
+          "declarationOfConformity": [
+            "declarationOfConformityContentType"
+          ],
+          "dismantlingInstructions": [
+            "dismantlingInstructionsContentType"
+          ]
         }
       },
       "language": "de"
@@ -1467,6 +1647,12 @@
     },
     {
       "@id": "dismantlingInstructions",
+      "classification": [
+        "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
+      ]
+    },
+    {
+      "@id": "dismantlingInstructionsContentType",
       "classification": [
         "https://w3id.org/soya/dpp-access/v1#legitimateInterest"
       ]

@@ -71,9 +71,13 @@ content:
         def many($flat; $id):
           [ $flat[] | select(.elementId == $id) | .value | select(. != null and . != "") ];
 
-        # A RelatedResource carries a url and no value.
+        # A RelatedResource carries a url and no value, and beside it the
+        # media type of what the url serves.
         def link($flat; $id):
           [ $flat[] | select(.elementId == $id) | .url | select(. != null and . != "") ] | first;
+
+        def link_type($flat; $id):
+          [ $flat[] | select(.elementId == $id) | .contentType | select(. != null and . != "") ] | first;
 
         # --- the answers ----------------------------------------------------
 
@@ -107,7 +111,9 @@ content:
             carbonFootprint:           value($flat; "CarbonFootprint"),
 
             declarationOfConformity:   link($flat; "DeclarationOfConformity"),
-            dismantlingInstructions:   link($flat; "DismantlingInstructions")
+            declarationOfConformityContentType: link_type($flat; "DeclarationOfConformity"),
+            dismantlingInstructions:   link($flat; "DismantlingInstructions"),
+            dismantlingInstructionsContentType: link_type($flat; "DismantlingInstructions")
           }
         # What was not in the document is left out rather than set to null: an
         # empty field and a field answered with nothing are different things,

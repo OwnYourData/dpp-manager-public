@@ -29,5 +29,7 @@
   "carbonFootprint": 2.4,
 
   "declarationOfConformity": "https://example.org/nordlicht/doc/NL-A60-9W-827.pdf",
-  "dismantlingInstructions": "https://example.org/nordlicht/dismantling/NL-A60.pdf"
+  "declarationOfConformityContentType": "application/pdf",
+  "dismantlingInstructions": "https://example.org/nordlicht/dismantling/NL-A60.pdf",
+  "dismantlingInstructionsContentType": "application/pdf"
 }

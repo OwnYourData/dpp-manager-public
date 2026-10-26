@@ -37,7 +37,10 @@ class LampReverseTransformationTest < ActiveSupport::TestCase
     "containsSvhc" => false,
     "energyEfficiencyClass" => "E",
     "carbonFootprint" => 1.8,
-    "declarationOfConformity" => "https://docs.lumina.example/doc/LUM-A60.pdf"
+    "declarationOfConformity" => "https://docs.lumina.example/doc/LUM-A60.pdf",
+    "declarationOfConformityContentType" => "application/pdf",
+    "dismantlingInstructions" => "https://docs.lumina.example/dismantling/LUM-A60.html",
+    "dismantlingInstructionsContentType" => "text/html"
   }.freeze
 
   test "the overlay is the one shape soya transform will look for" do

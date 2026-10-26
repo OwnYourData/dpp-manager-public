@@ -246,6 +246,7 @@ de:
         other: "Die %{count} offenen Punkte anzeigen"
       one_of: "muss einer dieser Werte sein: %{values}"
       required: "fehlt"
+      required_with: "fehlt, sobald %{field} angegeben ist"
       granularity_config: "der Produkttyp schreibt %{expected} vor"
       at_least: "braucht mindestens %{count} Werte"
       at_most:
