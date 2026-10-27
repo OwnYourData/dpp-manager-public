@@ -19,7 +19,7 @@ Encoding.default_external = Encoding::UTF_8 if Encoding.default_external != Enco
 Encoding.default_internal = Encoding::UTF_8 if Encoding.default_internal.nil?
 
 module DppManager
-  VERSION = "0.1.12".freeze
+  VERSION = "0.1.13".freeze
 
   class Application < Rails::Application
     config.load_defaults 8.1

@@ -29,6 +29,20 @@ class SetupTest < ActionDispatch::IntegrationTest
     assert_equal "service_configured", Event.last.kind
   end
 
+  test "the hosts a service answers printed identifiers on are recorded with it" do
+    with_probe(reachable: true, did: "did:oyd:zQmServiceDid234567892345678923456789",
+               audience: "https://svc.example", carrier_hosts: %w[id.svc.example]) do
+      post setup_service_path, params: { service_base_url: "svc.example" }
+    end
+    assert_equal %w[id.svc.example], settings.reload.carrier_hosts
+    assert_not settings.carrier_hosts_due?
+
+    with_probe(reachable: true, audience: "https://svc.example") do
+      post setup_service_path, params: { service_base_url: "svc.example" }
+    end
+    assert_equal [], settings.reload.carrier_hosts, "a service that names none has none"
+  end
+
   test "an unreachable service is refused and nothing is stored" do
     with_probe(reachable: false, message: :unreachable) do
       post setup_service_path, params: { service_base_url: "https://nowhere.example" }

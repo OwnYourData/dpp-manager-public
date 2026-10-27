@@ -287,6 +287,9 @@ en:
       schema: "Semantic model"
       dpp_id: "Passport identifier"
       identifier_frozen: "Part of the passport identifier that has been created, so it can no longer be changed."
+    carrier:
+      suggested: "Suggested because this passport stays with the DPP Service: the service answers the identifiers printed on products at %{host}. A host of your own works the same way once it points at the service and the service answers on it."
+      unserved: "Scanning the product will not lead to this passport: the DPP Service answers printed identifiers at %{hosts}, and this identifier is at %{host}. It leads here only once %{host} points at the service and the service answers on it."
     mint:
       title: "The passport identifier"
       action: "Create the passport identifier"

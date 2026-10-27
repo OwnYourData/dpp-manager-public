@@ -9,13 +9,14 @@ class PassportsController < ApplicationController
   # Enough to act on, not so many that the message becomes a wall.
   SHOWN_PROBLEMS = 8
 
-  helper_method :mint_endpoint_base, :storage_base
+  helper_method :mint_endpoint_base, :storage_base, :identifier_suggestion, :unserved_identifier_host
 
   before_action :find_passport,
                 only: %i[edit update destroy mint keys secure_keys export_keys
                          submit correct attest retire renew_delegation check_delegation
                          move_custody finish_move apply_access_policy access_policy sign]
   before_action :require_product_type, only: %i[new create]
+  before_action :refresh_carrier_hosts, only: :new
 
   def index
     @passports = Passport.includes(:product_type).all
@@ -1106,7 +1107,61 @@ class PassportsController < ApplicationController
   end
 
   def permitted
-    params.require(:passport).permit(:label, :unique_product_identifier, :granularity, :facility_id,
-                                     :placed_on_market_on)
+    values = params.require(:passport).permit(:label, :unique_product_identifier, :granularity, :facility_id,
+                                              :placed_on_market_on)
+    # The suggestion left as it was is not an identifier anybody chose, and a
+    # draft is not refused for it.
+    values[:unique_product_identifier] = "" if suggestion_untouched?(values[:unique_product_identifier])
+    values
+  end
+
+  # --- the carrier host ---------------------------------------------------------
+
+  # A passport the service keeps in its own database is reached by scanning
+  # the product only if its identifier is on a host the service answers on
+  # (its carrierHosts). With a custodian nothing here applies: the custodian
+  # answers for its passports itself.
+
+  # Starting a passport is when the identifier is chosen, so that is when the
+  # list is brought up to date. Every other page uses it as it was last fetched.
+  def refresh_carrier_hosts
+    return if settings.service_base_url.blank? || !settings.carrier_hosts_due?
+
+    settings.record_carrier_hosts!(DppService::Directory.carrier_hosts(settings.service_base_url))
+  end
+
+  # What the identifier of a new passport starts with: the first host the
+  # service answers on, and the start of a GS1 Digital Link. nil with a
+  # custodian, once the identifier is fixed, or when the service names no host.
+  def identifier_suggestion
+    host = settings.carrier_hosts.first
+    return nil if host.nil? || @passport.minted? || !stays_with_service?
+
+    "https://#{host}/01/"
+  end
+
+  # The host of this passport's identifier when the passport stays with the
+  # service and the service does not answer on that host. nil when there is
+  # nothing to warn about: a custodian, an identifier that is not one yet, a
+  # host the service answers on, or a service that names no host.
+  def unserved_identifier_host
+    hosts = settings.carrier_hosts
+    return nil if hosts.empty? || !stays_with_service?
+
+    identifier = @passport.identifier
+    return nil unless identifier.valid?
+
+    identifier.host unless hosts.include?(identifier.host)
+  end
+
+  # Decided at minting (Passport#custodial?); until then by whether this
+  # installation hands its passports to a custodian.
+  def stays_with_service?
+    @passport.minted? ? !@passport.custodial? : !settings.custodian_configured?
+  end
+
+  def suggestion_untouched?(value)
+    value = value.to_s.strip
+    value.present? && settings.carrier_hosts.any? { |host| [ "https://#{host}/01/", "https://#{host}/01" ].include?(value) }
   end
 end

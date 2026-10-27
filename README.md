@@ -114,6 +114,14 @@ Link or an identification link under a domain the operator controls. No length
 is enforced: the EU registry accepts up to 2000 characters, and how much the
 carrier bears is the operator's decision.
 
+Without a custodian the passport stays in the DPP Service's own database, and a
+scanned identifier reaches it only on a host the service answers on; the
+service names those hosts in its discovery document. A new passport's
+identifier therefore starts on the first of them, and the passport page warns
+when an identifier is on a host the service does not answer on. A host of the
+operator's own works the same way once it points at the service and the service
+answers on it.
+
 The **passport identifier** is the `did:oyd` this application mints for the
 passport. It carries a `DigitalProductPassport` service entry naming where the
 passport can be read, and the DPP Service compares that host with the host it is

@@ -55,4 +55,32 @@ class Setting < ApplicationRecord
   def record_authority_issuers!(issuers)
     update!(service_authority_issuers: JSON.generate(Array(issuers)), service_authority_issuers_at: Time.current)
   end
+
+  # How long the list of carrier hosts is taken as it is before the service is
+  # asked again. It changes with the service's configuration, not with what is
+  # done here, so a few minutes are plenty.
+  CARRIER_HOSTS_FOR = 10.minutes
+
+  # The hosts the service answers printed product identifiers on, as last
+  # fetched; empty when it was never asked or names none.
+  def carrier_hosts
+    return [] if service_carrier_hosts.blank?
+
+    Array(JSON.parse(service_carrier_hosts)).map(&:to_s)
+  rescue JSON::ParserError
+    []
+  end
+
+  def carrier_hosts_due?
+    service_carrier_hosts_at.nil? || service_carrier_hosts_at <= Time.current - CARRIER_HOSTS_FOR
+  end
+
+  # +hosts+ nil means the service could not be asked: the list stays as it was,
+  # and the attempt counts, so that a service out of reach costs one try per
+  # interval rather than one per page.
+  def record_carrier_hosts!(hosts)
+    attributes = { service_carrier_hosts_at: Time.current }
+    attributes[:service_carrier_hosts] = JSON.generate(Array(hosts)) unless hosts.nil?
+    update!(attributes)
+  end
 end

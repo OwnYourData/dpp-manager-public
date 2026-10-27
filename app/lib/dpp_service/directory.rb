@@ -17,7 +17,7 @@ module DppService
 
     TIMEOUT = ENV.fetch("DPP_SERVICE_TIMEOUT", 10).to_i
 
-    Result = Struct.new(:reachable, :did, :audience, :message, keyword_init: true) do
+    Result = Struct.new(:reachable, :did, :audience, :carrier_hosts, :message, keyword_init: true) do
       def reachable? = reachable
     end
 
@@ -39,10 +39,31 @@ module DppService
         did:       discovery["did"].presence,
         # A service that does not publish an audience still expects its own base
         # URL in `aud`, which is what a client can discover on its own.
-        audience:  discovery["audience"].presence || base
+        audience:  discovery["audience"].presence || base,
+        carrier_hosts: hosts_in(discovery)
       )
     rescue Error => e
       Result.new(reachable: false, message: e.message.to_sym)
+    end
+
+    # The hosts the service answers printed product identifiers on, as it
+    # publishes them under /.well-known/dpp-service (carrierHosts): a passport
+    # it keeps in its own database is reached by scanning the product only if
+    # its identifier is on one of them. Empty when the service names none, nil
+    # when it cannot be asked.
+    def carrier_hosts(base_url)
+      base = normalize_base(base_url)
+      return nil if base.nil?
+
+      discovery = get_json(URI.join(base + "/", ".well-known/dpp-service"))
+      discovery.is_a?(Hash) ? hosts_in(discovery) : nil
+    rescue Error
+      nil
+    end
+
+    # DNS compares names without regard to case, and so does the service.
+    def hosts_in(discovery)
+      Array(discovery["carrierHosts"]).map { |host| host.to_s.strip.downcase }.reject(&:empty?).uniq
     end
 
     # Whom the service takes grants for authorities from, as it publishes it

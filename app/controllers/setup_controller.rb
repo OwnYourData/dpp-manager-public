@@ -27,7 +27,9 @@ class SetupController < ApplicationController
     end
 
     settings.update!(service_base_url: base, service_did: result.did,
-                     service_audience: result.audience, service_checked_at: Time.current)
+                     service_audience: result.audience, service_checked_at: Time.current,
+                     service_carrier_hosts: JSON.generate(Array(result.carrier_hosts)),
+                     service_carrier_hosts_at: Time.current)
     Event.record!(:service_configured, base_url: base, did: result.did)
     redirect_to setup_path
   end

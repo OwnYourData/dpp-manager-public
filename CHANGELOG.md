@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.13
+
+- **A passport without a custodian starts on a host that leads to it.** The
+  DPP Service names the hosts on which it answers the identifiers printed on
+  products. Without a custodian, the product identifier of a new passport
+  starts on the first of them, for the DPP Service of OwnYourData
+  `https://id.ownyourdata.eu/01/`, so that scanning the product leads to the
+  passport. A host of your own works the same way once it points at the
+  service and the service answers on it. The start left as it is is not saved
+  as an identifier.
+- The passport page warns when the identifier of a passport that stays with
+  the DPP Service is on a host the service does not answer on: scanning the
+  product does not lead to that passport.
+- With a custodian nothing changes.
+
 ## 0.1.12
 
 - **The documents of an LED lamp name their file type.** Beside the address of

@@ -283,6 +283,9 @@ de:
       schema: "Semantisches Modell"
       dpp_id: "Passkennung"
       identifier_frozen: "Teil der angelegten Passkennung und deshalb nicht mehr änderbar."
+    carrier:
+      suggested: "Vorschlag, weil dieser Pass beim DPP Service bleibt: Der Dienst beantwortet die auf Produkte gedruckten Kennungen unter %{host}. Ein eigener Host geht genauso, sobald er auf den Dienst zeigt und der Dienst unter ihm antwortet."
+      unserved: "Wer das Produkt scannt, kommt nicht zu diesem Pass: Der DPP Service beantwortet gedruckte Kennungen unter %{hosts}, diese Kennung liegt unter %{host}. Hierher führt sie erst, wenn %{host} auf den Dienst zeigt und der Dienst unter ihm antwortet."
     mint:
       title: "Die Passkennung"
       action: "Passkennung anlegen"

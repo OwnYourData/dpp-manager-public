@@ -51,6 +51,9 @@ module Dpp
       @path = build_path
     end
 
+    # Where the identifier is answered, in lower case as DNS compares it.
+    def host = (@uri&.host).to_s.downcase
+
     def digital_link? = scheme == :digital_link
     def identification_link? = scheme == :identification_link
     def valid? = problem.nil?

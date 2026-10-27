@@ -628,6 +628,24 @@ question does not do the thing that cannot be undone. Every place keeps asking
 the way it did, with `data-turbo-confirm`; forms outside Turbo, which used to
 skip the question entirely, are asked as well.
 
+## The product identifier starts where the service answers
+
+A passport without a custodian stays in the DPP Service's own database.
+Someone who scans the product reaches it only if its identifier is on a host
+the service answers on, and the service names those hosts in its discovery
+document (`carrierHosts`). The form therefore starts an empty identifier on the
+first of them, as the beginning of a GS1 Digital Link. The start left as it is
+is not saved, so a draft is never refused for an identifier nobody typed. The
+passport page warns when the identifier of such a passport is on another host:
+a warning rather than a refusal, because the operator's own host may still be
+pointed at the service.
+
+The list is fetched when the service is set up and when a passport is started,
+at most every ten minutes, and kept in the settings. Every other page uses it
+as it was last fetched and does not go to the network; a service that cannot
+be asked leaves it as it was. With a custodian none of this applies, because
+the custodian answers for its passports itself.
+
 ## Two repositories, and why the public one has no history
 
 The work happens in a private repository. The public one, `dpp-manager-public`,

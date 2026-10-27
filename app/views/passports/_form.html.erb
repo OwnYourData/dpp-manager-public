@@ -62,8 +62,14 @@
   <fieldset data-controller="identifier">
     <legend><%= t("passports.envelope.legend") %></legend>
 
+    <%# Without a custodian the passport stays with the DPP Service, and a
+        scanned identifier reaches it only on a host the service answers on.
+        An empty field therefore starts on the first of them; left as it is,
+        the start is not saved as an identifier (PassportsController). %>
+    <% suggestion = identifier_suggestion if passport.unique_product_identifier.blank? %>
     <label for="passport_unique_product_identifier"><%= t("passports.envelope.identifier") %></label>
     <%= f.text_field :unique_product_identifier,
+          value: passport.unique_product_identifier.presence || suggestion,
           placeholder: "https://id.example.com/01/09520123456788",
           readonly: passport.minted?,
           data: { identifier_target: "field", action: "input->identifier#derive" } %>
@@ -71,6 +77,13 @@
       <%= passport.minted? ? t("passports.envelope.identifier_frozen") : t("passports.envelope.identifier_hint") %>
       <span data-identifier-target="count" data-unit="<%= t("passports.envelope.characters") %>"></span>
     </p>
+    <% if suggestion %>
+      <p class="hint"><%= t("passports.carrier.suggested", host: URI(suggestion).host) %></p>
+    <% end %>
+    <% if (unserved = unserved_identifier_host) %>
+      <p class="warning-inline"><%= t("passports.carrier.unserved", host: unserved,
+                                      hosts: settings.carrier_hosts.join(", ")) %></p>
+    <% end %>
 
     <label for="passport_granularity"><%= t("passports.envelope.granularity") %></label>
     <%= f.select :granularity,
