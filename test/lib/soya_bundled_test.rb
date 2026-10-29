@@ -90,4 +90,50 @@ class SoyaBundledTest < ActiveSupport::TestCase
     assert_nil Soya::Bundled.fetch("SomethingElse")
     assert_not Soya::Bundled.include?("SomethingElse")
   end
+  # `rake soya:bundle`. The finding behind the YAML check: a structure pushed
+  # with `soya init | soya push` carries no YAML in the repository, and every
+  # installation that fetched it again showed a form that did not render.
+  test "refreshing the copies says when the repository serves no YAML for a structure" do
+    in_bundle_dir("DppLamp" => "meta:\n  name: DppLamp\n") do
+      served = { "DppLamp" => nil, "DppLampToEN" => nil }
+      problems = refresh_with(served)
+
+      assert_equal 1, problems.size
+      assert_match(/DppLamp: .*soya init-push/, problems.first)
+      assert Soya::Bundled.dir.join("DppLamp.jsonld").exist?, "the JSON-LD is still refreshed"
+    end
+  end
+
+  test "refreshing the copies says when the repository serves another YAML" do
+    in_bundle_dir("DppLamp" => "meta:\n  name: DppLamp\n") do
+      problems = refresh_with("DppLamp" => "meta:\n  name: Other\n", "DppLampToEN" => nil)
+
+      assert_equal [ "DppLamp: the repository serves a different YAML than soya/DppLamp.yaml" ], problems
+    end
+  end
+
+  test "refreshing the copies is quiet when the repository serves the same YAML" do
+    in_bundle_dir("DppLamp" => "meta:\n  name: DppLamp\n") do
+      assert_empty refresh_with("DppLamp" => "meta:\r\n  name: DppLamp\r\n\n", "DppLampToEN" => nil)
+    end
+  end
+
+  private
+
+  def in_bundle_dir(yamls)
+    Dir.mktmpdir do |tmp|
+      yamls.each { |name, text| File.write(File.join(tmp, "#{name}.yaml"), text) }
+      manifest = [ { "structure" => "DppLamp", "transformation" => "DppLampToEN", "repo" => "https://soya.example" } ]
+      stubbing(Soya::Bundled, :dir, ->(*) { Pathname.new(tmp) }) do
+        stubbing(Soya::Bundled, :manifest, ->(*) { manifest }) { yield }
+      end
+    end
+  end
+
+  def refresh_with(served)
+    fetch = ->(_repo, name) {
+      Soya::Repository::Structure.new(name: name, jsonld: '{"@graph":[]}', yaml: served.fetch(name), dri: nil)
+    }
+    stubbing(Soya::Repository, :fetch, fetch) { Soya::Bundled.refresh!(out: StringIO.new) }
+  end
 end

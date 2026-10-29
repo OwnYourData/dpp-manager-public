@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.14
+
+- **The form says what is wrong in words.** The checks of the passport form
+  used to show the messages of the validator underneath, with internal field
+  names in them. They are now short sentences in the language of the page:
+  required, needed as soon as the field it belongs to is filled in, an address
+  that starts with https://, at most so many characters, and the like. A
+  message the DPP Manager does not recognise is still shown as it comes.
+- The warning about an identifier on a host the DPP Service does not answer on
+  no longer says that only pointing that host at the service helps. Whether
+  scanning leads to the passport depends on who answers on that host: a host
+  of your own that points at the service, or a custodian that passes
+  identifiers it does not know on to the service.
+- **No product type without its YAML.** The form is built from the YAML of a
+  structure. When *Fetch again* gets a structure from the repository without
+  it, the DPP Manager takes the YAML it ships with if the structure is the
+  same, and otherwise refuses the fetch with a message saying so; the product
+  type keeps the version it had.
+
 ## 0.1.13
 
 - **A passport without a custodian starts on a host that leads to it.** The

@@ -18,7 +18,7 @@ module Soya
     module_function
 
     def refresh(product_type)
-      structure = fetch_structure(product_type.repo_base_url, product_type.structure_name)
+      structure = with_yaml(fetch_structure(product_type.repo_base_url, product_type.structure_name))
 
       product_type.update!(
         jsonld:      structure.jsonld,
@@ -65,6 +65,42 @@ module Soya
       Repository.fetch(base, name)
     rescue Error => e
       Bundled.fetch(name) || raise(e)
+    end
+
+    # The author's YAML, which the form cannot do without.
+    #
+    # soya-form builds the form from the YAML (it holds the form overlay) and
+    # stops with "Failed to fetch SOyA YAML" when there is none; it falls back
+    # to the generated form only for a YAML without a form overlay. A structure
+    # pushed as JSON-LD alone is therefore a type whose form never renders.
+    #
+    # When the image carries the same structure, its YAML is taken: the same
+    # structure, so the same form. "The same" is the graph, not the bytes,
+    # because the repository and `rake soya:bundle` may order the nodes
+    # differently. Otherwise the refresh fails with a message that says so,
+    # before anything is stored, and the copy that worked stays.
+    def with_yaml(structure)
+      return structure if structure.yaml.present?
+
+      bundled = Bundled.fetch(structure.name)
+      if bundled&.yaml.present? && same_graph?(bundled.jsonld, structure.jsonld)
+        return Repository::Structure.new(name: structure.name, jsonld: structure.jsonld,
+                                         yaml: bundled.yaml, dri: structure.dri)
+      end
+
+      raise Error, I18n.t("product_types.yaml_missing", name: structure.name)
+    end
+
+    def same_graph?(one, other)
+      canonical(JSON.parse(one)) == canonical(JSON.parse(other))
+    rescue JSON::ParserError
+      false
+    end
+
+    def canonical(document)
+      return document unless document.is_a?(Hash) && document["@graph"].is_a?(Array)
+
+      document.merge("@graph" => document["@graph"].sort_by { |node| [ node.is_a?(Hash) ? node["@id"].to_s : "", JSON.generate(node) ] })
     end
 
     # The transformation, if this type names one.

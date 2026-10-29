@@ -68,5 +68,45 @@ module Soya
       path = dir.join(filename)
       path.exist? ? path.read : nil
     end
+
+    # What `rake soya:bundle` does: the JSON-LD of every bundled structure,
+    # fetched from its repository and written beside the YAML. Returns the
+    # problems found, an empty list when there are none.
+    #
+    # It also checks that the repository serves each structure's YAML, and the
+    # same YAML as the file beside it. A structure pushed with
+    # `soya init | soya push` has JSON-LD only, and an installation that
+    # fetches it again gets a form that does not render; `soya init-push`
+    # stores the YAML as well. Transformations have no form and are not
+    # checked for one.
+    def refresh!(out: $stdout)
+      manifest.flat_map do |entry|
+        repo = entry["repo"].to_s
+
+        [ entry["structure"], entry["transformation"], entry["reverse_transformation"] ].compact.filter_map do |name|
+          structure = Repository.fetch(repo, name)
+          path = dir.join("#{name}.jsonld")
+          path.write("#{JSON.pretty_generate(JSON.parse(structure.jsonld))}\n")
+          out.puts "#{name}: #{path.size} bytes from #{repo}"
+
+          yaml_problem(name, structure.yaml) if name == entry["structure"]
+        rescue Error => e
+          "#{name}: #{e.message}"
+        end
+      end
+    end
+
+    def yaml_problem(name, served)
+      if served.blank?
+        return "#{name}: the repository serves no YAML; push it again with `soya init-push`"
+      end
+
+      local = read_optional("#{name}.yaml")
+      return nil if local.nil? || normalize(local) == normalize(served)
+
+      "#{name}: the repository serves a different YAML than soya/#{name}.yaml"
+    end
+
+    def normalize(text) = text.gsub(/\r\n?/, "\n").rstrip
   end
 end

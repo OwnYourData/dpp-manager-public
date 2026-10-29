@@ -26,7 +26,8 @@
         soya_form_empty_label_value: t("passports.form.nothing_entered"),
         soya_form_filled_label_value: t("passports.form.fields_entered"),
         soya_form_loaded_label_value: t("passports.form.load_json_loaded"),
-        soya_form_load_failed_label_value: t("passports.form.load_json_failed")
+        soya_form_load_failed_label_value: t("passports.form.load_json_failed"),
+        soya_form_messages_value: t("passports.form.errors").to_json
       } do |f| %>
 
   <% if passport.errors.any? %>

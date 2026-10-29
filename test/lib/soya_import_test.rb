@@ -169,6 +169,68 @@ class SoyaImportTest < ActiveSupport::TestCase
     end
   end
 
+  # The finding behind this: a structure pushed with `soya init | soya push`
+  # has no YAML in the repository, and soya-form shows no form without one.
+  test "a structure without YAML is not stored, and the copy that worked stays" do
+    with_open_vault do
+      type = create
+      with_repository_and_web_cli { Soya::Import.refresh(type) }
+
+      bare = STRUCTURE.dup.tap { |structure| structure.yaml = nil; structure.dri = "zLampBare" }
+      stubbing(Soya::Repository, :fetch, ->(*) { bare }) do
+        stubbing(Soya::WebCli, :form, ->(*, **) { flunk "no form may be generated for a structure without YAML" }) do
+          result = Soya::Import.refresh(type)
+          assert_not result.ok?
+          assert_match "soya init-push", result.error
+        end
+      end
+
+      type.reload
+      assert_equal STRUCTURE.yaml, type.yaml
+      assert_equal "zLamp", type.dri
+      assert type.forms_by_language.any?
+    end
+  end
+
+  test "the YAML in the image stands in when the repository has the same graph without it" do
+    with_open_vault do
+      type = create
+      graph = [ { "@id" => "a", "x" => 1 }, { "@id" => "b", "x" => 2 } ]
+      remote  = Soya::Repository::Structure.new(name: "Lamp", jsonld: JSON.generate("@graph" => graph), yaml: nil, dri: "zLamp2")
+      bundled = Soya::Repository::Structure.new(name: "Lamp", jsonld: JSON.generate("@graph" => graph.reverse),
+                                                yaml: "meta:\n  name: Lamp\nform: bundled\n", dri: nil)
+
+      stubbing(Soya::Repository, :fetch, ->(*) { remote }) do
+        stubbing(Soya::Bundled, :fetch, ->(_name) { bundled }) do
+          stubbing(Soya::WebCli, :form, ->(*, **) { FORM }) do
+            assert Soya::Import.refresh(type).ok?
+          end
+        end
+      end
+
+      type.reload
+      assert_includes type.yaml, "form: bundled"
+      assert_equal "zLamp2", type.dri
+    end
+  end
+
+  test "the YAML in the image is not taken for a structure that differs from it" do
+    with_open_vault do
+      type = create
+      remote  = Soya::Repository::Structure.new(name: "Lamp", jsonld: '{"@graph":[{"@id":"a","x":1}]}', yaml: nil, dri: "zLamp2")
+      bundled = Soya::Repository::Structure.new(name: "Lamp", jsonld: '{"@graph":[{"@id":"a","x":2}]}',
+                                                yaml: "meta:\n  name: Lamp\n", dri: nil)
+
+      stubbing(Soya::Repository, :fetch, ->(*) { remote }) do
+        stubbing(Soya::Bundled, :fetch, ->(_name) { bundled }) do
+          assert_not Soya::Import.refresh(type).ok?
+        end
+      end
+
+      assert_not type.reload.fetched?
+    end
+  end
+
   private
 
   def with_repository_and_web_cli

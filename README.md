@@ -220,10 +220,22 @@ encrypted file. The `Gemfile` pins `force_ruby_platform` for the same reason.
 `test/lib/library_test.rb` checks all of this and fails loudly if the library
 underneath is not SQLCipher 4.
 
-After pushing a changed structure to the repository, refresh the copies the
-image carries:
+A changed structure goes to the repository with `soya init-push`, which stores
+the YAML next to the JSON-LD:
+
+    cat soya/DppLedLamp.yaml | soya init-push
+
+Not `soya init | soya push`: that stores the JSON-LD only, and the form is
+built from the YAML. A product type fetched again from a structure without
+YAML is refused, and the type keeps the version it had.
+
+Then refresh the copies the image carries:
 
     bin/rails soya:bundle
+
+It writes the JSON-LD of every bundled structure into `soya/` and stops with a
+message when the repository serves no YAML for a structure, or another YAML
+than the one beside it.
 
 Run the tests:
 

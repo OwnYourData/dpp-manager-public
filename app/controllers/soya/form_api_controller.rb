@@ -27,9 +27,11 @@ module Soya
 
     # GET /api/repo/:name/yaml
     #
-    # The SPA prefers the author's YAML, because that is where a form overlay
-    # lives, and falls back to the generated form when it is not there. A 404 is
-    # therefore an ordinary answer and not a failure.
+    # The SPA builds the form from the author's YAML, because that is where a
+    # form overlay lives; it falls back to the generated form only for a YAML
+    # without one. Without any YAML it shows no form at all, which is why
+    # Import does not store a type whose YAML is missing. A 404 here means the
+    # type has not been fetched.
     def yaml
       type = ProductType.resolve(params[:name])
       return head :not_found if type.nil? || type.yaml.blank?

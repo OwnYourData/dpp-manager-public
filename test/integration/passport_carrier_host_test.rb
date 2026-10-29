@@ -109,6 +109,7 @@ class PassportCarrierHostTest < ActionDispatch::IntegrationTest
                                    unique_product_identifier: "https://p.lumina.example/01/09520123456788/21/0001")
       get edit_passport_path(elsewhere)
       assert_select "p.warning-inline", text: /p\.lumina\.example/
+      assert_select "p.warning-inline", text: /depends on who answers at p\.lumina\.example: .*custodian that passes identifiers/
 
       served = Passport.create!(product_type: type, label: "Served", granularity: "item",
                                 unique_product_identifier: "https://ID.example.org/01/09520123456788/21/0002")
@@ -147,7 +148,7 @@ class PassportCarrierHostTest < ActionDispatch::IntegrationTest
                                   unique_product_identifier: "https://p.lumina.example/01/09520123456788/21/0001")
 
       get edit_passport_path(passport)
-      assert_select "p.warning-inline", text: /kommt nicht zu diesem Pass/
+      assert_select "p.warning-inline", text: /entscheidet, wer unter p\.lumina\.example antwortet/
     end
   end
 

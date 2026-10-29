@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { readable } from "controllers/form_messages"
 
 // The bridge between the form and the page around it.
 //
@@ -17,7 +18,8 @@ export default class extends Controller {
     emptyLabel: String,
     filledLabel: String,
     loadedLabel: String,
-    loadFailedLabel: String
+    loadFailedLabel: String,
+    messages: Object
   }
 
   connect() {
@@ -32,15 +34,55 @@ export default class extends Controller {
     this.lastHeight = 0
     this.timer = setInterval(this.fit, 400)
     this.frameTarget.addEventListener("load", this.fit)
+
+    // The messages of the form's checks, made readable as soon as they appear
+    // (form_messages.js). The frame's document is replaced whenever the frame
+    // loads again, so the watch starts again with it.
+    this.watchMessages = this.watchMessages.bind(this)
+    this.frameTarget.addEventListener("load", this.watchMessages)
+    this.watchMessages()
   }
 
   disconnect() {
     window.removeEventListener("message", this.onMessage)
     this.frameTarget.removeEventListener("load", this.fit)
+    this.frameTarget.removeEventListener("load", this.watchMessages)
+    this.observer?.disconnect()
     clearInterval(this.timer)
   }
 
+  watchMessages() {
+    this.observer?.disconnect()
+    const body = this.frameTarget.contentDocument?.body
+    if (!body) return
+
+    this.observer = new MutationObserver(() => this.rewriteMessages())
+    this.observer.observe(body, { childList: true, subtree: true, characterData: true })
+    this.rewriteMessages()
+  }
+
+  // The text node is changed in place, never replaced: React keeps a reference
+  // to it and writes the next message into that same node, which this observer
+  // then sees and rewrites again. A rewritten message is left as it is, since
+  // it no longer matches anything.
+  rewriteMessages() {
+    const doc = this.frameTarget.contentDocument
+    if (!doc || !this.hasMessagesValue) return
+
+    doc.querySelectorAll(".Mui-error").forEach((element) => {
+      const walker = doc.createTreeWalker(element, NodeFilter.SHOW_TEXT)
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const text = readable(node.nodeValue, this.messagesValue)
+        if (text !== node.nodeValue) node.nodeValue = text
+      }
+    })
+  }
+
   fit() {
+    // A form that was already in the frame before this controller connected
+    // has no load event left to fire; the first measurement starts the watch.
+    if (!this.observer && this.frameTarget.contentDocument?.body) this.watchMessages()
+
     // The body, not documentElement: the root element of a document is never
     // shorter than the viewport it is in, so measuring it means the frame can
     // only ever grow — it would keep whatever height it happened to start with
