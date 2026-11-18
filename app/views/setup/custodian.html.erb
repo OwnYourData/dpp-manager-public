@@ -18,8 +18,13 @@
   <p class="hint"><%= t("setup.custodian.controller_hint", did: Identity.current&.did) %></p>
 </section>
 
+<%# An installation can be told not to name a custodian (DPP_KNOWN_CUSTODIAN=off),
+    for instance a test instance whose service keeps the passports itself. Then
+    there is only the field. %>
 <% known = Setting::KNOWN_CUSTODIAN %>
-<% chose_known = settings.custodian_base_url.blank? || Setting.known_custodian?(settings.custodian_base_url) %>
+<% offer_known = Deployment.known_custodian_offered? %>
+<% chose_known = offer_known &&
+                 (settings.custodian_base_url.blank? || Setting.known_custodian?(settings.custodian_base_url)) %>
 
 <%= form_with url: setup_custodian_path, method: :post, local: true do %>
   <fieldset class="choice">
@@ -28,18 +33,22 @@
     <%# The address of the named one is not in a field: it comes from the
         application when this option is chosen. A field would invite a typo into
         something that is frozen into every identifier minted afterwards. %>
-    <label class="confirm">
-      <%= radio_button_tag :custodian_choice, "known", chose_known %>
-      <span>
-        <strong><%= known[:name] %></strong> · <code><%= known[:base_url] %></code>
-        <br><span class="hint"><%= t("setup.custodian.known_hint") %></span>
-      </span>
-    </label>
+    <% if offer_known %>
+      <label class="confirm">
+        <%= radio_button_tag :custodian_choice, "known", chose_known %>
+        <span>
+          <strong><%= known[:name] %></strong> · <code><%= known[:base_url] %></code>
+          <br><span class="hint"><%= t("setup.custodian.known_hint") %></span>
+        </span>
+      </label>
 
-    <label class="confirm">
-      <%= radio_button_tag :custodian_choice, "other", !chose_known %>
-      <span><%= t("setup.custodian.other") %></span>
-    </label>
+      <label class="confirm">
+        <%= radio_button_tag :custodian_choice, "other", !chose_known %>
+        <span><%= t("setup.custodian.other") %></span>
+      </label>
+    <% else %>
+      <%= hidden_field_tag :custodian_choice, "other" %>
+    <% end %>
 
     <label for="custodian_base_url"><%= t("setup.custodian.base_url") %></label>
     <%= text_field_tag :custodian_base_url,

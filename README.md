@@ -11,7 +11,10 @@ operator's own computer and keeps everything in one encrypted file in a
 directory they choose.
 
 It is a pure client. It calls the OwnYourData DPP Service over its HTTP API and
-changes nothing about that service.
+changes nothing about that service. The two belong together: the
+[DPP Service](https://github.com/OwnYourData/dpp-service-public) implements the
+passport API of EN 18222:2026, and the DPP Manager is its client for economic
+operators.
 
 ## What this version does
 
@@ -254,6 +257,13 @@ Run the application against a directory of your choosing:
 | `PORT` | `3000` | the port the server listens on |
 | `BIND` | `0.0.0.0` | the interface it binds to |
 | `SECRET_KEY_BASE` | generated at boot | only affects session cookies, never the vault |
+| `DPP_SERVICE_URL` | the public DPP Service | the service the setup suggests and the bar links to until one is set up |
+| `DPP_NOINDEX` | off | `true`: robots meta element on every page, `X-Robots-Tag` on every response |
+| `DPP_KNOWN_CUSTODIAN` | on | `off`: the setup offers no named custodian, only the address field |
+| `DPP_SECURE_COOKIES` | off | `true`: the session cookie is sent over HTTPS only |
+
+For running it on a server rather than on one's own computer, see
+[docs/Install.md](docs/Install.md), section 8.
 
 ## Where things are
 

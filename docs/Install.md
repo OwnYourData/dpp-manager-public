@@ -250,6 +250,36 @@ will offer to create a new one.
 
 ---
 
+## 8 — On a server instead of your own computer
+
+The DPP Manager is made for one person on their own computer. It can run on a
+server — for a shared test, for instance — but then three things are yours to
+take care of:
+
+- **Its own lock in front of it.** The application has no user accounts. Put
+  it behind a password at the reverse proxy, a VPN or something of that kind,
+  and serve it over HTTPS only.
+- **The open data file belongs to one browser.** While the file is open, the
+  key is held in the memory of the server process, and it can be used only from
+  the browser session that opened it. Another browser that reaches the page
+  sees the file as locked and is told that it is open elsewhere; typing the
+  passphrase there moves it to that browser, and the first one is locked out
+  and told so. Locking, the idle limit and a restart close it as usual.
+- **Who knows the passphrase.** Everybody who should be able to work with the
+  data needs it, and only they should have it.
+
+These settings are for such an installation. Without them everything is as
+described above.
+
+| Variable | Effect |
+|---|---|
+| `DPP_SERVICE_URL` | The DPP Service the setup suggests, and the one the bar links to until one is set up. The footer keeps linking to the public tools. |
+| `DPP_NOINDEX=true` | Asks search engines not to index anything: a `robots` meta element on every page and an `X-Robots-Tag` header on every response. |
+| `DPP_KNOWN_CUSTODIAN=off` | The setup does not offer the named custodian; there is only the field for an address of your own. |
+| `DPP_SECURE_COOKIES=true` | The session cookie is sent over HTTPS only. The reverse proxy has to pass `X-Forwarded-Proto: https`, which common ones do; without it the application cannot set the cookie at all. |
+
+---
+
 ## What this does not need
 
 No account. No registration. No licence key. No connection to us. The DPP

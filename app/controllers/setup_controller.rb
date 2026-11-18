@@ -111,7 +111,9 @@ class SetupController < ApplicationController
     # somebody who picked it off the list did not type an address, and a typo in
     # a field they never looked at would be frozen into every identifier they
     # mint afterwards.
-    chosen = params[:custodian_choice] == "known" ? Setting::KNOWN_CUSTODIAN[:base_url] : params[:custodian_base_url]
+    # When the installation does not offer it, choosing it is not possible either.
+    known  = params[:custodian_choice] == "known" && Deployment.known_custodian_offered?
+    chosen = known ? Setting::KNOWN_CUSTODIAN[:base_url] : params[:custodian_base_url]
     base = DppService::Directory.normalize_base(chosen)
     collection = params[:custodian_collection_id].to_s.strip
 

@@ -66,6 +66,7 @@ en:
       purpose: "Everything this application knows is kept in one encrypted file. The passphrase is what turns that file back into readable data; without it nothing on this page works."
       no_recovery: "There is no way to recover the passphrase. Not by us, not by anyone. If it is lost, the data in the file is lost with it."
       interrupted: "What you sent last was not carried out. Once the file is open, you are taken back to that page, with what you had typed — except passphrases and keys."
+      held_elsewhere: "The data file is open in another browser session. Entering the passphrase here moves it to this one; the other session is locked."
     new:
       lead: "No data file was found. Choose a passphrase and one will be created."
       warning_title: "Choose it carefully."
@@ -87,6 +88,7 @@ en:
     locked_after_idle: "Locked because the application sat unused."
     locked_after_idle_action: "Locked because the application sat unused. What you sent was not carried out."
     action_not_done: "The data file is locked, so what you sent was not carried out."
+    taken_over: "The data file was opened in another browser session, so it is locked here."
     action_not_done_after_unlock: "The data file is open again. What you sent before the lock was not carried out: nothing of it was saved or sent anywhere. Check the form and send it again — passphrases and keys have to be typed in again."
     wrong_passphrase: "That passphrase does not open this file."
     wrong_current_passphrase: "The current passphrase is not correct."

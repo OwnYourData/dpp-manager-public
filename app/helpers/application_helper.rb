@@ -17,7 +17,7 @@ module ApplicationHelper
   # one set up, and until there is one the one setup suggests. While the vault
   # is closed nothing set up can be read, so it is the suggestion then too.
   def dpp_service_url
-    (settings.service_base_url.presence if vault_open?) || Setting::DEFAULT_SERVICE_BASE_URL
+    (settings.service_base_url.presence if vault_open?) || Setting.suggested_service_base_url
   end
 
   # The funding notice for the footer, in the wording of config/funding.yml.

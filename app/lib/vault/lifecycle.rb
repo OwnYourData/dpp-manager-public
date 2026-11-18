@@ -61,6 +61,41 @@ module Vault
       false
     end
 
+    # Another session has the vault open, and this one types the passphrase.
+    # Opening the file again is not how this is checked: a wrong passphrase on
+    # that path closes the vault, so one mistyped attempt in a second browser
+    # would lock out the first. Instead the passphrase is derived with the salt
+    # and profile of the key that is held and compared with it; the connection
+    # is not touched either way.
+    #
+    # Deriving and the delay after a wrong passphrase happen outside the
+    # holder's lock, so wrong guesses from elsewhere do not slow the holder
+    # down. Returns the token for the session that now holds the vault, or nil.
+    def take_over!(passphrase)
+      salt, profile = Session.derivation_inputs
+      raise NotOpenError, "vault is not open" if salt.nil?
+
+      candidate = Kdf.derive(passphrase, salt, profile: profile)
+      token = Session.bind_if_key!(candidate)
+
+      if token.nil?
+        register_failure
+        sleep FAILURE_DELAY
+        return nil
+      end
+
+      if failures_since_last_unlock.positive?
+        Event.record!(:vault_open_failed, attempts: failures_since_last_unlock)
+      end
+      clear_failures!
+
+      Event.record!(:vault_opened, kdf_profile: profile, taken_over: true)
+      token
+    ensure
+      candidate&.replace("\0" * candidate.bytesize) rescue nil
+      salt&.replace("\0" * salt.bytesize) rescue nil
+    end
+
     # `detail` says what else belongs on the record: an action that arrived
     # after the vault should have closed, and so was not carried out.
     def lock!(reason: "manual", **detail)

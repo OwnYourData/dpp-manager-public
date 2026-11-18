@@ -62,6 +62,7 @@ de:
       purpose: "Alles, was diese Anwendung weiß, liegt in einer verschlüsselten Datei. Das Passwort macht diese Datei wieder lesbar; ohne es funktioniert auf dieser Seite nichts."
       no_recovery: "Es gibt keinen Weg, das Passwort wiederherzustellen. Nicht durch uns, nicht durch jemand anderen. Ist es verloren, sind die Daten in der Datei mit verloren."
       interrupted: "Was Sie zuletzt abgeschickt haben, wurde nicht ausgeführt. Sobald die Datei offen ist, kommen Sie auf diese Seite zurück, mit dem, was Sie eingegeben hatten — außer Passwörtern und Schlüsseln."
+      held_elsewhere: "Die Datendatei ist in einer anderen Browser-Sitzung geöffnet. Wenn Sie hier das Passwort eingeben, wechselt sie in diese Sitzung; die andere wird gesperrt."
     new:
       lead: "Es wurde keine Datendatei gefunden. Wählen Sie ein Passwort, dann wird eine angelegt."
       warning_title: "Wählen Sie es mit Bedacht."
@@ -83,6 +84,7 @@ de:
     locked_after_idle: "Gesperrt, weil die Anwendung unbenutzt dastand."
     locked_after_idle_action: "Gesperrt, weil die Anwendung unbenutzt dastand. Was Sie abgeschickt haben, wurde nicht ausgeführt."
     action_not_done: "Die Datendatei ist gesperrt, deshalb wurde nicht ausgeführt, was Sie abgeschickt haben."
+    taken_over: "Die Datendatei wurde in einer anderen Browser-Sitzung geöffnet und ist deshalb hier gesperrt."
     action_not_done_after_unlock: "Die Datendatei ist wieder offen. Was Sie vor der Sperre abgeschickt haben, wurde nicht ausgeführt: Nichts davon wurde gespeichert oder irgendwohin geschickt. Prüfen Sie das Formular und schicken Sie es noch einmal ab — Passwörter und Schlüssel müssen Sie neu eingeben."
     wrong_passphrase: "Mit diesem Passwort lässt sich die Datei nicht öffnen."
     wrong_current_passphrase: "Das bisherige Passwort ist nicht richtig."

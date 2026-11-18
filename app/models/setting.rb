@@ -22,6 +22,11 @@ class Setting < ApplicationRecord
   # carries the Knowledge Base, the DPP Linter and the Validator.
   DEFAULT_SERVICE_BASE_URL = "https://dpp-service.ownyourdata.eu".freeze
 
+  # What the setup suggests and the bar links to: the operator's choice
+  # (DPP_SERVICE_URL) where there is one, the public service otherwise. The
+  # footer keeps pointing at the public service, which is where the tools are.
+  def self.suggested_service_base_url = Deployment.service_url || DEFAULT_SERVICE_BASE_URL
+
   validates :locale, inclusion: { in: LOCALES }
   validates :idle_timeout_minutes, numericality: { greater_than_or_equal_to: 1, less_than_or_equal_to: 480 }
 

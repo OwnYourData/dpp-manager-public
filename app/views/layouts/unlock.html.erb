@@ -3,6 +3,7 @@
   <head>
     <title><%= t("app.name") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <% if Deployment.noindex? %><meta name="robots" content="noindex, nofollow"><% end %>
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>

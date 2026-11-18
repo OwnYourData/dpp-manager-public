@@ -608,6 +608,38 @@ the vault's one connection is the vault: it closed after five minutes whatever
 the setting said, with no log entry and no message. The pool's idle timeout is
 off; the setting decides.
 
+## An open file belongs to the session that opened it
+
+The key that opens the data file lives in the application's memory while the
+file is open. On a person's own computer that is the whole story: one person,
+one browser. Once the application is reachable by more than one browser — on a
+server, behind a reverse proxy — an open file would otherwise be open for every
+browser that reaches it, and whatever protects the address would be the only
+lock left.
+
+So opening the file binds it to the browser session that opened it. That
+session receives a random token in its session cookie; the application keeps
+only a digest of it, next to the key. A request whose token does not match sees
+the file as locked, even while it is open. It is told that the file is open
+elsewhere, and typing the passphrase there takes the file over: the first
+session is locked out from its next request on, and is told why. There is one
+holder at a time; there is no second, parallel session.
+
+Checking the passphrase for a takeover does not reopen the file. A wrong
+passphrase on that path would close it, and one mistyped attempt in a second
+browser would lock out the person working in the first. The passphrase is
+derived and compared with the key that is held instead, outside the lock that
+guards the key, so a run of wrong guesses from elsewhere does not slow the
+holder down.
+
+Only the holder can lock the file. The idle limit is the holder's too — only
+its requests count as activity — but the clock is kept beside the key rather
+than in the holder's cookie, and any request from any session checks it. A
+holder who walks away does not leave the key in memory until they come back.
+
+On one computer with one browser nothing changes. Tabs share the cookie; a
+second browser on the same machine has to unlock, and takes the file over.
+
 ## Times are shown in UTC, and say so
 
 Every time on screen carries its zone, and the zone is UTC. The event log, the

@@ -17,6 +17,10 @@
 <% if @vault_exists %>
   <p class="lead"><%= t("unlock.existing.lead") %></p>
 
+  <% if vault_held_elsewhere? %>
+    <p class="hint"><%= t("unlock.existing.held_elsewhere") %></p>
+  <% end %>
+
   <% if @interrupted %>
     <p class="hint"><%= t("unlock.existing.interrupted") %></p>
   <% end %>

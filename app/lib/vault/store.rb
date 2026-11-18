@@ -169,8 +169,17 @@ module Vault
 
         # Everything is on disk before anything is replaced.
         File.open(temp, "rb") { |f| f.fsync }
-        close!
-        FileUtils.mv(temp.to_s, path.to_s)
+
+        # Only the connection goes, not the session: the vault stays bound to
+        # the session that is changing its passphrase. If the file cannot be
+        # moved, the vault is closed outright, as it would be after any lock.
+        ActiveRecord::Base.remove_connection rescue nil
+        begin
+          FileUtils.mv(temp.to_s, path.to_s)
+        rescue StandardError
+          close!
+          raise
+        end
 
         Session.store(key: new_key, salt: new_salt, profile: Kdf::CURRENT_PROFILE)
         connect!

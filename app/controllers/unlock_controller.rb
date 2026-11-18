@@ -3,6 +3,11 @@ class UnlockController < ApplicationController
   skip_before_action :require_open_vault
   skip_before_action :enforce_idle_timeout
 
+  # The idle limit is checked here too, but without the redirect: whoever is on
+  # this page is about to unlock, and should not be offered to take over a vault
+  # whose holder has long gone.
+  before_action :close_vault_left_idle
+
   layout "unlock"
 
   def show
@@ -18,6 +23,8 @@ class UnlockController < ApplicationController
   def create
     if vault_open?
       redirect_to root_path
+    elsif Vault::Store.open?
+      take_over
     elsif (problem = Vault::Store.storage_problem)
       storage_unusable(problem)
     elsif Vault::Store.exists?
@@ -34,10 +41,14 @@ class UnlockController < ApplicationController
 
   # Locking on purpose forgets where unlocking would have led: whoever opens the
   # file next starts at the overview, not on the page somebody else left.
+  #
+  # Only the session that holds the vault can lock it. Any other session that
+  # asks to lock only gives up its own cookie; the vault stays as it is.
   def destroy
-    Vault::Lifecycle.lock!(reason: "manual")
+    held = vault_open?
+    Vault::Lifecycle.lock!(reason: "manual") if held
     reset_session
-    redirect_to unlock_path, notice: t("vault.locked")
+    redirect_to unlock_path, notice: (t("vault.locked") if held)
   end
 
   private
@@ -48,11 +59,29 @@ class UnlockController < ApplicationController
       start_session
       resume_where_interrupted(resume)
     else
-      @vault_exists = true
-      @interrupted  = session.dig(:resume, "action").present?
-      flash.now[:alert] = t("vault.wrong_passphrase")
-      render :show, status: :unprocessable_entity
+      wrong_passphrase
     end
+  end
+
+  # The vault is open in another session. The right passphrase moves it here;
+  # a wrong one leaves it where it is, open and bound to that session.
+  def take_over
+    resume = session[:resume] || {}
+    token  = Vault::Lifecycle.take_over!(params[:passphrase].to_s)
+    return wrong_passphrase if token.nil?
+
+    start_session(token)
+    resume_where_interrupted(resume)
+  rescue Vault::NotOpenError
+    # Closed between the check and the attempt: then it is an ordinary unlock.
+    unlock
+  end
+
+  def wrong_passphrase
+    @vault_exists = true
+    @interrupted  = session.dig(:resume, "action").present?
+    flash.now[:alert] = t("vault.wrong_passphrase")
+    render :show, status: :unprocessable_entity
   end
 
   def create_vault
@@ -107,8 +136,10 @@ class UnlockController < ApplicationController
     redirect_to path
   end
 
-  def start_session
+  # A fresh session that holds the vault. +token+ is given when the vault was
+  # taken over, and minted here when it was just opened or created.
+  def start_session(token = Vault::Session.bind!)
     reset_session
-    session[:last_seen_at] = Time.current.iso8601
+    session[:vault_holder] = token
   end
 end

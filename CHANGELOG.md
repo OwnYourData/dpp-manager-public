@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.15
+
+- **An open data file belongs to the browser that opened it.** While the file
+  is open, only the browser session that unlocked it can use it. Another
+  browser sees it as locked and is told that it is open elsewhere; entering the
+  passphrase there moves it to that browser, and the first one is locked and
+  told so on its next click. A wrong passphrase there changes nothing for the
+  first browser. Only the browser that holds the file can lock it, and only its
+  clicks keep the file open; the idle limit is checked whoever asks. On one
+  computer with one browser nothing changes.
+- **Settings for an installation on a server.** `DPP_SERVICE_URL` sets the DPP
+  Service the setup suggests, `DPP_NOINDEX=true` asks search engines not to
+  index anything, `DPP_KNOWN_CUSTODIAN=off` leaves the named custodian out of
+  the setup, and `DPP_SECURE_COOKIES=true` sends the session cookie over HTTPS
+  only. Without them everything stays as it was; docs/Install.md, section 8.
+
 ## 0.1.14
 
 - **The form says what is wrong in words.** The checks of the passport form
